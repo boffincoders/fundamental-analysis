@@ -35,8 +35,12 @@ export const evaluate = {
     return { value, status: "Bad", insight: "High correlation to sales, could mean overvalued." };
   },
 
+  /**
+   * PEG — expects the output of peg(), i.e. P/E ÷ growth expressed in whole
+   * percent (P/E 30, 15 % growth → 2.0).
+   */
   peg: (value: number | null): EvaluatedMetric => {
-    if (value === null || value <= 0) return { value, status: "N/A", insight: "Cannot calculate PEG meaningfully." };
+    if (value === null || value <= 0) return { value, status: "N/A", insight: "PEG not meaningful (negative earnings or zero/negative expected growth)." };
     if (value < 1) return { value, status: "Good", insight: "Undervalued relative to expected growth." };
     if (value <= 1.5) return { value, status: "Neutral", insight: "Fairly valued relative to growth." };
     return { value, status: "Bad", insight: "Overvalued relative to growth expectations." };

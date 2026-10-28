@@ -125,8 +125,9 @@ export interface ValueScoreInput {
    */
   pbVsSector: number;
   /**
-   * PEG ratio (P/E ÷ Growth Rate). Lower is better; 1.0 = fair, < 1 = undervalued.
-   * Capped at 0 for negative PEG; capped at full score for PEG ≤ 0.5.
+   * PEG ratio as returned by peg(): P/E ÷ growth in whole percent
+   * (P/E 30, 15 % growth → 2.0). Lower is better; 1.0 = fair, < 1 = undervalued.
+   * PEG ≤ 0 scores 0; PEG ≤ 0.5 scores 100; PEG ≥ 2.0 scores 0.
    */
   peg: number;
   /**
@@ -151,7 +152,7 @@ export const computeValueScore = (input: ValueScoreInput): number => {
   // Cheaper than historical → ratio < 1 → higher score
   const peAvgScore = Math.min(Math.max((1 - peVs3yrAvg + 1) * 50, 0), 100); // maps 0→100, 1→50, 2→0
   const pbScore    = Math.min(Math.max((1 - pbVsSector + 1) * 50, 0), 100);
-  // PEG: ≤0.5 → 100, 1.0 → 50, ≥2.0 → 0
+  // PEG: ≤0.5 → 100, 1.0 → 66.7, 1.5 → 33.3, ≥2.0 → 0 (linear)
   const pegScore   = peg <= 0 ? 0 : Math.min(Math.max((2 - peg) / 1.5 * 100, 0), 100);
   // Lower percentile = better value: invert
   const histScore  = Math.max(0, 100 - historicalPePercentile);

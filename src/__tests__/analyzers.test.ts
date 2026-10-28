@@ -136,3 +136,20 @@ describe("analyzeBatch", () => {
     expect(results[1].valuation.pe).toBeCloseTo(5);
   });
 });
+
+describe("analyzeValuation PEG (growth as decimal)", () => {
+  it("P/E 30 with 15% expected growth → PEG 2.0, rated Bad", () => {
+    const raw = analyzeValuation({ price: 150, eps: 5, expectedEarningsGrowthRate: 0.15 });
+    expect(raw.peg).toBeCloseTo(2);
+    const ins = analyzeValuation({ price: 150, eps: 5, expectedEarningsGrowthRate: 0.15 }, true) as any;
+    expect(ins.peg.status).toBe("Bad");
+  });
+  it("P/E 15 with 20% growth → PEG 0.75, rated Good", () => {
+    const ins = analyzeValuation({ price: 75, eps: 5, expectedEarningsGrowthRate: 0.2 }, true) as any;
+    expect(ins.peg.value).toBeCloseTo(0.75);
+    expect(ins.peg.status).toBe("Good");
+  });
+  it("negative growth gives null PEG", () => {
+    expect(analyzeValuation({ price: 150, eps: 5, expectedEarningsGrowthRate: -0.05 }).peg).toBeNull();
+  });
+});

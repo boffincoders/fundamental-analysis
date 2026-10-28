@@ -31,8 +31,14 @@ describe("P/S Ratio", () => {
 });
 
 describe("PEG Ratio", () => {
-  it("calculates correctly", () => expect(pegFn(30, 0.15)).toBeCloseTo(200));
+  it("calculates correctly (growth as decimal: P/E 30, 15% growth → 2.0)", () => expect(pegFn(30, 0.15)).toBeCloseTo(2));
+  it("P/E 20 with 20% growth → 1.0 (fairly valued)", () => expect(pegFn(20, 0.2)).toBeCloseTo(1));
   it("returns null for zero growth rate", () => expect(pegFn(30, 0)).toBeNull());
+  it("returns null for negative growth (meaningless PEG)", () => expect(pegFn(30, -0.1)).toBeNull());
+  it("returns null for non-positive P/E (no earnings)", () => {
+    expect(pegFn(-12, 0.15)).toBeNull();
+    expect(pegFn(0, 0.15)).toBeNull();
+  });
 });
 
 describe("Enterprise Value & EV/EBITDA", () => {

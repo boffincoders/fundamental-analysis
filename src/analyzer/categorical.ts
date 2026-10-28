@@ -41,7 +41,8 @@ export function analyzeValuation(data: CompanySnapshotInput, withInsights = fals
     pe:              data.eps ? pe(price, data.eps) : null,
     pb:              data.bookValuePerShare ? pb(price, data.bookValuePerShare) : null,
     ps:              data.revenuePerShare ? ps(price, data.revenuePerShare) : null,
-    peg:             data.eps && data.expectedEarningsGrowthRate ? peg(pe(price, data.eps) ?? 0, data.expectedEarningsGrowthRate) : null,
+    // expectedEarningsGrowthRate is a decimal (0.15 = 15 %); peg() converts it to a percentage.
+    peg:             data.eps && data.expectedEarningsGrowthRate != null ? peg(pe(price, data.eps) ?? 0, data.expectedEarningsGrowthRate) : null,
     evEbitda:        data.ebitda ? evEbitda(ev, data.ebitda) : null,
     dividendYield:   data.annualDividendPerShare ? dividendYield(data.annualDividendPerShare, price) : null,
     grahamNumber:    data.eps && data.bookValuePerShare ? grahamNumber(data.eps, data.bookValuePerShare) : null,
