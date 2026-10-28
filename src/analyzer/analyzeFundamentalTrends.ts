@@ -55,16 +55,12 @@ export function analyzeFundamentalTrends(
   }
 
   // Calculate CAGR if annual
-  const periods = data.revenue.length - 1;
-  const revenueCagr =
-    periodType === "annual" && periods > 0
-      ? cagr(data.revenue[0], data.revenue[data.revenue.length - 1], periods)
+  const seriesCagr = (values: number[]) =>
+    periodType === "annual" && values.length > 1
+      ? cagr(values[0], values[values.length - 1], values.length - 1)
       : null;
-
-  const netIncomeCagr =
-    periodType === "annual" && periods > 0
-      ? cagr(data.netIncome[0], data.netIncome[data.netIncome.length - 1], periods)
-      : null;
+  const revenueCagr = seriesCagr(data.revenue);
+  const netIncomeCagr = seriesCagr(data.netIncome);
 
   return {
     periodType,

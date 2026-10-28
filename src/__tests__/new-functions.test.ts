@@ -102,8 +102,8 @@ describe("computeTTM", () => {
   it("sums all when exactly 4 values", () => {
     expect(computeTTM([10, 20, 30, 40])).toBe(100);
   });
-  it("sums all when fewer than 4 values", () => {
-    expect(computeTTM([15, 25])).toBe(40);
+  it("returns null when fewer than 4 quarters (not a twelve-month figure)", () => {
+    expect(computeTTM([15, 25])).toBeNull();
   });
   it("returns null for empty array", () => {
     expect(computeTTM([])).toBeNull();
@@ -175,6 +175,9 @@ describe("computeNYearSum", () => {
   });
   it("returns null for empty array", () => {
     expect(computeNYearSum([], 1)).toBeNull();
+  });
+  it("returns null when fewer than years × 4 quarters", () => {
+    expect(computeNYearSum([10, 20, 30, 40, 50], 2)).toBeNull();
   });
 });
 
@@ -315,6 +318,43 @@ describe("computeQualityScore", () => {
     });
     expect(score).toBeGreaterThanOrEqual(0);
     expect(score).toBeLessThanOrEqual(100);
+  });
+  it("unchanged result for full inputs: 5/9, 0.8, true, false, true → 16.67+16+20+0+15 = 67.67", () => {
+    const score = computeQualityScore({ piotroskiScore: 5, roeVsSector: 0.8, marginsImproving: true, pledgeFree: false, promoterStable: true });
+    expect(score).toBeCloseTo(67.6667, 3);
+  });
+  it("normalises Piotroski by maxScore: 3/3 counts as full marks (was 3/9)", () => {
+    const score = computeQualityScore({
+      piotroskiScore: 3, piotroskiMaxScore: 3, roeVsSector: 1, marginsImproving: true,
+      insiderPledgeFree: true, insiderHoldingStable: true,
+    });
+    expect(score).toBeCloseTo(100);
+  });
+  it("insider/promoter signals optional: remaining weights rescale to 0–100", () => {
+    // (100×0.30 + 100×0.20 + 100×0.20) / 0.70 = 100
+    expect(computeQualityScore({ piotroskiScore: 9, roeVsSector: 1, marginsImproving: true })).toBeCloseTo(100);
+    // (66.67×0.30 + 50×0.20 + 0×0.20) / 0.70 = (20 + 10) / 0.7 = 42.857
+    expect(computeQualityScore({ piotroskiScore: 6, roeVsSector: 0.5, marginsImproving: false })).toBeCloseTo(42.857, 2);
+    expect(computeQualityScore({ piotroskiScore: 0, roeVsSector: 0, marginsImproving: false })).toBeCloseTo(0);
+  });
+  it("generic field names take precedence over deprecated ones", () => {
+    const a = computeQualityScore({ piotroskiScore: 9, roeVsSector: 1, marginsImproving: true, insiderPledgeFree: false, pledgeFree: true });
+    // (30 + 20 + 20 + 0) / 0.85 = 82.35
+    expect(a).toBeCloseTo(82.353, 2);
+  });
+  it("negative ROE vs sector is clamped at 0 (score never negative)", () => {
+    expect(computeQualityScore({ piotroskiScore: 0, roeVsSector: -3, marginsImproving: false })).toBe(0);
+  });
+});
+
+describe("computeValueScore clamps", () => {
+  it("negative P/E or P/B ratio scores 0, not full points", () => {
+    const neg = computeValueScore({ peVs3yrAvg: -0.5, pbVsSector: -1, peg: 1, historicalPePercentile: 50 });
+    // 0 + 0 + 66.67×0.25 + 50×0.20 = 26.67
+    expect(neg).toBeCloseTo(26.667, 2);
+  });
+  it("percentile outside 0–100 cannot push the score past 100", () => {
+    expect(computeValueScore({ peVs3yrAvg: 0.1, pbVsSector: 0.1, peg: 0.5, historicalPePercentile: -20 })).toBeLessThanOrEqual(100);
   });
 });
 

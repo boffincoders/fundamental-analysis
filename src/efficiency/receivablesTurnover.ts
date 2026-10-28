@@ -20,11 +20,13 @@ export const receivablesTurnover = (
  * Formula: (Trade Receivables / Revenue) × 365  (= 365 / receivables turnover)
  * Lower is better — under 45 days is generally healthy.
  *
- * @param totalRevenue Total revenue
+ * @param totalRevenue Total revenue for the period
  * @param tradeReceivables Trade receivables
+ * @param daysInPeriod Days covered by totalRevenue: 365 for annual/TTM revenue (default), ~91 for one quarter
  * @returns DSO in days or null
  */
 export const daysSalesOutstanding = (
   totalRevenue: number,
-  tradeReceivables: number
-): number | null => safeDivide(tradeReceivables * 365, totalRevenue);
+  tradeReceivables: number,
+  daysInPeriod = 365
+): number | null => safeDivide(tradeReceivables * daysInPeriod, totalRevenue);

@@ -21,10 +21,11 @@ export const computeNYearAverage = (quarterlyValues: number[], years: number): n
 /**
  * N-Year Sum
  * Returns the sum of the last (years × 4) quarterly values.
- * If fewer values are available, sums all available values.
+ * Returns null when fewer than (years × 4) values are supplied, since a
+ * shorter sum would not cover N years.
  */
 export const computeNYearSum = (quarterlyValues: number[], years: number): number | null => {
-  if (!quarterlyValues || quarterlyValues.length === 0 || years <= 0) return null;
+  if (!quarterlyValues || years <= 0 || quarterlyValues.length < years * 4) return null;
   const window = quarterlyValues.slice(-(years * 4));
   return window.reduce((sum, v) => sum + v, 0);
 };

@@ -83,3 +83,87 @@ export interface CompanySnapshotInput {
   /** Standard deviation of returns for the same period — Sharpe */
   stdDev?: number;
 }
+
+import type { EvaluatedMetric } from "../evaluator/evaluate";
+import type { PiotroskiResult } from "../risk/piotroski";
+
+/** Same keys as a raw metrics object, each value evaluated to { value, status, insight }. */
+export type WithInsights<T> = { [K in keyof T]: EvaluatedMetric };
+
+export interface ValuationMetrics {
+  pe: number | null;
+  pb: number | null;
+  ps: number | null;
+  /** P/E ÷ growth in whole percent (P/E 30, 15 % growth → 2.0) */
+  peg: number | null;
+  evEbitda: number | null;
+  dividendYield: number | null;
+  grahamNumber: number | null;
+  priceToCashFlow: number | null;
+  earningsYield: number | null;
+  evRevenue: number | null;
+  evFcf: number | null;
+}
+
+export interface ProfitabilityMetrics {
+  roa: number | null;
+  roe: number | null;
+  roic: number | null;
+  grossMargin: number | null;
+  operatingMargin: number | null;
+  netProfitMargin: number | null;
+  fcfMargin: number | null;
+}
+
+export interface LiquidityMetrics {
+  currentRatio: number | null;
+  quickRatio: number | null;
+  debtToEquity: number | null;
+  interestCoverage: number | null;
+}
+
+export interface SolvencyMetrics {
+  /** Total debt − cash; negative = net cash */
+  netDebt: number | null;
+  /** max(cash − debt, 0) */
+  netCash: number | null;
+  /** null when EBITDA <= 0 */
+  netDebtToEbitda: number | null;
+  debtToAssets: number | null;
+  debtToEquity: number | null;
+  interestCoverage: number | null;
+}
+
+export interface EfficiencyMetrics {
+  assetTurnover: number | null;
+  inventoryTurnover: number | null;
+  receivablesTurnover: number | null;
+  daysSalesOutstanding: number | null;
+}
+
+export interface RiskMetrics {
+  /** Original Altman Z (public manufacturers) */
+  altmanZScore: number | null;
+  /** Altman Z'' (non-manufacturers / private firms) */
+  altmanZScoreDoublePrime: number | null;
+  sharpe: number | null;
+  piotroski: PiotroskiResult | null;
+}
+
+export interface QualityMetrics {
+  payoutRatio: number | null;
+  cashConversionRatio: number | null;
+  targetUpside: number | null;
+}
+
+export interface CompanyAnalysis {
+  valuation: ValuationMetrics;
+  profitability: ProfitabilityMetrics;
+  liquidity: LiquidityMetrics;
+  solvency: SolvencyMetrics;
+  efficiency: EfficiencyMetrics;
+  risk: RiskMetrics;
+  quality: QualityMetrics;
+}
+
+export type CompanyAnalysisWithInsights = { [K in keyof CompanyAnalysis]: WithInsights<CompanyAnalysis[K]> };

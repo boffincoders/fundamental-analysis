@@ -87,9 +87,9 @@ export const evaluate = {
   earningsYield: (value: number | null): EvaluatedMetric => {
     if (value === null || value <= 0) return { value, status: "N/A", insight: "Negative earnings or unavailable." };
     const pct = Math.round(value * 10000) / 100; // e.g. 0.0667 → 6.67%
-    if (value > 0.0667) return { value, status: "Good", insight: `Strong ${pct}% earnings yield — better than average bond rate.` };
-    if (value >= 0.04) return { value, status: "Neutral", insight: `Moderate ${pct}% earnings yield.` };
-    return { value, status: "Bad", insight: `Low ${pct}% earnings yield — stock may be expensive vs bonds.` };
+    if (value > 0.0667) return { value, status: "Good", insight: `Strong ${pct}% earnings yield (P/E below 15). Compare with current government bond yields.` };
+    if (value >= 0.04) return { value, status: "Neutral", insight: `Moderate ${pct}% earnings yield (P/E 15–25).` };
+    return { value, status: "Bad", insight: `Low ${pct}% earnings yield (P/E above 25) — may be expensive relative to bonds.` };
   },
 
   /**
@@ -164,10 +164,10 @@ export const evaluate = {
   },
 
   roic: (value: number | null): EvaluatedMetric => {
-    if (value === null) return { value, status: "N/A", insight: "Capital or NOPAT unavailable." };
-    if (value >= 0.10) return { value, status: "Good", insight: "Excellent capital allocator." };
-    if (value > 0.02) return { value, status: "Neutral", insight: "Average capital allocator." };
-    return { value, status: "Bad", insight: "Destroying shareholder wealth (returns less than typical WACC)." };
+    if (value === null) return { value, status: "N/A", insight: "NOPAT unavailable, or invested capital zero/negative (e.g. net cash exceeds debt + equity)." };
+    if (value >= 0.10) return { value, status: "Good", insight: "Strong return on capital — above a typical cost of capital (~8–10 %)." };
+    if (value > 0.05) return { value, status: "Neutral", insight: "Moderate return on capital — compare with the company's own cost of capital." };
+    return { value, status: "Bad", insight: "Low return on capital — likely below the cost of capital." };
   },
 
   margin: (value: number | null, name: string): EvaluatedMetric => {

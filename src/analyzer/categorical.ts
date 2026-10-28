@@ -1,4 +1,14 @@
-import { CompanySnapshotInput } from "./types";
+import {
+  CompanySnapshotInput,
+  WithInsights,
+  ValuationMetrics,
+  ProfitabilityMetrics,
+  LiquidityMetrics,
+  SolvencyMetrics,
+  EfficiencyMetrics,
+  RiskMetrics,
+  QualityMetrics,
+} from "./types";
 import { pe } from "../valuation/pe";
 import { pb } from "../valuation/pb";
 import { ps } from "../valuation/ps";
@@ -43,7 +53,10 @@ const isPositive = (v: number | undefined): v is number => v != null && v > 0;
 
 // ── Valuation ─────────────────────────────────────────────────────────────────
 
-export function analyzeValuation(data: CompanySnapshotInput, withInsights = false) {
+export function analyzeValuation(data: CompanySnapshotInput, withInsights?: false): ValuationMetrics;
+export function analyzeValuation(data: CompanySnapshotInput, withInsights: true): WithInsights<ValuationMetrics>;
+export function analyzeValuation(data: CompanySnapshotInput, withInsights?: boolean): ValuationMetrics | WithInsights<ValuationMetrics>;
+export function analyzeValuation(data: CompanySnapshotInput, withInsights = false): ValuationMetrics | WithInsights<ValuationMetrics> {
   const price      = isPositive(data.price) ? data.price : null;
   const marketCap  = isPositive(data.marketCap) ? data.marketCap : null;
   const ev         = marketCap !== null
@@ -85,7 +98,10 @@ export function analyzeValuation(data: CompanySnapshotInput, withInsights = fals
 
 // ── Profitability ─────────────────────────────────────────────────────────────
 
-export function analyzeProfitability(data: CompanySnapshotInput, withInsights = false) {
+export function analyzeProfitability(data: CompanySnapshotInput, withInsights?: false): ProfitabilityMetrics;
+export function analyzeProfitability(data: CompanySnapshotInput, withInsights: true): WithInsights<ProfitabilityMetrics>;
+export function analyzeProfitability(data: CompanySnapshotInput, withInsights?: boolean): ProfitabilityMetrics | WithInsights<ProfitabilityMetrics>;
+export function analyzeProfitability(data: CompanySnapshotInput, withInsights = false): ProfitabilityMetrics | WithInsights<ProfitabilityMetrics> {
   const revenue = data.totalRevenue;
 
   let gross: number | null = null;
@@ -121,7 +137,10 @@ export function analyzeProfitability(data: CompanySnapshotInput, withInsights = 
 
 // ── Liquidity ─────────────────────────────────────────────────────────────────
 
-export function analyzeLiquidity(data: CompanySnapshotInput, withInsights = false) {
+export function analyzeLiquidity(data: CompanySnapshotInput, withInsights?: false): LiquidityMetrics;
+export function analyzeLiquidity(data: CompanySnapshotInput, withInsights: true): WithInsights<LiquidityMetrics>;
+export function analyzeLiquidity(data: CompanySnapshotInput, withInsights?: boolean): LiquidityMetrics | WithInsights<LiquidityMetrics>;
+export function analyzeLiquidity(data: CompanySnapshotInput, withInsights = false): LiquidityMetrics | WithInsights<LiquidityMetrics> {
   // Current and quick ratios need CURRENT assets and liabilities. Total assets /
   // total liabilities are a different (solvency) measure and are not used here.
   const ca = data.currentAssets;
@@ -146,7 +165,10 @@ export function analyzeLiquidity(data: CompanySnapshotInput, withInsights = fals
 
 // ── Solvency ──────────────────────────────────────────────────────────────────
 
-export function analyzeSolvency(data: CompanySnapshotInput, withInsights = false) {
+export function analyzeSolvency(data: CompanySnapshotInput, withInsights?: false): SolvencyMetrics;
+export function analyzeSolvency(data: CompanySnapshotInput, withInsights: true): WithInsights<SolvencyMetrics>;
+export function analyzeSolvency(data: CompanySnapshotInput, withInsights?: boolean): SolvencyMetrics | WithInsights<SolvencyMetrics>;
+export function analyzeSolvency(data: CompanySnapshotInput, withInsights = false): SolvencyMetrics | WithInsights<SolvencyMetrics> {
   const hasDebtData = data.totalDebt != null || data.cashAndEquivalents != null;
   const td   = data.totalDebt ?? 0;
   const cash = data.cashAndEquivalents ?? 0;
@@ -175,7 +197,10 @@ export function analyzeSolvency(data: CompanySnapshotInput, withInsights = false
 
 // ── Efficiency ────────────────────────────────────────────────────────────────
 
-export function analyzeEfficiency(data: CompanySnapshotInput, withInsights = false) {
+export function analyzeEfficiency(data: CompanySnapshotInput, withInsights?: false): EfficiencyMetrics;
+export function analyzeEfficiency(data: CompanySnapshotInput, withInsights: true): WithInsights<EfficiencyMetrics>;
+export function analyzeEfficiency(data: CompanySnapshotInput, withInsights?: boolean): EfficiencyMetrics | WithInsights<EfficiencyMetrics>;
+export function analyzeEfficiency(data: CompanySnapshotInput, withInsights = false): EfficiencyMetrics | WithInsights<EfficiencyMetrics> {
   const raw = {
     assetTurnover:        data.totalRevenue != null && data.totalAssets ? assetTurnover(data.totalRevenue, data.totalAssets) : null,
     inventoryTurnover:    data.costOfRevenue != null && data.inventory ? inventoryTurnover(data.costOfRevenue, data.inventory) : null,
@@ -195,7 +220,10 @@ export function analyzeEfficiency(data: CompanySnapshotInput, withInsights = fal
 
 // ── Risk ──────────────────────────────────────────────────────────────────────
 
-export function analyzeRisk(data: CompanySnapshotInput, withInsights = false) {
+export function analyzeRisk(data: CompanySnapshotInput, withInsights?: false): RiskMetrics;
+export function analyzeRisk(data: CompanySnapshotInput, withInsights: true): WithInsights<RiskMetrics>;
+export function analyzeRisk(data: CompanySnapshotInput, withInsights?: boolean): RiskMetrics | WithInsights<RiskMetrics>;
+export function analyzeRisk(data: CompanySnapshotInput, withInsights = false): RiskMetrics | WithInsights<RiskMetrics> {
   const ca = data.currentAssets;
   const cl = data.currentLiabilities;
   const workingCapital = data.workingCapital ?? (ca != null && cl != null ? ca - cl : undefined);
@@ -264,13 +292,16 @@ export function analyzeRisk(data: CompanySnapshotInput, withInsights = false) {
     sharpe:                  evaluate.sharpe(raw.sharpe),
     piotroski:               raw.piotroski
       ? evaluate.piotroski(raw.piotroski.score, raw.piotroski.maxScore)
-      : evaluate.piotroski(0, 0),
+      : { value: null, status: "N/A", insight: "Insufficient data for Piotroski scoring (needs net income, total assets and operating cash flow)." } as EvaluatedMetric,
   };
 }
 
 // ── Quality ───────────────────────────────────────────────────────────────────
 
-export function analyzeQuality(data: CompanySnapshotInput, withInsights = false) {
+export function analyzeQuality(data: CompanySnapshotInput, withInsights?: false): QualityMetrics;
+export function analyzeQuality(data: CompanySnapshotInput, withInsights: true): WithInsights<QualityMetrics>;
+export function analyzeQuality(data: CompanySnapshotInput, withInsights?: boolean): QualityMetrics | WithInsights<QualityMetrics>;
+export function analyzeQuality(data: CompanySnapshotInput, withInsights = false): QualityMetrics | WithInsights<QualityMetrics> {
   const raw = {
     payoutRatio:         data.annualDividendPerShare != null && data.eps ? payoutRatio(data.annualDividendPerShare, data.eps) : null,
     cashConversionRatio: data.operatingCashFlow != null && data.netIncome ? cashConversionRatio(data.operatingCashFlow, data.netIncome) : null,

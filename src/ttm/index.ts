@@ -7,12 +7,14 @@
 
 /**
  * Trailing Twelve Months Sum
- * Returns the sum of the last 4 quarterly values (or fewer if < 4 available).
+ * Returns the sum of the last 4 quarterly values.
  * Expects values in chronological order: oldest first, most recent last.
  * e.g. [Q1, Q2, Q3, Q4, Q1_next, Q2_next] → sums last 4
+ * Returns null when fewer than 4 quarters are supplied (a shorter sum is not
+ * a twelve-month figure).
  */
 export const computeTTM = (quarterlyValues: number[]): number | null => {
-  if (!quarterlyValues || quarterlyValues.length === 0) return null;
+  if (!quarterlyValues || quarterlyValues.length < 4) return null;
   const last4 = quarterlyValues.slice(-4);
   return last4.reduce((sum, v) => sum + v, 0);
 };

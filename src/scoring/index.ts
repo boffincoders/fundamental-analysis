@@ -5,6 +5,10 @@
  * Each score is a weighted sum of normalised sub-signals (also 0-100 or boolean).
  *
  * These scores feed into computeGFactor for the overall composite.
+ *
+ * The weights and caps are heuristic design choices of this library, not an
+ * academic standard. Momentum inputs (SMA, RSI, ADX, volume, ROC) must be
+ * computed elsewhere; this library does not calculate technical indicators.
  */
 
 // ---------------------------------------------------------------------------
@@ -12,47 +16,71 @@
 // ---------------------------------------------------------------------------
 
 export interface QualityScoreInput {
-  /** Piotroski F-Score (0–9) */
+  /** Piotroski F-Score points achieved (PiotroskiResult.score) */
   piotroskiScore: number;
   /**
-   * ROE vs. sector median — percentage of sector ROE this company achieves.
+   * Maximum Piotroski points possible with the data you had
+   * (PiotroskiResult.maxScore). Default 9. When prior-year data is missing
+   * the maximum is lower, and the score is normalised by it.
+   */
+  piotroskiMaxScore?: number;
+  /**
+   * Company ROE divided by the sector median ROE.
    * e.g. if company ROE is 18% and sector median is 15%, pass 18/15 = 1.2.
-   * Capped at 1.0 (100 points if >= sector median).
+   * Clamped to [0, 1] (100 points at or above the sector median). Only
+   * meaningful when the sector median ROE is positive.
    */
   roeVsSector: number;
   /** Whether operating margins are improving YoY (boolean) */
   marginsImproving: boolean;
-  /** Promoter pledge percentage is 0 or negligible (boolean) */
-  pledgeFree: boolean;
-  /** Promoter holding is stable or increasing YoY (boolean) */
-  promoterStable: boolean;
+  /**
+   * Insider/promoter shares pledged are zero or negligible. Optional — omit
+   * for markets where share pledging by insiders/promoters is not reported.
+   */
+  insiderPledgeFree?: boolean;
+  /**
+   * Insider/promoter holding is stable or increasing YoY. Optional — omit if
+   * you do not track insider/promoter ownership.
+   */
+  insiderHoldingStable?: boolean;
+  /** @deprecated Use insiderPledgeFree. Still accepted. */
+  pledgeFree?: boolean;
+  /** @deprecated Use insiderHoldingStable. Still accepted. */
+  promoterStable?: boolean;
 }
 
 /**
  * Quality Score (0–100)
- * Weights:
- *   Piotroski (0–9 → 0–100): 30 %
- *   ROE vs Sector (capped at 1.0 multiplier): 20 %
+ * Weights when every signal is supplied:
+ *   Piotroski (score / maxScore → 0–100): 30 %
+ *   ROE vs Sector (clamped 0–1): 20 %
  *   Margins improving: 20 %
- *   Pledge-free: 15 %
- *   Promoter stable: 15 %
+ *   Insider/promoter shares pledge-free: 15 %
+ *   Insider/promoter holding stable: 15 %
+ *
+ * Optional signals that are omitted (the two insider/promoter signals, or
+ * Piotroski when piotroskiMaxScore is 0) are dropped and the remaining
+ * weights are rescaled to sum to 100 %, so the score still spans 0–100.
+ * Without the insider/promoter signals the weights become
+ * Piotroski 42.9 %, ROE 28.6 %, Margins 28.6 %.
  */
 export const computeQualityScore = (input: QualityScoreInput): number => {
-  const { piotroskiScore, roeVsSector, marginsImproving, pledgeFree, promoterStable } = input;
+  const { piotroskiScore, piotroskiMaxScore = 9, roeVsSector, marginsImproving } = input;
+  const pledgeFree    = input.insiderPledgeFree ?? input.pledgeFree;
+  const holdingStable = input.insiderHoldingStable ?? input.promoterStable;
 
-  const piotroskiNorm = Math.min(piotroskiScore / 9, 1) * 100;
-  const roeNorm       = Math.min(roeVsSector, 1) * 100;
-  const marginsScore  = marginsImproving ? 100 : 0;
-  const pledgeScore   = pledgeFree ? 100 : 0;
-  const promoterScore = promoterStable ? 100 : 0;
+  const signals: Array<[score: number, weight: number]> = [
+    [Math.min(Math.max(roeVsSector, 0), 1) * 100, 0.20],
+    [marginsImproving ? 100 : 0, 0.20],
+  ];
+  if (piotroskiMaxScore > 0) {
+    signals.push([Math.min(Math.max(piotroskiScore / piotroskiMaxScore, 0), 1) * 100, 0.30]);
+  }
+  if (pledgeFree != null)    signals.push([pledgeFree ? 100 : 0, 0.15]);
+  if (holdingStable != null) signals.push([holdingStable ? 100 : 0, 0.15]);
 
-  return (
-    piotroskiNorm * 0.30 +
-    roeNorm       * 0.20 +
-    marginsScore  * 0.20 +
-    pledgeScore   * 0.15 +
-    promoterScore * 0.15
-  );
+  const totalWeight = signals.reduce((sum, [, w]) => sum + w, 0);
+  return signals.reduce((sum, [score, w]) => sum + score * w, 0) / totalWeight;
 };
 
 // ---------------------------------------------------------------------------
@@ -63,7 +91,9 @@ export interface GrowthScoreInput {
   /**
    * Revenue growth rate relative to sector.
    * e.g. if company revenue grew 20% and sector average is 12%, pass 20/12 = 1.67.
-   * Capped at 1.0 (100 points if >= sector growth).
+   * Clamped to [0, 1] (100 points if >= sector growth). Only meaningful when
+   * sector growth is positive: dividing two negative growth rates gives a
+   * positive ratio, so pass 0 (or your own judgement) in that case.
    */
   revenueGrowthVsSector: number;
   /**
@@ -114,7 +144,7 @@ export const computeGrowthScore = (input: GrowthScoreInput): number => {
 
 export interface ValueScoreInput {
   /**
-   * Current P/E divided by the stock's own 3-year average P/E.
+   * Current P/E divided by the stock's own 3-year average P/E (both positive).
    * e.g. currentPE = 15, avgPE = 20 → ratio = 15/20 = 0.75 (trading below avg → higher score).
    * Score is higher when ratio < 1 (currently cheaper than historical average).
    */
@@ -149,13 +179,15 @@ export interface ValueScoreInput {
 export const computeValueScore = (input: ValueScoreInput): number => {
   const { peVs3yrAvg, pbVsSector, peg, historicalPePercentile } = input;
 
-  // Cheaper than historical → ratio < 1 → higher score
-  const peAvgScore = Math.min(Math.max((1 - peVs3yrAvg + 1) * 50, 0), 100); // maps 0→100, 1→50, 2→0
-  const pbScore    = Math.min(Math.max((1 - pbVsSector + 1) * 50, 0), 100);
+  // Cheaper than historical → ratio < 1 → higher score; maps 0→100, 1→50, 2→0.
+  // A ratio <= 0 means a negative P/E or P/B (losses / negative equity) and scores 0.
+  const ratioScore = (ratio: number) => (ratio <= 0 ? 0 : Math.min(Math.max((2 - ratio) * 50, 0), 100));
+  const peAvgScore = ratioScore(peVs3yrAvg);
+  const pbScore    = ratioScore(pbVsSector);
   // PEG: ≤0.5 → 100, 1.0 → 66.7, 1.5 → 33.3, ≥2.0 → 0 (linear)
   const pegScore   = peg <= 0 ? 0 : Math.min(Math.max((2 - peg) / 1.5 * 100, 0), 100);
-  // Lower percentile = better value: invert
-  const histScore  = Math.max(0, 100 - historicalPePercentile);
+  // Lower percentile = better value: invert (percentile clamped to 0–100)
+  const histScore  = 100 - Math.min(Math.max(historicalPePercentile, 0), 100);
 
   return (
     peAvgScore * 0.30 +
@@ -177,8 +209,8 @@ export interface MomentumScoreInput {
    */
   priceVsSma200: number;
   /**
-   * RSI (14-period). Range 0–100.
-   * Score peaks at RSI 50–65 (trending without being overbought).
+   * RSI (14-period), computed by you or your data provider. Range 0–100.
+   * Score peaks at RSI 57.5 and falls 2.5 points per RSI point either side.
    */
   rsi: number;
   /**
@@ -214,7 +246,7 @@ export const computeMomentumScore = (input: MomentumScoreInput): number => {
   // Price vs SMA200: 1.0 → 50, ≥1.10 → 100, <1.0 → decreasing
   const smaScore = Math.min(Math.max((priceVsSma200 - 0.9) / 0.2 * 100, 0), 100);
 
-  // RSI: optimal 50–65, 30 → ~25, 70 → ~75, extremes penalised
+  // RSI: 57.5 → 100, 50/65 → 81, 70 → 69, 30 → 31, ≤17.5 or ≥97.5 → 0
   const rsiScore = rsi <= 0 || rsi >= 100
     ? 0
     : Math.max(0, 100 - Math.abs(rsi - 57.5) * 2.5);
