@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { metricsData } from '../data/metrics';
+import { usePageMeta } from '../seo';
 import { useDark } from '../App';
 
 const STATUS_COLORS: Record<string, string> = {
@@ -19,6 +20,11 @@ export default function MetricView() {
   const metric = id ? metricsData[id] : null;
   const { dark } = useDark();
   const [inputs, setInputs] = useState<Record<string, number>>({});
+
+  usePageMeta(
+    metric ? `${metric.name} — formula, calculator & JavaScript example | finance-calculator-pro` : 'Metric not found | finance-calculator-pro',
+    metric ? `${metric.description} Formula: ${metric.formula}. Interactive calculator and TypeScript/JavaScript function in finance-calculator-pro.` : undefined,
+  );
 
   useEffect(() => {
     if (metric) {
@@ -47,8 +53,11 @@ export default function MetricView() {
     );
   }
 
-  const liveValue = Object.keys(inputs).length > 0 ? metric.calculate(inputs) : null;
-  const analysis  = (liveValue !== null && !isNaN(liveValue as number)) ? metric.evaluateInsight(liveValue) : null;
+  const ready     = Object.keys(inputs).length > 0;
+  const liveValue = ready ? metric.calculate(inputs) : null;
+  // Evaluate even when the value is null, so "not meaningful" cases (e.g. negative EBITDA) explain themselves.
+  const analysis  = ready ? metric.evaluateInsight(liveValue !== null && isNaN(liveValue as number) ? null : liveValue, inputs) : null;
+  const related   = Object.values(metricsData).filter(m => m.category === metric.category && m.id !== metric.id);
   const statusColor = analysis ? (STATUS_COLORS[analysis.status] ?? 'var(--text-3)') : 'var(--text-3)';
   const statusBg    = analysis ? (STATUS_BG[analysis.status]    ?? 'var(--bg-muted)') : 'var(--bg-muted)';
 
@@ -109,21 +118,25 @@ export default function MetricView() {
                 <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
               </svg>
               <div>
-                <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--yellow)' }}>Benchmark Thresholds</p>
+                <p className="text-[11px] font-bold uppercase tracking-wider mb-1" style={{ color: 'var(--yellow)' }}>How to read it (rules of thumb — vary by sector)</p>
                 <p className="text-[13px] leading-relaxed m-0" style={{ color: dark ? '#fde68a' : '#92400e' }}>{metric.benchmark}</p>
               </div>
             </div>
           )}
 
-          {/* Category badge */}
-          <div>
-            <span
-              className="inline-flex items-center text-[11px] font-semibold px-3 py-1.5 rounded-full uppercase tracking-wider"
-              style={{ background: 'var(--bg-muted)', color: 'var(--text-3)', border: '1px solid var(--border)' }}
-            >
-              {metric.category}
-            </span>
-          </div>
+          {/* Related metrics */}
+          {related.length > 0 && (
+            <div className="rounded-xl p-4" style={{ border: '1px solid var(--border)', background: 'var(--bg-subtle)' }}>
+              <p className="text-[11px] font-bold uppercase tracking-wider mb-2" style={{ color: 'var(--text-4)' }}>Related {metric.category.toLowerCase()} metrics</p>
+              <div className="flex flex-wrap gap-2">
+                {related.map(r => (
+                  <Link key={r.id} to={`/metrics/${r.id}`} className="text-[12px] no-underline px-2.5 py-1 rounded-full" style={{ border: '1px solid var(--border)', color: 'var(--text-2)', background: 'var(--bg)' }}>
+                    {r.name}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right: playground */}
@@ -174,7 +187,7 @@ export default function MetricView() {
             <div className="text-[3.5rem] font-black tabular-nums leading-none" style={{ color: 'var(--text)', letterSpacing: '-0.04em' }}>
               {liveValue !== null && !isNaN(liveValue as number)
                 ? (liveValue as number).toFixed(2)
-                : '—'}
+                : 'null'}
             </div>
 
             {analysis && (

@@ -3,11 +3,11 @@ import {
   priceToCashFlow, earningsYield, evRevenue, evFcf, marketCapToDebtCap,
   roa, roe, roic, grossMargin, operatingMargin, netProfitMargin, fcfMargin,
   currentRatio, quickRatio, debtToEquity, interestCoverage,
-  netDebt, netDebtToEbitda, debtToAssets,
+  netDebt, netCash, netDebtToEbitda, debtToAssets,
   assetTurnover, inventoryTurnover, receivablesTurnover, daysSalesOutstanding,
   payableDays, workingCapitalDays, cashConversionCycle,
   payoutRatio, cashConversionRatio,
-  altmanZScore, sharpe, targetUpside, piotroski,
+  altmanZScore, altmanZScoreDoublePrime, sharpe, targetUpside, piotroski,
   computeNCVPS, computeGFactor, computeIntrinsicValue,
   computeQualityScore, computeGrowthScore, computeValueScore, computeMomentumScore,
   medianGrowth, cagr,
@@ -26,7 +26,8 @@ export interface MetricDefinition {
   benchmark?: string;
   inputs: { key: string; label: string; min: number; max: number; step: number; default: number; prefix?: string }[];
   calculate: (inputs: any) => number | null | any;
-  evaluateInsight: (val: number | null | any) => any;
+  /** Receives the computed value and the current playground inputs. */
+  evaluateInsight: (val: number | null | any, inputs: Record<string, number>) => any;
 }
 
 export const metricsData: Record<string, MetricDefinition> = {
@@ -62,6 +63,7 @@ export const metricsData: Record<string, MetricDefinition> = {
     description: 'Compares a company\'s stock price to its revenues.',
     history: 'Crucial for evaluating young, high-growth companies that are not yet profitable but have strong top-line revenue growth.',
     formula: 'P/S = Price / Revenue Per Share',
+    benchmark: '< 1 = cheap relative to sales · 1–2 = average · > 2 = expensive by generic standards. High-margin businesses such as software routinely trade at 5–15× sales, so compare within a sector.',
     inputs: [
         { key: 'price', label: 'Share Price', min: 1, max: 10000, step: 1, default: 150, prefix: '$' },
         { key: 'revenuePerShare', label: 'Revenue Per Share', min: 0, max: 1000, step: 1, default: 50, prefix: '$' }
@@ -73,10 +75,11 @@ export const metricsData: Record<string, MetricDefinition> = {
     id: 'peg', name: 'PEG Ratio', category: 'Valuation',
     description: 'The P/E ratio adjusted for earnings growth.',
     history: 'Popularized by Peter Lynch, the PEG ratio improves on the P/E ratio by factoring in the expected growth rate.',
-    formula: 'PEG = PE Ratio / Earnings Growth Rate',
+    formula: 'PEG = P/E ÷ (annual EPS growth × 100)   e.g. P/E 30, growth 0.15 → 30 ÷ 15 = 2.0',
+    benchmark: '< 1 = cheap relative to growth (Lynch\'s rule) · 1–1.5 = fairly valued · > 1.5 = expensive relative to growth. Enter growth as a decimal (0.15 = 15 %). PEG is not meaningful for negative earnings or zero/negative growth, so the function returns null.',
     inputs: [
-        { key: 'peRatio', label: 'PE Ratio', min: 1, max: 500, step: 1, default: 25 },
-        { key: 'earningsGrowthRate', label: 'Earnings Growth Rate (Decimal)', min: -0.5, max: 2, step: 0.01, default: 0.15 }
+        { key: 'peRatio', label: 'P/E Ratio', min: 1, max: 100, step: 1, default: 25 },
+        { key: 'earningsGrowthRate', label: 'Expected EPS Growth (decimal, 0.15 = 15%)', min: -0.2, max: 0.6, step: 0.01, default: 0.15 }
     ],
     calculate: (inputs) => peg(inputs.peRatio, inputs.earningsGrowthRate),
     evaluateInsight: evaluate.peg
@@ -86,7 +89,7 @@ export const metricsData: Record<string, MetricDefinition> = {
     description: 'Compares a company\'s total value to its cash earnings minus non-cash expenses.',
     history: 'Heavily used in private equity and mergers/acquisitions to value a business regardless of its capital structure.',
     formula: 'EV/EBITDA = Enterprise Value / EBITDA',
-    benchmark: '< 10× is cheap; 10–15× is fairly valued for most industries; > 20× implies a strong growth or scarcity premium. Common M&A deal multiple for mature companies: 8–12×.',
+    benchmark: '< 10× = cheap · 10–15× = fairly valued · > 15× = expensive (the library\'s generic rating thresholds). Normal ranges differ by sector; not meaningful for banks and insurers.',
     inputs: [
         { key: 'enterpriseValue', label: 'Enterprise Value', min: 1000, max: 5000000, step: 1000, default: 165000, prefix: '$' },
         { key: 'ebitda', label: 'EBITDA', min: -10000, max: 500000, step: 1000, default: 10000, prefix: '$' }
@@ -107,7 +110,7 @@ export const metricsData: Record<string, MetricDefinition> = {
         { key: 'terminalGrowthRate', label: 'Terminal Growth Rate', min: 0.01, max: 0.1, step: 0.005, default: 0.025 }
     ],
     calculate: (inputs) => calculateDCF([inputs.fcf1, inputs.fcf2, inputs.fcf3], inputs.discountRate, inputs.terminalGrowthRate),
-    evaluateInsight: (val) => ({ value: val, status: 'Neutral', insight: 'Intrinsic Enterprise Value. Compare strictly against current Market Cap + Debt to find upside.' })
+    evaluateInsight: (val) => ({ value: val, status: 'Neutral', insight: 'Present value of the cash flows = enterprise value. Compare with market cap + debt − cash, or convert to a per-share value with impliedSharePrice().' })
   },
   'graham': {
     id: 'graham', name: 'Graham Number', category: 'Valuation',
@@ -140,7 +143,7 @@ export const metricsData: Record<string, MetricDefinition> = {
     description: 'Indicator of how profitable a company is relative to its total assets.',
     history: 'A foundational metric created by DuPont in the 1920s to evaluate management efficiency in deploying assets to generate income.',
     formula: 'ROA = Net Income / Total Assets',
-    benchmark: '> 5% is solid · > 10% is excellent. Capital-intensive sectors (banks, utilities) operate at 1–3% by design. Compare only within the same industry.',
+    benchmark: '> 5% is solid · > 10% is excellent. Banks typically earn about 1% because they are highly leveraged; capital-intensive utilities 2–4%. Compare only within the same industry.',
     inputs: [
         { key: 'netIncome', label: 'Net Income', min: -100000, max: 1000000, step: 1000, default: 5000 },
         { key: 'totalAssets', label: 'Total Assets', min: 1000, max: 5000000, step: 1000, default: 100000 }
@@ -186,11 +189,11 @@ export const metricsData: Record<string, MetricDefinition> = {
         { key: 'costOfRevenue', label: 'Cost of Revenue', min: 0, max: 1000000, step: 1000, default: 20000 }
     ],
     calculate: (inputs) => grossMargin(inputs.revenue, inputs.costOfRevenue),
-    evaluateInsight: (val) => evaluate.margin(val, 'Gross Margin')
+    evaluateInsight: (val) => evaluate.margin(val, 'Gross')
   },
   'operating-margin': {
     id: 'operating-margin', name: 'Operating Margin', category: 'Profitability',
-    description: 'Measures how much profit a company makes on a dollar of sales after paying for variable costs of production.',
+    description: 'Measures how much profit a company makes on each unit of sales after all operating expenses — cost of goods sold, selling, general and administrative costs, R&D, depreciation — but before interest and tax.',
     history: 'A prime indicator of operational efficiency, excluding taxes and interest to focus purely on the core business.',
     formula: 'Operating Margin = Operating Income / Revenue',
     inputs: [
@@ -198,7 +201,7 @@ export const metricsData: Record<string, MetricDefinition> = {
         { key: 'revenue', label: 'Total Revenue', min: 1000, max: 1000000, step: 1000, default: 50000 }
     ],
     calculate: (inputs) => operatingMargin(inputs.operatingIncome, inputs.revenue),
-    evaluateInsight: (val) => evaluate.margin(val, 'Operating Margin')
+    evaluateInsight: (val) => evaluate.margin(val, 'Operating')
   },
   'net-margin': {
     id: 'net-margin', name: 'Net Profit Margin', category: 'Profitability',
@@ -210,7 +213,7 @@ export const metricsData: Record<string, MetricDefinition> = {
         { key: 'revenue', label: 'Revenue', min: 1000, max: 500000, step: 1000, default: 50000 }
     ],
     calculate: (inputs) => netProfitMargin(inputs.netIncome, inputs.revenue),
-    evaluateInsight: (val) => evaluate.margin(val, 'Net Margin')
+    evaluateInsight: (val) => evaluate.margin(val, 'Net Profit')
   },
   'fcf-margin': {
     id: 'fcf-margin', name: 'Free Cash Flow Margin', category: 'Profitability',
@@ -222,7 +225,7 @@ export const metricsData: Record<string, MetricDefinition> = {
         { key: 'revenue', label: 'Revenue', min: 1000, max: 500000, step: 1000, default: 50000 }
     ],
     calculate: (inputs) => fcfMargin(inputs.freeCashFlow, inputs.revenue),
-    evaluateInsight: (val) => evaluate.margin(val, 'FCF Margin')
+    evaluateInsight: (val) => evaluate.margin(val, 'Free Cash Flow')
   },
 
   // --- LIQUIDITY ---
@@ -230,13 +233,13 @@ export const metricsData: Record<string, MetricDefinition> = {
     id: 'current-ratio', name: 'Current Ratio', category: 'Liquidity',
     description: 'Measures a company\'s ability to pay short-term obligations.',
     history: 'A classic bank-loan liquidity test to ensure the company has enough assets to cover liabilities over the next 12 months.',
-    formula: 'Current Ratio = Total Assets / Total Liabilities',
-    benchmark: '1.5–3.0 is the healthy range. Below 1.0 means current liabilities exceed current assets — a near-term liquidity warning. Above 3.0 may suggest underutilised assets.',
+    formula: 'Current Ratio = Current Assets / Current Liabilities',
+    benchmark: '1.2–2.0 = healthy (rated Good) · above 2.0 = very liquid, possibly idle assets (Neutral) · below 1.2 = tight (Bad). Supermarkets and other fast-cash businesses run below 1 comfortably. Use current — not total — assets and liabilities.',
     inputs: [
-        { key: 'totalAssets', label: 'Current Assets', min: 1000, max: 500000, step: 1000, default: 100000 },
-        { key: 'totalLiabilities', label: 'Current Liabs', min: 1000, max: 500000, step: 1000, default: 60000 }
+        { key: 'currentAssets', label: 'Current Assets', min: 1000, max: 500000, step: 1000, default: 40000 },
+        { key: 'currentLiabilities', label: 'Current Liabilities', min: 1000, max: 500000, step: 1000, default: 25000 }
     ],
-    calculate: (inputs) => currentRatio(inputs.totalAssets, inputs.totalLiabilities),
+    calculate: (inputs) => currentRatio(inputs.currentAssets, inputs.currentLiabilities),
     evaluateInsight: evaluate.currentRatio
   },
   'quick-ratio': {
@@ -245,19 +248,19 @@ export const metricsData: Record<string, MetricDefinition> = {
     history: 'A more stringent version of the Current Ratio used because inventory is often difficult to liquidate immediately in a crisis.',
     formula: 'Quick Ratio = (Current Assets - Inventory) / Current Liabilities',
     inputs: [
-        { key: 'currentAssets', label: 'Current Assets', min: 1000, max: 500000, step: 1000, default: 100000 },
+        { key: 'currentAssets', label: 'Current Assets', min: 1000, max: 500000, step: 1000, default: 40000 },
         { key: 'inventory', label: 'Inventory', min: 0, max: 200000, step: 1000, default: 10000 },
-        { key: 'currentLiabilities', label: 'Current Liabs', min: 1000, max: 500000, step: 1000, default: 60000 }
+        { key: 'currentLiabilities', label: 'Current Liabilities', min: 1000, max: 500000, step: 1000, default: 25000 }
     ],
     calculate: (inputs) => quickRatio(inputs.currentAssets, inputs.inventory, inputs.currentLiabilities),
     evaluateInsight: evaluate.quickRatio
   },
   'debt-to-equity': {
     id: 'debt-to-equity', name: 'Debt-to-Equity', category: 'Liquidity',
-    description: 'Evaluates a company\'s financial leverage by dividing total liabilities by shareholder equity.',
+    description: 'Evaluates a company\'s financial leverage by dividing total debt (borrowings) by shareholder equity.',
     history: 'Crucial for understanding how a company is financing its operations—whether heavily reliant on debt or equity.',
     formula: 'D/E = Total Debt / Total Equity',
-    benchmark: '< 1.0 is conservative · 1–2 is moderate · > 2 signals elevated financial risk. Capital-intensive industries (industrials, utilities) routinely operate at 2–4×.',
+    benchmark: '< 1.0 is conservative · 1–2 is moderate · > 2 signals elevated financial risk. Capital-intensive industries (industrials, utilities) routinely operate at 2–4×. A negative value means negative shareholder equity and is rated Bad.',
     inputs: [
         { key: 'totalDebt', label: 'Total Debt', min: 0, max: 1000000, step: 1000, default: 20000 },
         { key: 'totalEquity', label: 'Total Equity', min: 1000, max: 1000000, step: 1000, default: 40000 },
@@ -269,7 +272,8 @@ export const metricsData: Record<string, MetricDefinition> = {
     id: 'interest-coverage', name: 'Interest Coverage Ratio', category: 'Liquidity',
     description: 'Measures how easily a company can pay interest on its outstanding debt.',
     history: 'Bondholders and lenders heavily scrutinize this to identify companies at risk of defaulting on coupon payments.',
-    formula: 'Interest Coverage = EBIT / Interest Expense',
+    formula: 'Interest Coverage = EBIT / |Interest Expense|',
+    benchmark: '≥ 3× = comfortable · 1.5–3× = narrow · < 1.5× = risky. Zero or negative EBIT is rated Bad. Interest expense reported as a negative number is treated as a cost.',
     inputs: [
         { key: 'ebit', label: 'EBIT', min: -10000, max: 500000, step: 1000, default: 7500 },
         { key: 'interestExpense', label: 'Interest Expense', min: 0, max: 100000, step: 500, default: 500 },
@@ -283,22 +287,23 @@ export const metricsData: Record<string, MetricDefinition> = {
     id: 'asset-turnover', name: 'Asset Turnover', category: 'Efficiency',
     description: 'Measures the value of a company\'s sales or revenues generated relative to the value of its assets.',
     history: 'Often used comparatively within the same industry to see which management team extracts the most value from their property and equipment.',
-    formula: 'Asset Turnover = Total Revenue / Average Assets',
+    formula: 'Asset Turnover = Revenue / Total Assets  (pass the average of opening and closing assets if you have both)',
+    benchmark: '≥ 1.0 = efficient · 0.5–1.0 = moderate · < 0.5 = low. Retailers run well above 1; utilities and telecoms well below. Compare within a sector.',
     inputs: [
         { key: 'revenue', label: 'Total Revenue', min: 1000, max: 1000000, step: 1000, default: 50000 },
-        { key: 'averageTotalAssets', label: 'Avg Total Assets', min: 1000, max: 1000000, step: 1000, default: 100000 },
+        { key: 'averageTotalAssets', label: 'Total Assets (or average)', min: 1000, max: 1000000, step: 1000, default: 100000 },
     ],
     calculate: (inputs) => assetTurnover(inputs.revenue, inputs.averageTotalAssets),
-    evaluateInsight: (val) => ({ value: val, status: 'Neutral', insight: 'Higher indicates more efficiency. Heavily industry specific.' })
+    evaluateInsight: evaluate.assetTurnover
   },
   'inventory-turnover': {
     id: 'inventory-turnover', name: 'Inventory Turnover', category: 'Efficiency',
     description: 'Shows how many times a company has sold and replaced inventory during a given period.',
     history: 'Critical for retail and manufacturing. A low turnover implies weak sales or excess inventory.',
-    formula: 'Inventory Turnover = COGS / Average Inventory',
+    formula: 'Inventory Turnover = COGS / Inventory  (pass average inventory if you have it)',
     inputs: [
         { key: 'costOfRevenue', label: 'COGS', min: 1000, max: 1000000, step: 1000, default: 20000 },
-        { key: 'averageInventory', label: 'Avg Inventory', min: 1000, max: 500000, step: 1000, default: 10000 },
+        { key: 'averageInventory', label: 'Inventory (or average)', min: 1000, max: 500000, step: 1000, default: 10000 },
     ],
     calculate: (inputs) => inventoryTurnover(inputs.costOfRevenue, inputs.averageInventory),
     evaluateInsight: evaluate.inventoryTurnover,
@@ -319,7 +324,7 @@ export const metricsData: Record<string, MetricDefinition> = {
     id: 'days-sales-outstanding', name: 'Days Sales Outstanding (DSO)', category: 'Efficiency',
     description: 'Average number of days to collect payment after a sale. Lower DSO means faster cash conversion.',
     history: 'A key working capital metric tracked by CFOs and credit analysts. A rising DSO trend often precedes write-offs and signals that customers are struggling to pay.',
-    formula: 'DSO = 365 / Receivables Turnover',
+    formula: 'DSO = (Trade Receivables / Revenue) × 365   (= 365 / receivables turnover)',
     inputs: [
       { key: 'revenue', label: 'Total Revenue', min: 1000, max: 1000000, step: 1000, default: 50000, prefix: '$' },
       { key: 'tradeReceivables', label: 'Trade Receivables', min: 100, max: 200000, step: 500, default: 6250, prefix: '$' },
@@ -345,7 +350,7 @@ export const metricsData: Record<string, MetricDefinition> = {
     id: 'cash-conversion-ratio', name: 'Cash Conversion Ratio (CCR)', category: 'Quality',
     description: 'Ratio of operating cash flow to net income. Values > 1 indicate high earnings quality backed by real cash.',
     history: 'Used by forensic accountants and short sellers to detect earnings manipulation. Companies with consistently low CCR (income >> cash flow) often face eventual earnings restatements.',
-    formula: 'CCR = Operating Cash Flow / Net Income',
+    formula: 'CCR = Operating Cash Flow / Net Income   (null when net income ≤ 0)',
     benchmark: '> 1.0 = cash-backed earnings (strong quality) · 0.8–1.0 = acceptable · < 0.8 warrants scrutiny. A consistently low CCR is an early forensic accounting warning sign.',
     inputs: [
       { key: 'operatingCashFlow', label: 'Operating Cash Flow', min: -50000, max: 500000, step: 1000, default: 7000, prefix: '$' },
@@ -371,7 +376,7 @@ export const metricsData: Record<string, MetricDefinition> = {
   'earnings-yield': {
     id: 'earnings-yield', name: 'Earnings Yield', category: 'Valuation',
     description: 'The inverse of P/E ratio — shows EPS as a percentage of share price. Useful for comparing stocks to bonds.',
-    history: 'Championed by Joel Greenblatt in his "Magic Formula" investing strategy, the earnings yield can be directly compared against bond yields to determine relative equity attractiveness.',
+    history: 'The earnings yield can be compared with bond yields to judge the relative attractiveness of equities. Joel Greenblatt\'s "Magic Formula" uses a related version, EBIT / Enterprise Value; this function uses the simpler EPS / Price.',
     formula: 'Earnings Yield = EPS / Price',
     inputs: [
       { key: 'eps', label: 'Earnings Per Share', min: -100, max: 500, step: 0.1, default: 5, prefix: '$' },
@@ -416,21 +421,33 @@ export const metricsData: Record<string, MetricDefinition> = {
       { key: 'cash', label: 'Cash & Equivalents', min: 0, max: 500000, step: 1000, default: 5000, prefix: '$' },
     ],
     calculate: (inputs) => netDebt(inputs.totalDebt, inputs.cash),
-    evaluateInsight: (val) => ({ value: val, status: val < 0 ? 'Good' : 'Neutral', insight: val < 0 ? 'Net cash position — stronger than zero debt.' : 'Company carries net debt obligations.' }),
+    evaluateInsight: (val) => evaluate.netDebt(val),
+  },
+  'net-cash': {
+    id: 'net-cash', name: 'Net Cash', category: 'Solvency',
+    description: 'Cash and equivalents in excess of total debt. Zero when debt is greater than or equal to cash.',
+    history: 'Value investors look for net cash because it gives a company room to invest, buy back shares or survive a downturn without new financing.',
+    formula: 'Net Cash = max(Cash − Total Debt, 0)',
+    inputs: [
+      { key: 'totalDebt', label: 'Total Debt', min: 0, max: 500000, step: 1000, default: 10000, prefix: '$' },
+      { key: 'cash', label: 'Cash & Equivalents', min: 0, max: 500000, step: 1000, default: 30000, prefix: '$' },
+    ],
+    calculate: (inputs) => netCash(inputs.totalDebt, inputs.cash),
+    evaluateInsight: (val) => ({ value: val, status: val > 0 ? 'Good' : 'Neutral', insight: val > 0 ? 'Cash exceeds debt — the company could repay all borrowings from cash today.' : 'No net cash — debt is greater than or equal to cash.' }),
   },
   'net-debt-to-ebitda': {
     id: 'net-debt-to-ebitda', name: 'Net Debt / EBITDA', category: 'Solvency',
     description: 'Shows how many years of EBITDA it would take to repay all net debt — the primary leverage metric used by lenders.',
     history: 'The standard leverage covenant in leveraged buyouts and corporate credit agreements. Ratios above 4× typically trigger credit downgrades or covenant breaches.',
     formula: 'Net Debt / EBITDA = (Total Debt − Cash) / EBITDA',
-    benchmark: '< 2× is comfortable · 2–4× is moderate leverage · > 4× typically triggers credit rating concerns or loan covenant breaches. Investment-grade companies aim to stay below 3×.',
+    benchmark: '< 1.5× = low leverage (Good) · 1.5–3× = moderate · > 3× = high. Lender covenants are often set around 3–4×. Only defined for positive EBITDA: with negative EBITDA the ratio is null, and net debt plus negative EBITDA is rated Bad — never "net cash".',
     inputs: [
       { key: 'totalDebt', label: 'Total Debt', min: 0, max: 500000, step: 1000, default: 20000, prefix: '$' },
       { key: 'cash', label: 'Cash & Equivalents', min: 0, max: 500000, step: 1000, default: 5000, prefix: '$' },
-      { key: 'ebitda', label: 'EBITDA', min: 1, max: 500000, step: 1000, default: 10000, prefix: '$' },
+      { key: 'ebitda', label: 'EBITDA', min: -50000, max: 500000, step: 1000, default: 10000, prefix: '$' },
     ],
     calculate: (inputs) => netDebtToEbitda(inputs.totalDebt, inputs.cash, inputs.ebitda),
-    evaluateInsight: evaluate.netDebtToEbitda,
+    evaluateInsight: (val, inputs) => evaluate.netDebtToEbitda(val, { netDebt: netDebt(inputs.totalDebt, inputs.cash), ebitda: inputs.ebitda }),
   },
   'debt-to-assets': {
     id: 'debt-to-assets', name: 'Debt-to-Assets', category: 'Solvency',
@@ -448,10 +465,10 @@ export const metricsData: Record<string, MetricDefinition> = {
   // --- RISK ---
   'z-score': {
     id: 'z-score', name: 'Altman Z-Score', category: 'Risk',
-    description: 'Predicts the probability that a firm will go into bankruptcy within two years.',
-    history: 'Developed by Edward Altman in 1968. At its inception, the model correctly predicted 72% of bankruptcies two years prior to the event.',
-    formula: 'Z = 1.2X₁ + 1.4X₂ + 3.3X₃ + 0.6X₄ + 1.0X₅',
-    benchmark: 'Z > 2.99 = Safe Zone (unlikely bankruptcy) · 1.81–2.99 = Grey Zone (uncertain) · Z < 1.81 = Distress Zone (high bankruptcy risk within 2 years).',
+    description: 'Estimates the risk of financial distress within two years for publicly traded manufacturing companies.',
+    history: 'Developed by Edward Altman in 1968 on US public manufacturers. In the original sample it classified about 72% of bankruptcies correctly two years before the event. For service, technology, retail and private companies use the Z\'\'-Score instead.',
+    formula: 'Z = 1.2·WC/TA + 1.4·RE/TA + 3.3·EBIT/TA + 0.6·MarketCap/TL + 1.0·Sales/TA',
+    benchmark: 'Z > 2.99 = Safe Zone · 1.81–2.99 = Grey Zone · Z < 1.81 = Distress Zone. Original model for public manufacturers only; not meaningful for banks or insurers.',
     inputs: [
         { key: 'workingCapital', label: 'Working Capital', min: -50000, max: 100000, step: 1000, default: 15000 },
         { key: 'retainedEarnings', label: 'Retained Earnings', min: -50000, max: 100000, step: 1000, default: 20000 },
@@ -464,12 +481,29 @@ export const metricsData: Record<string, MetricDefinition> = {
     calculate: (inputs) => altmanZScore(inputs.workingCapital, inputs.retainedEarnings, inputs.ebit, inputs.marketCap, inputs.totalRevenue, inputs.totalAssets, inputs.totalLiabilities),
     evaluateInsight: evaluate.altmanZScore
   },
+  'z-score-double-prime': {
+    id: 'z-score-double-prime', name: 'Altman Z\'\'-Score (non-manufacturers)', category: 'Risk',
+    description: 'A version of the Altman Z-Score for non-manufacturing, service and private companies. It drops the sales-turnover term and uses book equity instead of market value.',
+    history: 'Published by Edward Altman in 1995 because the original model\'s sales/assets term penalised asset-light businesses and needed a market price. This is the version without the +3.25 constant used for emerging-market bonds.',
+    formula: "Z'' = 6.56·WC/TA + 3.26·RE/TA + 6.72·EBIT/TA + 1.05·BookEquity/TL",
+    benchmark: "Z'' > 2.6 = Safe Zone · 1.1–2.6 = Grey Zone · Z'' < 1.1 = Distress Zone. Not meaningful for banks or insurers.",
+    inputs: [
+        { key: 'workingCapital', label: 'Working Capital', min: -50000, max: 100000, step: 1000, default: 15000 },
+        { key: 'retainedEarnings', label: 'Retained Earnings', min: -50000, max: 100000, step: 1000, default: 20000 },
+        { key: 'ebit', label: 'EBIT', min: -50000, max: 100000, step: 1000, default: 7500 },
+        { key: 'bookEquity', label: 'Book Equity', min: -50000, max: 500000, step: 1000, default: 40000 },
+        { key: 'totalAssets', label: 'Total Assets', min: 1000, max: 500000, step: 1000, default: 100000 },
+        { key: 'totalLiabilities', label: 'Total Liabilities', min: 0, max: 500000, step: 1000, default: 60000 }
+    ],
+    calculate: (inputs) => altmanZScoreDoublePrime(inputs.workingCapital, inputs.retainedEarnings, inputs.ebit, inputs.bookEquity, inputs.totalAssets, inputs.totalLiabilities),
+    evaluateInsight: evaluate.altmanZScoreDoublePrime
+  },
   'sharpe': {
     id: 'sharpe', name: 'Sharpe Ratio', category: 'Risk',
     description: 'Helps investors understand the return of an investment compared to its risk.',
     history: 'Created by Nobel laureate William F. Sharpe in 1966. It adjusts a portfolio\'s performance for the excess risk that was taken by the investor.',
     formula: 'Sharpe = (Rx - Rf) / StdDev(Rx)',
-    benchmark: '< 1.0 is suboptimal · 1.0–2.0 is adequate · > 2.0 is very good · > 3.0 is exceptional. Most actively managed funds average 0.5–1.2 over the long run.',
+    benchmark: '≥ 2.0 = excellent · 1.0–2.0 = good · 0.5–1.0 = acceptable · < 0.5 = poor. Thresholds assume annualised return, risk-free rate and volatility. To compute from a series of periodic returns, use sharpeFromReturns().',
     inputs: [
         { key: 'returnVal', label: 'Portfolio Return', min: -0.5, max: 1.0, step: 0.01, default: 0.12 },
         { key: 'riskFree', label: 'Risk-Free Rate', min: 0, max: 0.2, step: 0.01, default: 0.04 },
@@ -483,17 +517,22 @@ export const metricsData: Record<string, MetricDefinition> = {
     description: 'A 9-point scorecard separating fundamentally strong companies from deteriorating ones across profitability, leverage, and efficiency signals.',
     history: 'Developed by accounting professor Joseph Piotroski in 2000. His original paper showed that buying high-score stocks and shorting low-score stocks generated 23% annual returns over 20 years.',
     formula: 'F1 ROA>0 | F2 CFO>0 | F3 ROA↑ | F4 CFO>ROA | F5 Leverage↓ | F6 Liquidity↑ | F7 No Dilution | F8 Gross Margin↑ | F9 Asset Turnover↑',
-    benchmark: '8–9 = fundamentally strong (consider long) · 5–7 = neutral · 0–2 = fundamentally weak (avoid or consider short). Piotroski\'s original paper used ≥ 8 as the long threshold.',
+    benchmark: 'With all 9 signals: 7–9 = strong · 3–6 = mixed · 0–2 = weak. Piotroski\'s paper bought 8–9 and shorted 0–1. Six signals need prior-year data; with fewer signals the library rates the share of available signals met and says the score is partial. This playground uses 4 signals (F1–F4).',
     inputs: [
       { key: 'netIncome', label: 'Net Income', min: -50000, max: 100000, step: 1000, default: 5000, prefix: '$' },
       { key: 'totalAssets', label: 'Total Assets', min: 1000, max: 500000, step: 1000, default: 100000, prefix: '$' },
       { key: 'operatingCashFlow', label: 'Operating Cash Flow', min: -50000, max: 100000, step: 1000, default: 7000, prefix: '$' },
+      { key: 'priorNetIncome', label: 'Prior-Year Net Income', min: -50000, max: 100000, step: 1000, default: 4000, prefix: '$' },
+      { key: 'priorTotalAssets', label: 'Prior-Year Total Assets', min: 1000, max: 500000, step: 1000, default: 100000, prefix: '$' },
     ],
-    calculate: (inputs) => {
-      const result = piotroski({ netIncome: inputs.netIncome, totalAssets: inputs.totalAssets, operatingCashFlow: inputs.operatingCashFlow });
-      return result.score;
-    },
-    evaluateInsight: (val) => evaluate.piotroski(val, 9),
+    calculate: (inputs) => piotroski({
+      netIncome: inputs.netIncome, totalAssets: inputs.totalAssets, operatingCashFlow: inputs.operatingCashFlow,
+      priorNetIncome: inputs.priorNetIncome, priorTotalAssets: inputs.priorTotalAssets,
+    }).score,
+    evaluateInsight: (val, inputs) => evaluate.piotroski(val, piotroski({
+      netIncome: inputs.netIncome, totalAssets: inputs.totalAssets, operatingCashFlow: inputs.operatingCashFlow,
+      priorNetIncome: inputs.priorNetIncome, priorTotalAssets: inputs.priorTotalAssets,
+    }).maxScore),
   },
   'target-upside': {
     id: 'target-upside', name: 'Target Upside', category: 'Risk',
@@ -569,9 +608,9 @@ export const metricsData: Record<string, MetricDefinition> = {
     calculate: (inputs) => marketCapToDebtCap(inputs.marketCap, inputs.totalDebt),
     evaluateInsight: (val) => ({
       value: val,
-      status: val !== null && val > 0.6 ? 'Good' : val !== null && val > 0.35 ? 'Neutral' : 'Bad',
+      status: val !== null && val > 0.7 ? 'Good' : val !== null && val >= 0.4 ? 'Neutral' : 'Bad',
       insight: val !== null
-        ? `${(val * 100).toFixed(1)}% equity-financed. ${val > 0.6 ? 'Low leverage.' : val > 0.35 ? 'Moderate leverage.' : 'High debt in capital structure.'}`
+        ? `${(val * 100).toFixed(1)}% equity-financed. ${val > 0.7 ? 'Low leverage.' : val >= 0.4 ? 'Balanced capital structure.' : 'High debt in capital structure.'}`
         : 'N/A',
     }),
   },
@@ -586,24 +625,44 @@ export const metricsData: Record<string, MetricDefinition> = {
     inputs: [
       { key: 'currentAssets', label: 'Current Assets', min: 0, max: 500000, step: 1000, default: 80000, prefix: '$' },
       { key: 'totalLiabilities', label: 'Total Liabilities', min: 0, max: 500000, step: 1000, default: 50000, prefix: '$' },
-      { key: 'sharesOutstanding', label: 'Shares Outstanding (000s)', min: 1, max: 10000, step: 10, default: 1000 },
+      { key: 'sharesOutstanding', label: 'Shares Outstanding (same unit as the amounts)', min: 1, max: 10000, step: 10, default: 1000 },
+      { key: 'price', label: 'Share Price', min: 1, max: 200, step: 1, default: 25, prefix: '$' },
     ],
     calculate: (inputs) => computeNCVPS(inputs.currentAssets, inputs.totalLiabilities, inputs.sharesOutstanding),
-    evaluateInsight: (val) => ({ value: val, status: val !== null && val > 0 ? 'Good' : 'Bad', insight: val !== null && val > 0 ? 'Positive net current value per share — current assets exceed all liabilities.' : 'Liabilities exceed current assets — no net current value.' }),
+    evaluateInsight: (val, inputs) => ({
+      value: val,
+      status: val === null || val <= 0 ? 'Bad' : val > inputs.price ? 'Good' : 'Neutral',
+      insight: val === null || val <= 0
+        ? 'Liabilities exceed current assets — no net current value.'
+        : val > inputs.price
+          ? 'Trades below net current value — Graham\'s "net-net" condition. Often seen in distressed or declining businesses; check why.'
+          : 'Positive net current value, but the price is above it — not a net-net.',
+    }),
   },
   'intrinsic-value': {
     id: 'intrinsic-value', name: 'Intrinsic Value Estimate', category: 'Valuation',
-    description: 'A simplified 5-year EPS projection discounted to present value with a margin of safety applied. Quick-screen approximation — not a full DCF.',
-    history: 'Derived from the principle of discounting future earnings, popularised by Benjamin Graham and refined by Warren Buffett. Margin of safety (Graham\'s key concept) is baked in to protect against forecasting error.',
-    formula: 'IV = (EPS × (1 + g)^5) / (1 − safety)',
-    benchmark: 'If current price < Intrinsic Value, the stock has a margin of safety. Use a 25–35% safety margin for conservative estimates. The result is sensitive to growth rate assumptions — stress-test with pessimistic inputs.',
+    description: 'A per-share value from projected earnings: grow EPS for a number of years, apply an exit P/E, discount back to today and subtract a margin of safety. A quick screen, not a full DCF.',
+    history: 'Based on discounting future earnings, the approach popularised by Benjamin Graham and Warren Buffett. The margin of safety — Graham\'s key idea — lowers the value to protect against forecasting error.',
+    formula: 'IV = EPS × (1+g)ⁿ × terminal P/E ÷ (1+r)ⁿ × (1 − margin)   defaults: n = 5, P/E 15, r = 10 %',
+    benchmark: 'The result already includes the margin of safety, so a market price below it suggests undervaluation even after that cushion. Very sensitive to growth and exit P/E — stress-test with pessimistic inputs. Example: EPS 10, g 15 %, margin 25 % → 140.50.',
     inputs: [
-      { key: 'eps', label: 'EPS (TTM)', min: 0.01, max: 500, step: 0.1, default: 10, prefix: '$' },
-      { key: 'growthRate', label: 'Expected Growth Rate (5yr)', min: 0, max: 0.5, step: 0.01, default: 0.12 },
+      { key: 'eps', label: 'EPS (TTM)', min: 0.01, max: 100, step: 0.1, default: 10, prefix: '$' },
+      { key: 'growthRate', label: 'Expected EPS Growth (decimal, 5 yrs)', min: -0.2, max: 0.4, step: 0.01, default: 0.15 },
+      { key: 'terminalPE', label: 'Exit (Terminal) P/E', min: 5, max: 40, step: 1, default: 15 },
+      { key: 'discountRate', label: 'Discount Rate (required return)', min: 0.04, max: 0.2, step: 0.005, default: 0.10 },
       { key: 'safetyMargin', label: 'Margin of Safety', min: 0, max: 0.5, step: 0.05, default: 0.25 },
+      { key: 'price', label: 'Current Share Price', min: 1, max: 500, step: 1, default: 120, prefix: '$' },
     ],
-    calculate: (inputs) => computeIntrinsicValue(inputs.eps, inputs.growthRate, inputs.safetyMargin),
-    evaluateInsight: (val) => ({ value: val, status: 'Neutral', insight: 'Compare against current market price. Price < Intrinsic Value = margin of safety exists.' }),
+    calculate: (inputs) => computeIntrinsicValue(inputs.eps, inputs.growthRate, inputs.safetyMargin, { terminalPE: inputs.terminalPE, discountRate: inputs.discountRate }),
+    evaluateInsight: (val, inputs) => ({
+      value: val,
+      status: val === null ? 'N/A' : inputs.price <= val ? 'Good' : 'Bad',
+      insight: val === null
+        ? 'Not computable (EPS must be positive).'
+        : inputs.price <= val
+          ? `Price ${inputs.price} is below the intrinsic value of ${val.toFixed(2)} (after the margin of safety).`
+          : `Price ${inputs.price} is above the intrinsic value of ${val.toFixed(2)}.`,
+    }),
   },
   'g-factor': {
     id: 'g-factor', name: 'G-Factor (Composite Score)', category: 'Risk',
@@ -645,7 +704,7 @@ export const metricsData: Record<string, MetricDefinition> = {
   // --- GROWTH (new) ---
   'median-growth': {
     id: 'median-growth', name: 'Median Growth Rate', category: 'Growth',
-    description: 'The median of all year-over-year growth rates in a series. More robust than CAGR because outlier years (unusually high or low) do not distort the result.',
+    description: 'The median of all year-over-year growth rates in a series. Less distorted than an average by unusually high or low years; years whose previous value is 0 are skipped.',
     history: 'Preferred by sell-side analysts as a sanity-check alongside CAGR. A company with lumpy, one-off revenue spikes will show a high CAGR but a modest median growth — the median reveals the typical annual pace more honestly.',
     formula: 'Median of [YoY growth rates] — sorts all (v[i] − v[i-1]) / |v[i-1]| values and returns the middle value',
     benchmark: '> 15% = strong typical growth · 5–15% = steady compounder · < 5% = slow growth. Compare against CAGR: if median << CAGR, growth is driven by outlier years.',
@@ -660,7 +719,7 @@ export const metricsData: Record<string, MetricDefinition> = {
     evaluateInsight: (val) => ({
       value: val,
       status: val !== null && val > 0.15 ? 'Good' : val !== null && val > 0.05 ? 'Neutral' : 'Bad',
-      insight: val !== null ? `Typical annual growth: ${(val * 100).toFixed(1)}%. Outlier years have no effect on this figure.` : 'N/A',
+      insight: val !== null ? `Typical annual growth: ${(val * 100).toFixed(1)}%. The median is less affected by outlier years than the mean.` : 'N/A',
     }),
   },
 
@@ -737,7 +796,7 @@ export const metricsData: Record<string, MetricDefinition> = {
   'historical-point': {
     id: 'historical-point', name: 'Historical Point Lookup (computeHistoricalPoint)', category: 'Historical',
     description: 'Returns the value at exactly N quarters back from the most recent quarter. Used to fetch same-quarter-prior-year data for YoY comparisons.',
-    history: 'Point-in-time lookup is essential for avoiding look-ahead bias in backtesting and for computing YoY growth with proper quarterly alignment (e.g., Q3 this year vs Q3 last year).',
+    history: 'Useful for year-over-year comparisons with proper quarterly alignment (Q3 this year vs Q3 last year), which removes seasonality that a quarter-over-quarter comparison would show.',
     formula: 'values[length - 1 - quartersBack]',
     inputs: [
       { key: 'q1', label: 'Q1 (oldest)', min: -100000, max: 1000000, step: 100, default: 2000 },
@@ -754,34 +813,36 @@ export const metricsData: Record<string, MetricDefinition> = {
   // --- SCORING (new module) ---
   'quality-score': {
     id: 'quality-score', name: 'Quality Score (computeQualityScore)', category: 'Scoring',
-    description: 'Composite quality score (0–100) based on Piotroski F-Score, ROE vs sector, margin improvement, promoter pledge status, and promoter holding stability.',
-    history: 'Quality factors have historically produced excess returns independent of value or momentum (Asness et al., 2019). This score aggregates five independently validated quality signals into a single 0–100 index.',
-    formula: 'Piotroski×30% + ROE vs Sector×20% + Margins Improving×20% + Pledge-Free×15% + Promoter Stable×15%',
+    description: 'Composite quality score (0–100) from the Piotroski F-Score, ROE versus the sector, margin trend and two optional ownership signals: insider/promoter shares pledged and insider/promoter holding stability.',
+    history: 'Quality factors have historically earned excess returns independent of value or momentum (Asness, Frazzini & Pedersen, "Quality Minus Junk", 2019). The weights here are this library\'s heuristics. The ownership signals matter most in markets such as India, where promoter pledging is disclosed; elsewhere you can leave them out and the other weights are rescaled.',
+    formula: 'Piotroski (score/max)×30% + ROE vs Sector×20% + Margins Improving×20% + Insider Pledge-Free×15% + Insider Holding Stable×15%  (omitted signals are dropped and weights rescaled)',
     benchmark: '> 70 = high quality · 40–70 = average · < 40 = weak fundamentals. Use above 60 as a long-side quality filter in a multi-factor strategy.',
     inputs: [
-      { key: 'piotroskiScore', label: 'Piotroski F-Score (0–9)', min: 0, max: 9, step: 1, default: 7 },
-      { key: 'roeVsSector', label: 'ROE vs Sector (ratio, cap 1.0)', min: 0, max: 2, step: 0.05, default: 1.1 },
+      { key: 'piotroskiScore', label: 'Piotroski F-Score points', min: 0, max: 9, step: 1, default: 7 },
+      { key: 'piotroskiMaxScore', label: 'Piotroski max possible (9 with full data)', min: 1, max: 9, step: 1, default: 9 },
+      { key: 'roeVsSector', label: 'ROE ÷ Sector Median ROE', min: 0, max: 2, step: 0.05, default: 1.1 },
       { key: 'marginsImproving', label: 'Margins Improving (1=yes, 0=no)', min: 0, max: 1, step: 1, default: 1 },
-      { key: 'pledgeFree', label: 'Pledge-Free (1=yes, 0=no)', min: 0, max: 1, step: 1, default: 1 },
-      { key: 'promoterStable', label: 'Promoter Stable (1=yes, 0=no)', min: 0, max: 1, step: 1, default: 1 },
+      { key: 'insiderPledgeFree', label: 'Insider/Promoter Pledge-Free (1=yes, 0=no, −1=not tracked)', min: -1, max: 1, step: 1, default: -1 },
+      { key: 'insiderHoldingStable', label: 'Insider/Promoter Holding Stable (1=yes, 0=no, −1=not tracked)', min: -1, max: 1, step: 1, default: -1 },
     ],
     calculate: (inputs) => computeQualityScore({
       piotroskiScore: inputs.piotroskiScore,
+      piotroskiMaxScore: inputs.piotroskiMaxScore,
       roeVsSector: inputs.roeVsSector,
       marginsImproving: inputs.marginsImproving === 1,
-      pledgeFree: inputs.pledgeFree === 1,
-      promoterStable: inputs.promoterStable === 1,
+      insiderPledgeFree: inputs.insiderPledgeFree === -1 ? undefined : inputs.insiderPledgeFree === 1,
+      insiderHoldingStable: inputs.insiderHoldingStable === -1 ? undefined : inputs.insiderHoldingStable === 1,
     }),
     evaluateInsight: (val) => ({
       value: val,
       status: val > 70 ? 'Good' : val > 40 ? 'Neutral' : 'Bad',
-      insight: val > 70 ? 'High quality business across profitability, governance, and efficiency signals.' : val > 40 ? 'Average quality — mixed signals across quality dimensions.' : 'Weak quality fundamentals. Consider deeper due diligence.',
+      insight: val > 70 ? 'High quality across the supplied profitability, efficiency and ownership signals.' : val > 40 ? 'Average quality — mixed signals across quality dimensions.' : 'Weak quality fundamentals. Consider deeper due diligence.',
     }),
   },
   'growth-score': {
     id: 'growth-score', name: 'Growth Score (computeGrowthScore)', category: 'Scoring',
     description: 'Composite growth score (0–100) built from revenue growth vs sector, profit growth rate, EPS growth, CFO positivity, and revenue acceleration signals.',
-    history: 'Growth factor premiums are well-documented in academic literature (Fama-French 1992, Lakonishok et al. 1994). This score synthesises five prospective and backward-looking growth signals into a single quantitative rank.',
+    history: 'Academic evidence on growth is mixed: classic studies (Fama & French 1992; Lakonishok, Shleifer & Vishny 1994) found that expensive "glamour" stocks underperformed, while profitable, growing companies tend to do well. Use this score to describe a company\'s growth profile, ideally alongside the Value and Quality scores. Weights are this library\'s heuristics.',
     formula: 'RevGrowthVsSector×25% + ProfitGrowth×25% + EPSGrowth×20% + CFO+×15% + RevAccel×15%',
     benchmark: '> 70 = high-growth company · 40–70 = moderate growth · < 40 = stagnating or declining.',
     inputs: [
@@ -813,7 +874,7 @@ export const metricsData: Record<string, MetricDefinition> = {
     inputs: [
       { key: 'peVs3yrAvg', label: 'Current P/E ÷ 3yr Avg P/E', min: 0, max: 3, step: 0.05, default: 0.8 },
       { key: 'pbVsSector', label: 'Current P/B ÷ Sector Median P/B', min: 0, max: 3, step: 0.05, default: 0.75 },
-      { key: 'peg', label: 'PEG Ratio', min: 0, max: 5, step: 0.1, default: 0.9 },
+      { key: 'peg', label: 'PEG Ratio (P/E ÷ growth %)', min: 0, max: 3, step: 0.1, default: 0.9 },
       { key: 'historicalPePercentile', label: 'Historical P/E Percentile (0–100)', min: 0, max: 100, step: 1, default: 30 },
     ],
     calculate: (inputs) => computeValueScore({
@@ -831,7 +892,7 @@ export const metricsData: Record<string, MetricDefinition> = {
   'momentum-score': {
     id: 'momentum-score', name: 'Momentum Score (computeMomentumScore)', category: 'Scoring',
     description: 'Composite momentum score (0–100) combining price vs SMA-200, RSI, ADX trend strength, volume ratio, and 6-month Rate of Change (ROC-125).',
-    history: 'Price momentum is one of the most robust factor premiums across markets (Jegadeesh & Titman 1993). Rather than using a single signal (e.g., just RSI), this composite validates momentum using five independent technical lenses.',
+    history: 'Price momentum is one of the most robust factor premiums across markets (Jegadeesh & Titman 1993). This composite combines five signals. Note: the library does not calculate RSI, ADX, moving averages or volume ratios — supply them from your charting or data provider.',
     formula: 'PriceVsSMA200×25% + RSI×20% + ADX×20% + VolumeRatio×20% + ROC125×15%',
     benchmark: '> 70 = strong uptrend with volume confirmation · 40–70 = mixed momentum · < 40 = weak or negative momentum.',
     inputs: [

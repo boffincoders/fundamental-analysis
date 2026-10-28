@@ -2,6 +2,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { createHighlighter, type Highlighter } from 'shiki';
 import { metricsData } from '../data/metrics';
 import { useDark } from '../App';
+import { usePageMeta } from '../seo';
 
 // ── Shiki code block ────────────────────────────────────────────────────────
 let _hl: Highlighter | null = null;
@@ -95,9 +96,11 @@ function NullCallout() {
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
       </svg>
       <p className="text-[13px] m-0 leading-relaxed" style={{ color: 'var(--text-3)' }}>
-        All functions return{' '}
+        Ratio functions return{' '}
         <code className="font-mono text-[12px] px-1.5 py-0.5 rounded" style={{ background: 'var(--bg-subtle)', color: 'var(--blue)', border: '1px solid var(--border)' }}>number | null</code>.{' '}
-        <span style={{ color: 'var(--text-2)' }}>Null means a required input was absent</span> — the library never throws. Safe to call with partial data at any time.
+        <span style={{ color: 'var(--text-2)' }}>null means an input was missing, a denominator was zero, or the ratio is not meaningful</span>{' '}
+        (for example ROE with negative equity, or net debt / EBITDA with negative EBITDA). Rates are decimals (0.15 = 15 %).
+        Simple arithmetic helpers such as <code className="font-mono">netDebt()</code> and the composite scores return a plain number.
       </p>
     </div>
   );
@@ -120,23 +123,26 @@ pnpm add finance-calculator-pro`;
 const CORE_CODE = `import { analyzeCompany } from 'finance-calculator-pro';
 
 const data = {
-  price: 150, eps: 5.50,
-  netIncome: 1_000_000, totalAssets: 5_000_000,
-  totalDebt: 500_000, cashAndEquivalents: 200_000,
+  price: 150, eps: 5.50, marketCap: 1_500_000,
+  netIncome: 550_000, operatingCashFlow: 770_000, ebitda: 900_000,
+  totalAssets: 5_000_000, totalDebt: 500_000, cashAndEquivalents: 200_000,
 };
 
 // Returns 7 categories: valuation, profitability, liquidity,
 // solvency, efficiency, risk, quality
 const analysis = analyzeCompany(data, true /* withInsights */);
 
-console.log(analysis.valuation.pe);
-// { value: 27.27, status: "Bad", insight: "Expensive. High growth is priced in." }
+analysis.valuation.pe;
+// { value: 27.27, status: "Bad", insight: "Expensive by generic standards. ..." }
 
-console.log(analysis.solvency.netDebtToEbitda);
-// { value: 1.5, status: "Good", insight: "Low leverage. Manageable debt load." }
+analysis.solvency.netDebtToEbitda;
+// { value: 0.33, status: "Good", insight: "Low leverage. Debt is very manageable." }   (500k − 200k) / 900k
 
-console.log(analysis.quality.cashConversionRatio);
-// { value: 1.4, status: "Good", insight: "Cash-backed earnings. Strong quality." }`;
+analysis.quality.cashConversionRatio;
+// { value: 1.4, status: "Good", insight: "Earnings are well-supported by real cash flow. ..." }
+
+analysis.liquidity.currentRatio;
+// { value: null, status: "N/A", ... }  — needs currentAssets and currentLiabilities`;
 
 const CATEGORICAL_CODE = `import {
   analyzeValuation, analyzeSolvency,
@@ -152,18 +158,20 @@ const data = {
 
 // Run only what you need — each function accepts the same input shape
 const solvency = analyzeSolvency(data, true);
-console.log(solvency.netDebtToEbitda);
-// { value: 1.5, status: "Good", insight: "..." }
+solvency.netDebtToEbitda;   // { value: 1.5, status: "Neutral", ... }  (20k − 5k) / 10k
+solvency.netCash;           // { value: 0, status: "Neutral", ... }
 
 const quality = analyzeQuality(data, true);
-console.log(quality.cashConversionRatio);
-// { value: 1.4, status: "Good", insight: "..." }`;
+quality.cashConversionRatio; // { value: 1.4, status: "Good", ... }
+quality.payoutRatio;         // { value: 0.4, status: "Good", ... }  2 / 5`;
 
 const BATCH_CODE = `import { analyzeBatch, analyzeFundamentalTrends } from 'finance-calculator-pro';
 
-// Evaluate multiple companies at once — returns the same shape as analyzeCompany()
-const results = analyzeBatch([appleData, msftData, googleData], true);
-results[0].valuation.pe;  // { value: 28.5, status: "Bad", insight: "..." }
+// Evaluate a watchlist at once — same shape as analyzeCompany(), fully typed
+const results = analyzeBatch(watchlist, true);
+const cheapestFirst = results
+  .filter(r => r.valuation.pe.value !== null)
+  .sort((a, b) => a.valuation.pe.value! - b.valuation.pe.value!);
 
 // Timeseries growth analysis — pass arrays [oldest → newest]
 const trends = analyzeFundamentalTrends({
@@ -172,16 +180,15 @@ const trends = analyzeFundamentalTrends({
 }, 'annual');
 
 // Return shape:
-// trends.growth.revenueCagr       → number | null  (-2.2% CAGR)
-// trends.growth.revenueGrowth     → number[]       [+7.7%, -2.8%]
-// trends.growth.netIncomeCagr     → number | null
-// trends.margins.netProfitMargin  → number[]       [25.9%, 25.3%, 25.3%]
-// trends.quality.fcfConversion    → number[]       (FCF / Net Income per period)
-console.log(trends.growth.revenueCagr);   // -0.022
-console.log(trends.growth.revenueGrowth); // [0.0777, -0.0282]`;
+// trends.growth.revenueGrowth   → (number | null)[]  [0.0779, -0.0280]  (null where the prior value is 0)
+// trends.growth.revenueCagr     → number | null      0.0236 (+2.36 % a year)
+// trends.growth.netIncomeCagr   → number | null      0.0122
+// trends.margins.netMargins     → (number | null)[]  [0.2588, 0.2531, 0.2531]
+// trends.margins.grossMargins / operatingMargins / fcfMargins → when those series are supplied`;
 
-const TYPES_CODE = `interface CompanySnapshotInput {
-  // Pricing
+const TYPES_CODE = `// All fields optional. Amounts in one currency/unit; rates as decimals.
+interface CompanySnapshotInput {
+  // Market data
   price?: number;
   marketCap?: number;
   eps?: number;
@@ -189,35 +196,39 @@ const TYPES_CODE = `interface CompanySnapshotInput {
   revenuePerShare?: number;
   annualDividendPerShare?: number;
   analystTargetPrice?: number;
+  expectedEarningsGrowthRate?: number; // 0.15 = 15 %, for PEG
+  sharesOutstanding?: number;
 
-  // Income Statement
+  // Income statement
   totalRevenue?: number;
-  grossProfit?: number;
+  costOfRevenue?: number;      // positive number
+  grossProfit?: number;        // used when costOfRevenue is absent
   operatingIncome?: number;
-  netIncome?: number;
-  freeCashFlow?: number;
-  operatingCashFlow?: number;
-  ebitda?: number;
   ebit?: number;
-  costOfRevenue?: number;
-  interestExpense?: number;
-  expectedEarningsGrowthRate?: number;
+  ebitda?: number;
+  interestExpense?: number;    // positive number
+  netIncome?: number;
+  taxRate?: number;            // 0.25 = 25 %
 
-  // Balance Sheet
+  // Cash flow
+  operatingCashFlow?: number;
+  freeCashFlow?: number;
+
+  // Balance sheet
   totalAssets?: number;
   totalLiabilities?: number;
   totalEquity?: number;
+  currentAssets?: number;      // current & quick ratio
+  currentLiabilities?: number; // current & quick ratio
   totalDebt?: number;
   longTermDebt?: number;
   cashAndEquivalents?: number;
   inventory?: number;
   tradeReceivables?: number;
-  workingCapital?: number;
+  workingCapital?: number;     // derived from current assets/liabilities if omitted
   retainedEarnings?: number;
-  sharesOutstanding?: number;
-  taxRate?: number;
 
-  // Risk / Portfolio
+  // Precomputed risk inputs (same period basis)
   returns?: number;
   riskFree?: number;
   stdDev?: number;
@@ -234,7 +245,7 @@ const SINGLE_CODE = `import {
   assetTurnover, receivablesTurnover, daysSalesOutstanding,
   payableDays, workingCapitalDays, cashConversionCycle,
   payoutRatio, cashConversionRatio,
-  altmanZScore, piotroski, sharpe,
+  altmanZScore, altmanZScoreDoublePrime, piotroski, sharpe, sharpeFromReturns,
   grahamNumber, calculateDCF,
   computeNCVPS, computeIntrinsicValue, computeGFactor,
   evaluate,
@@ -255,27 +266,35 @@ workingCapitalDays(20_000, 200_000);          // → 36.5 days
 // Intrinsic Valuation
 grahamNumber(5, 20);                          // → 47.43
 computeNCVPS(80_000, 50_000, 1_000);          // → 30
-computeIntrinsicValue(10, 0.12, 0.25);        // → 14.09
-computeGFactor(70, 65, 55);                   // → 64.25
+computeIntrinsicValue(10, 0.12, 0.25);        // → 123.11 per share (P/E 15 exit, 10 % discount, 25 % margin)
+computeIntrinsicValue(10, 0.12, 0.25, { terminalPE: 20, discountRate: 0.08 }); // custom assumptions
+computeGFactor(70, 65, 55);                   // → 64.5
+peg(30, 0.15);                                // → 2 (growth as a decimal)
 
 // Risk
-altmanZScore(15_000, 20_000, 7_500, 250_000, 50_000, 100_000, 60_000); // → 3.71
+altmanZScore(15_000, 20_000, 7_500, 250_000, 50_000, 100_000, 60_000);   // → 3.7075 (manufacturers)
+altmanZScoreDoublePrime(15_000, 20_000, 7_500, 40_000, 100_000, 60_000); // → 2.84 (non-manufacturers)
+sharpeFromReturns([0.02, 0.01, -0.01, 0.03], 0, 12);                     // → 2.54 annualised
 
 const result = piotroski({
   netIncome: 5_000, totalAssets: 100_000, operatingCashFlow: 7_000,
   priorNetIncome: 4_000, priorTotalAssets: 100_000,
 });
 result.score;    // → 4
-result.maxScore; // → 5
+result.maxScore; // → 4  (F1–F4; the other signals need more prior-year fields)
 
 // Pair raw math with the evaluator
 const ratio = pe(150, 5);  // → 30
 evaluate.pe(ratio);
-// { value: 30, status: "Bad", insight: "Expensive. High growth is priced in." }`;
+// { value: 30, status: "Bad", insight: "Expensive by generic standards. High growth is priced in; normal for some sectors." }`;
 
 export default function ApiDocs() {
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
+  usePageMeta(
+    'API reference & guide — finance-calculator-pro (TypeScript financial ratios)',
+    'Install and use finance-calculator-pro: analyzeCompany, categorical analyzers, batch screening, growth trends, input conventions and every ratio function with verified examples.',
+  );
 
   // ⌘K shortcut
   useEffect(() => {
@@ -412,10 +431,10 @@ export default function ApiDocs() {
                     {[
                       { fn: 'analyzeValuation',    note: 'P/E, P/B, P/S, PEG, EV/EBITDA, Graham, P/CF, EY, EV/Rev, EV/FCF' },
                       { fn: 'analyzeProfitability', note: 'ROA, ROE, ROIC, all margins' },
-                      { fn: 'analyzeLiquidity',     note: 'Current, Quick, D/E, Interest Coverage' },
-                      { fn: 'analyzeSolvency',      note: 'Net Debt, Net Debt/EBITDA, Debt/Assets' },
-                      { fn: 'analyzeEfficiency',    note: 'Asset Turnover, Inventory, DSO, Payable Days, WC Days, CCC' },
-                      { fn: 'analyzeRisk',          note: 'Altman Z, Sharpe, Piotroski F-Score' },
+                      { fn: 'analyzeLiquidity',     note: 'Current & Quick (need current assets/liabilities), D/E, Interest Coverage' },
+                      { fn: 'analyzeSolvency',      note: 'Net Debt, Net Cash, Net Debt/EBITDA, Debt/Assets, D/E, Interest Coverage' },
+                      { fn: 'analyzeEfficiency',    note: 'Asset Turnover, Inventory Turnover, Receivables Turnover, DSO' },
+                      { fn: 'analyzeRisk',          note: "Altman Z, Altman Z'', Sharpe, Piotroski F-Score" },
                       { fn: 'analyzeQuality',       note: 'Payout Ratio, CCR, Target Upside' },
                     ].map(({ fn, note }) => (
                       <div key={fn} className="flex items-start gap-3 px-3 py-2.5 rounded-lg" style={{ border: '1px solid var(--border)', background: 'var(--bg-subtle)' }}>
@@ -454,7 +473,7 @@ export default function ApiDocs() {
             <SectionHeading id="types" number="05" title="Type Definitions" />
             <Prose>
               Every field in <code className="font-mono text-[13px]">CompanySnapshotInput</code> is optional.
-              Missing fields cause their dependent metrics to return <code className="font-mono text-[13px]">null</code> — the engine never throws.
+              Missing fields cause their dependent metrics to return <code className="font-mono text-[13px]">null</code> instead of a made-up number.
             </Prose>
             <CodeBlock code={TYPES_CODE} />
           </section>

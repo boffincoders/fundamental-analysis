@@ -1,118 +1,8 @@
 import { useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useDark } from '../App';
-
-const CATEGORIES = [
-  {
-    label: 'Valuation',
-    items: [
-      { id: 'pe', label: 'P/E Ratio' },
-      { id: 'pb', label: 'P/B Ratio' },
-      { id: 'ps', label: 'P/S Ratio' },
-      { id: 'peg', label: 'PEG Ratio' },
-      { id: 'ev-ebitda', label: 'EV/EBITDA' },
-      { id: 'ev-revenue', label: 'EV / Revenue' },
-      { id: 'ev-fcf', label: 'EV / Free Cash Flow' },
-      { id: 'price-to-cash-flow', label: 'Price-to-Cash-Flow' },
-      { id: 'earnings-yield', label: 'Earnings Yield' },
-      { id: 'dcf', label: 'Discounted Cash Flow' },
-      { id: 'graham', label: 'Graham Number' },
-      { id: 'dividend', label: 'Dividend Yield' },
-      { id: 'market-cap-to-debt-cap', label: 'Market Cap to Total Capital' },
-      { id: 'ncvps', label: 'Net Current Value Per Share' },
-      { id: 'intrinsic-value', label: 'Intrinsic Value Estimate' },
-    ],
-  },
-  {
-    label: 'Profitability',
-    items: [
-      { id: 'roa', label: 'ROA' },
-      { id: 'roe', label: 'ROE' },
-      { id: 'roic', label: 'ROIC' },
-      { id: 'gross-margin', label: 'Gross Margin' },
-      { id: 'operating-margin', label: 'Operating Margin' },
-      { id: 'net-margin', label: 'Net Profit Margin' },
-      { id: 'fcf-margin', label: 'FCF Margin' },
-    ],
-  },
-  {
-    label: 'Liquidity',
-    items: [
-      { id: 'current-ratio', label: 'Current Ratio' },
-      { id: 'quick-ratio', label: 'Quick Ratio' },
-      { id: 'debt-to-equity', label: 'Debt-to-Equity' },
-      { id: 'interest-coverage', label: 'Interest Coverage' },
-    ],
-  },
-  {
-    label: 'Solvency',
-    items: [
-      { id: 'net-debt', label: 'Net Debt' },
-      { id: 'net-debt-to-ebitda', label: 'Net Debt / EBITDA' },
-      { id: 'debt-to-assets', label: 'Debt-to-Assets' },
-    ],
-  },
-  {
-    label: 'Efficiency',
-    items: [
-      { id: 'asset-turnover', label: 'Asset Turnover' },
-      { id: 'inventory-turnover', label: 'Inventory Turnover' },
-      { id: 'receivables-turnover', label: 'Receivables Turnover' },
-      { id: 'days-sales-outstanding', label: 'Days Sales Outstanding' },
-      { id: 'payable-days', label: 'Payable Days (DPO)' },
-      { id: 'working-capital-days', label: 'Working Capital Days' },
-      { id: 'cash-conversion-cycle', label: 'Cash Conversion Cycle' },
-    ],
-  },
-  {
-    label: 'Quality',
-    items: [
-      { id: 'payout-ratio', label: 'Payout Ratio' },
-      { id: 'cash-conversion-ratio', label: 'Cash Conversion Ratio' },
-    ],
-  },
-  {
-    label: 'Risk',
-    items: [
-      { id: 'z-score', label: 'Altman Z-Score' },
-      { id: 'sharpe', label: 'Sharpe Ratio' },
-      { id: 'piotroski', label: 'Piotroski F-Score' },
-      { id: 'target-upside', label: 'Target Upside' },
-      { id: 'g-factor', label: 'G-Factor (Composite)' },
-    ],
-  },
-  {
-    label: 'Growth',
-    items: [
-      { id: 'cagr', label: 'CAGR' },
-      { id: 'median-growth', label: 'Median Growth Rate' },
-    ],
-  },
-  {
-    label: 'TTM',
-    items: [
-      { id: 'ttm-sum', label: 'TTM Sum' },
-      { id: 'ttm-avg', label: 'TTM Average' },
-    ],
-  },
-  {
-    label: 'Historical',
-    items: [
-      { id: 'n-year-avg', label: 'N-Year Average' },
-      { id: 'n-year-sum', label: 'N-Year Sum' },
-      { id: 'historical-point', label: 'Historical Point Lookup' },
-    ],
-  },
-  {
-    label: 'Scoring',
-    items: [
-      { id: 'quality-score', label: 'Quality Score' },
-      { id: 'growth-score', label: 'Growth Score' },
-      { id: 'value-score', label: 'Value Score' },
-      { id: 'momentum-score', label: 'Momentum Score' },
-    ],
-  },
-];
+import { CATEGORIES } from '../data/navigation';
+import { metricsData } from '../data/metrics';
 
 function SunIcon() {
   return (
@@ -191,7 +81,7 @@ const AppLayout: React.FC = () => {
       {/* Top nav links */}
       <div className="px-3 mb-2">
         <NavLink to="/" label="Overview & Playground" onClick={() => setMobileOpen(false)} />
-        <NavLink to="/api-docs" label="Developer API Docs" onClick={() => setMobileOpen(false)} />
+        <NavLink to="/api-docs" label="API Reference & Guide" onClick={() => setMobileOpen(false)} />
       </div>
 
       <div className="mx-5 my-3 border-t" style={{ borderColor: 'var(--border)' }} />
@@ -290,10 +180,10 @@ const AppLayout: React.FC = () => {
           {/* Breadcrumb / page title hint on desktop */}
           <div className="hidden md:flex items-center gap-2 text-sm" style={{ color: 'var(--text-3)' }}>
             <span className="font-medium" style={{ color: 'var(--text)' }}>finance-calculator-pro</span>
-            {currentMetricId && (
+            {currentMetricId && metricsData[currentMetricId] && (
               <>
                 <span>/</span>
-                <span>{currentMetricId}</span>
+                <span>{metricsData[currentMetricId].name}</span>
               </>
             )}
           </div>
@@ -352,18 +242,23 @@ const AppLayout: React.FC = () => {
 
         {/* Footer */}
         <footer className="px-8 py-6 text-center text-sm" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-4)' }}>
-          Open-source financial engine &copy;{new Date().getFullYear()} &mdash; Built by{' '}
-          <a href="https://boffincoders.com" target="_blank" rel="noreferrer" className="font-semibold no-underline" style={{ color: 'var(--blue)' }}>
-            Boffin Coders
-          </a>
-          {' '}·{' '}
-          <a href="https://github.com/boffincoders/finance-calculator" target="_blank" rel="noreferrer" className="no-underline" style={{ color: 'var(--text-4)' }}>
-            GitHub
-          </a>
-          {' '}·{' '}
-          <a href="https://www.npmjs.com/package/finance-calculator-pro" target="_blank" rel="noreferrer" className="no-underline" style={{ color: 'var(--text-4)' }}>
-            npm
-          </a>
+          <p className="m-0">
+            finance-calculator-pro is open source (MIT) and maintained by{' '}
+            <a href="https://boffincoders.com/?utm_source=docs&utm_medium=footer&utm_campaign=finance-calculator-pro" target="_blank" rel="noopener" className="font-semibold no-underline" style={{ color: 'var(--blue)' }}>
+              Boffin Coders
+            </a>
+            {' '}·{' '}
+            <a href="https://github.com/boffincoders/finance-calculator" target="_blank" rel="noopener" className="no-underline" style={{ color: 'var(--text-4)' }}>
+              GitHub
+            </a>
+            {' '}·{' '}
+            <a href="https://www.npmjs.com/package/finance-calculator-pro" target="_blank" rel="noopener" className="no-underline" style={{ color: 'var(--text-4)' }}>
+              npm
+            </a>
+          </p>
+          <p className="m-0 mt-2 text-[12px]">
+            Ratings are generic rules of thumb, not investment advice. Thresholds vary by sector.
+          </p>
         </footer>
       </div>
     </div>
