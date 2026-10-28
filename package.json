@@ -1,7 +1,11 @@
 {
   "name": "finance-calculator-pro",
   "version": "1.2.1",
-  "author": "boffincoders",
+  "author": {
+    "name": "Boffin Coders",
+    "url": "https://boffincoders.com"
+  },
+  "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/boffincoders/finance-calculator.git"
@@ -10,7 +14,7 @@
     "url": "https://github.com/boffincoders/finance-calculator/issues"
   },
   "homepage": "https://boffincoders.github.io/finance-calculator/",
-  "description": "Zero-dependency financial analysis engine for JavaScript/TypeScript. Calculates 60+ metrics: P/E, P/B, EV/EBITDA, ROE, Altman Z-Score, Piotroski F-Score, DCF, Graham Number, Sharpe Ratio, RSI, MACD, Bollinger Bands, ATR, VWAP, Beta, Cash Conversion Cycle, TTM aggregation, composite scoring engine, and more. Works with any data source.",
+  "description": "Zero-dependency TypeScript library for fundamental financial analysis: valuation ratios (P/E, P/B, P/S, PEG, EV/EBITDA, EV/FCF), profitability (ROE, ROA, ROIC, margins), liquidity and leverage (current and quick ratio, net debt/EBITDA, interest coverage), efficiency (DSO, DPO, cash conversion cycle), Altman Z and Z'' scores, Piotroski F-Score, Sharpe ratio, DCF, Graham number, intrinsic value, CAGR and TTM helpers, with plain-English ratings. Works with any data source.",
   "keywords": [
     "finance",
     "financial-ratios",
@@ -33,6 +37,7 @@
     "discounted-cash-flow",
     "graham-number",
     "altman-z-score",
+    "z-score",
     "piotroski",
     "piotroski-f-score",
     "sharpe-ratio",
@@ -43,31 +48,26 @@
     "liquidity-ratio",
     "debt-to-equity",
     "solvency",
-    "portfolio-analysis",
     "typescript",
     "zero-dependency",
-    "technical-analysis",
-    "rsi",
-    "macd",
-    "bollinger-bands",
-    "moving-average",
-    "ema",
-    "sma",
-    "atr",
-    "vwap",
-    "beta",
-    "pivot-points",
     "cash-conversion-cycle",
     "ttm",
     "trailing-twelve-months",
     "intrinsic-value",
     "composite-scoring",
-    "f-score",
-    "quant-finance"
+    "f-score"
   ],
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "sideEffects": false,
+  "files": [
+    "dist",
+    "CHANGELOG.md"
+  ],
+  "engines": {
+    "node": ">=16"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

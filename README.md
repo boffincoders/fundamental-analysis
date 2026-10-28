@@ -1,30 +1,69 @@
 # finance-calculator-pro
 
 [![NPM Version](https://img.shields.io/npm/v/finance-calculator-pro.svg)](https://www.npmjs.com/package/finance-calculator-pro)
-[![NPM Downloads](https://img.shields.io/npm/dm/finance-calculator-pro.svg)](https://www.npmjs.com/package/finance-calculator-pro)
 [![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue.svg)](https://www.typescriptlang.org/)
 [![Zero Dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen.svg)](https://www.npmjs.com/package/finance-calculator-pro?activeTab=dependencies)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-📖 **[View the Official Documentation & Live Playground →](https://boffincoders.github.io/finance-calculator/)**
+Maintained by [Boffin Coders](https://boffincoders.com/?utm_source=npm&utm_medium=readme&utm_campaign=finance-calculator-pro).
+
+📖 **[Documentation & live playground →](https://boffincoders.github.io/finance-calculator/)**
 
 ![finance-calculator-pro banner](https://raw.githubusercontent.com/boffincoders/finance-calculator/refs/heads/master/.github/assets/finance-calculator-pro.png)
 
-> **Zero-dependency financial analysis engine for JavaScript and TypeScript.**
-> Calculate 70+ financial metrics — valuation ratios, profitability, liquidity, solvency, efficiency, intrinsic value, composite scoring, TTM aggregation, historical analysis, and bankruptcy risk scores — from raw financial data. No API calls. No runtime dependencies. Works in Node.js, browsers, and edge runtimes.
+> **Zero-dependency fundamental analysis for JavaScript and TypeScript.**
+> Turn raw income-statement, balance-sheet and cash-flow numbers into valuation, profitability, liquidity, leverage, efficiency and financial-distress metrics — each with an optional plain-English rating. No API calls, no runtime dependencies. Runs in Node.js, browsers and edge runtimes.
 
 ---
 
-## What is finance-calculator-pro?
+## Contents
 
-`finance-calculator-pro` is a modular financial metrics library that transforms raw company fundamentals (income statement, balance sheet, cash flow data) into structured analysis — complete with computed values, signal ratings (`Good` / `Bad` / `Neutral`), and human-readable insights.
+- [What it is (and is not)](#what-it-is-and-is-not)
+- [Who uses it, and for what](#who-uses-it-and-for-what)
+- [Installation](#installation)
+- [Quick start](#quick-start)
+- [Input conventions — read this first](#input-conventions--read-this-first)
+- [About the ratings](#about-the-ratings)
+- [Metrics reference](#metrics-reference)
+- [Individual functions](#individual-functions)
+- [Composite scores](#composite-scores)
+- [TypeScript](#typescript)
+- [Changelog](#changelog) · [License](#license)
 
-Built for:
-- 📊 **Stock screener** and equity research tools
-- 💼 **Portfolio analysis** dashboards
-- 🏦 **FinTech applications** and investment platforms
-- 🔍 **Fundamental analysis** pipelines (pairs naturally with [`yahoo-finance2`](https://www.npmjs.com/package/yahoo-finance2))
-- 🎓 **Financial education** tools and calculators
+---
+
+## What it is (and is not)
+
+`finance-calculator-pro` is a library of financial-statement ratios plus a small analysis layer:
+
+1. **Pure metric functions** — `pe()`, `roe()`, `netDebtToEbitda()`, `altmanZScore()`, `calculateDCF()` … Each takes plain numbers and returns `number | null`.
+2. **Analyzers** — `analyzeCompany()` takes one flat object of fundamentals and returns every metric it can compute, grouped into valuation, profitability, liquidity, solvency, efficiency, risk and quality.
+3. **Evaluator** — `evaluate.*` turns a value into `{ value, status: "Good" | "Neutral" | "Bad" | "N/A", insight }`.
+4. **Series helpers** — growth rates, CAGR, median growth, trailing-twelve-month (TTM) and multi-year aggregation.
+5. **Composite scores** — Quality, Growth, Value and Momentum scores (0–100) and a weighted G-Factor.
+
+It does **not**:
+- fetch market data (bring your own: `yahoo-finance2`, Alpha Vantage, Financial Modeling Prep, Polygon.io, your database, a CSV…);
+- compute technical indicators (RSI, MACD, moving averages…). `computeMomentumScore()` expects you to supply RSI, ADX and SMA values computed elsewhere;
+- provide time-value-of-money (NPV/IRR/PMT) or portfolio statistics beyond the Sharpe ratio;
+- model banks, insurers or REITs. Ratios such as current ratio, EV/EBITDA and Altman Z are not meaningful for financial companies.
+
+---
+
+## Who uses it, and for what
+
+| Who | Typical use | Main APIs |
+|---|---|---|
+| Fintech and investing-app developers | Company snapshot cards, "is this stock cheap?" panels | `analyzeCompany(data, true)` |
+| Stock-screener builders | Rank and filter a watchlist on P/E, ROE, leverage, margins | `analyzeBatch()`, individual ratios |
+| Value and dividend investors | Graham number, intrinsic value, payout sustainability, net cash | `grahamNumber()`, `computeIntrinsicValue()`, `payoutRatio()`, `netCash()` |
+| Equity research and M&A analysts | Quick multiples and DCF sanity checks | `evEbitda()`, `evFcf()`, `calculateDCF()`, `impliedSharePrice()` |
+| Credit and lending analysts | Leverage and distress screens for non-financial companies | `netDebtToEbitda()`, `interestCoverage()`, `altmanZScore()`, `altmanZScoreDoublePrime()` |
+| CFOs and FP&A teams | Ratio packs from their own statements | `analyzeCompany()`, `daysSalesOutstanding()`, `payableDays()`, `cashConversionCycle()` |
+| Educators and students | Calculators that show the formula and a plain-English reading | individual functions + `evaluate.*` |
+| Dashboard builders | Growth trends and TTM figures from quarterly data | `analyzeFundamentalTrends()`, `computeTTM()`, `cagr()` |
+
+Works for companies in any market (US, UK, EU, Canada, Australia, India …) as long as all amounts in one snapshot use the same currency and unit.
 
 ---
 
@@ -32,468 +71,338 @@ Built for:
 
 ```bash
 npm install finance-calculator-pro
-# or
-yarn add finance-calculator-pro
-# or
-pnpm add finance-calculator-pro
 ```
 
-Works with **Node.js ≥ 16**. Ships as **CJS + ESM + TypeScript type declarations**. Zero runtime dependencies.
+Ships as CommonJS + ES modules + TypeScript declarations, marked side-effect-free for tree-shaking. Node.js ≥ 16.
 
 ---
 
-## 🏢 Enterprise Support & FinTech Development
-
-**finance-calculator-pro** is engineered and maintained by **[Boffin Coders](https://boffincoders.com)**, a software development agency specialising in FinTech, financial dashboards, and enterprise-grade data platforms.
-
-Building a stock screener, neo-bank, or internal financial analysis tool? [Let's talk →](https://boffincoders.com)
-
----
-
-## Metrics Reference — 70+ Functions Across 11 Categories
-
-### Valuation Ratios
-| Metric | Function | Formula |
-|---|---|---|
-| Price-to-Earnings (P/E) | `pe()` | `Price / EPS` |
-| Price-to-Book (P/B) | `pb()` | `Price / Book Value Per Share` |
-| Price-to-Sales (P/S) | `ps()` | `Price / Revenue Per Share` |
-| Price/Earnings-to-Growth (PEG) | `peg()` | `P/E / Earnings Growth Rate` |
-| EV/EBITDA (Enterprise Multiple) | `evEbitda()` | `Enterprise Value / EBITDA` |
-| EV / Revenue | `evRevenue()` | `Enterprise Value / Revenue` |
-| EV / Free Cash Flow | `evFcf()` | `Enterprise Value / FCF` |
-| Price-to-Cash-Flow (P/CF) | `priceToCashFlow()` | `Market Cap / Operating Cash Flow` |
-| Earnings Yield | `earningsYield()` | `EPS / Price` |
-| Dividend Yield | `dividendYield()` | `Annual Dividend / Price` |
-| Discounted Cash Flow (DCF) | `calculateDCF()` | Terminal value + discounted FCF streams |
-| Graham Number | `grahamNumber()` | `√(22.5 × EPS × Book Value)` |
-| Market Cap to Total Capital | `marketCapToDebtCap()` | `Market Cap / (Market Cap + Total Debt)` |
-
-### Profitability Metrics
-| Metric | Function | Formula |
-|---|---|---|
-| Return on Assets (ROA) | `roa()` | `Net Income / Total Assets` |
-| Return on Equity (ROE) | `roe()` | `Net Income / Total Equity` |
-| Return on Invested Capital (ROIC) | `roic()` | `NOPAT / Invested Capital` |
-| Gross Margin | `grossMargin()` | `Gross Profit / Revenue` |
-| Operating Margin | `operatingMargin()` | `Operating Income / Revenue` |
-| Net Profit Margin | `netProfitMargin()` | `Net Income / Revenue` |
-| Free Cash Flow Margin | `fcfMargin()` | `FCF / Revenue` |
-
-### Liquidity Ratios
-| Metric | Function | Formula |
-|---|---|---|
-| Current Ratio | `currentRatio()` | `Current Assets / Current Liabilities` |
-| Quick Ratio (Acid-Test) | `quickRatio()` | `(Current Assets − Inventory) / Current Liabilities` |
-| Debt-to-Equity | `debtToEquity()` | `Total Debt / Total Equity` |
-| Interest Coverage Ratio | `interestCoverage()` | `EBIT / Interest Expense` |
-
-### Solvency & Leverage Metrics
-| Metric | Function | Formula |
-|---|---|---|
-| Net Debt | `netDebt()` | `Total Debt − Cash & Equivalents` |
-| Net Debt / EBITDA | `netDebtToEbitda()` | `(Debt − Cash) / EBITDA` |
-| Debt-to-Assets | `debtToAssets()` | `Total Debt / Total Assets` |
-
-### Efficiency Metrics
-| Metric | Function | Formula |
-|---|---|---|
-| Asset Turnover | `assetTurnover()` | `Revenue / Average Assets` |
-| Inventory Turnover | `inventoryTurnover()` | `COGS / Average Inventory` |
-| Receivables Turnover | `receivablesTurnover()` | `Revenue / Trade Receivables` |
-| Days Sales Outstanding (DSO) | `daysSalesOutstanding()` | `365 / Receivables Turnover` |
-| Payable Days (DPO) | `payableDays()` | `(Trade Payables / COGS) × 365` |
-| Working Capital Days | `workingCapitalDays()` | `(Working Capital / Revenue) × 365` |
-| Cash Conversion Cycle | `cashConversionCycle()` | `DSO + DIO − DPO` |
-
-### Earnings Quality Metrics
-| Metric | Function | Formula |
-|---|---|---|
-| Payout Ratio | `payoutRatio()` | `Annual Dividend / EPS` |
-| Cash Conversion Ratio (CCR) | `cashConversionRatio()` | `Operating Cash Flow / Net Income` |
-
-### Risk & Bankruptcy Prediction
-| Metric | Function | Notes |
-|---|---|---|
-| Altman Z-Score | `altmanZScore()` | Z > 2.99 = safe, 1.81–2.99 = grey zone, < 1.81 = distress |
-| Piotroski F-Score | `piotroski()` | 9-signal scorecard; 8–9 = strong, 0–2 = weak |
-| Sharpe Ratio | `sharpe()` | Risk-adjusted return vs risk-free rate |
-| Target Upside | `targetUpside()` | % gap to analyst target price |
-
-### Intrinsic Valuation & Scoring
-| Metric | Function | Notes |
-|---|---|---|
-| Graham Number | `grahamNumber()` | Benjamin Graham's defensive value ceiling |
-| Net Current Value Per Share | `computeNCVPS()` | (Current Assets − Total Liabilities) / Shares |
-| Intrinsic Value Estimate | `computeIntrinsicValue()` | Simple 5-yr EPS projection with margin of safety |
-| G-Factor (Composite) | `computeGFactor()` | Quality×40% + Growth×35% + Momentum×25% |
-| Quality Score | `computeQualityScore()` | Piotroski + ROE vs sector + margins + pledge + promoter |
-| Growth Score | `computeGrowthScore()` | Revenue growth + profit growth + EPS growth + CFO |
-| Value Score | `computeValueScore()` | P/E vs avg + P/B vs sector + PEG + historical percentile |
-| Momentum Score | `computeMomentumScore()` | SMA200 + RSI + ADX + volume ratio + ROC-125 |
-
-### Growth & Timeseries Analysis
-| Function | Description |
-|---|---|
-| `calculateGrowthRate()` | Single-period % growth rate |
-| `yoyGrowth()` | Year-over-year growth rates for a series |
-| `qoqGrowth()` | Quarter-over-quarter growth rates |
-| `cagr()` | Compound Annual Growth Rate |
-| `medianGrowth()` | Median YoY growth rate (outlier-resistant) |
-
-### TTM & Historical Aggregation
-| Function | Description |
-|---|---|
-| `computeTTM()` | Trailing Twelve Months sum (last 4 quarters) |
-| `computeTTMAvg()` | Trailing Twelve Months average |
-| `computeNYearAverage()` | Rolling N-year average of quarterly data |
-| `computeNYearSum()` | Rolling N-year sum of quarterly data |
-| `computeHistoricalPoint()` | Value at exactly N quarters back |
-
-
-
----
-
-## Quick Start
-
-### The All-in-One API: `analyzeCompany()`
-
-Pass any subset of a company's fundamentals and get structured analysis across all 7 categories at once:
+## Quick start
 
 ```typescript
 import { analyzeCompany } from 'finance-calculator-pro';
 
 const data = {
-  price: 150,
-  eps: 5,
-  bookValuePerShare: 20,
-  marketCap: 150000,
-  totalDebt: 20000,
-  cashAndEquivalents: 5000,
-  ebitda: 9000,
-  netIncome: 5000,
-  operatingCashFlow: 7500,
-  totalRevenue: 50000,
-  totalAssets: 100000,
-  totalLiabilities: 60000,
-  totalEquity: 40000,
+  price: 150, eps: 5, bookValuePerShare: 20, marketCap: 150_000,
+  totalDebt: 20_000, cashAndEquivalents: 5_000,
+  ebitda: 10_000, ebit: 7_500, interestExpense: 500,
+  netIncome: 5_000, operatingCashFlow: 7_500, totalRevenue: 50_000,
+  totalAssets: 100_000, totalLiabilities: 60_000, totalEquity: 40_000,
+  currentAssets: 40_000, currentLiabilities: 25_000, inventory: 10_000,
+  retainedEarnings: 20_000,
+  expectedEarningsGrowthRate: 0.15,   // 15 %, as a decimal
 };
 
-// withInsights: true → returns { value, status, insight } for every metric
-const analysis = analyzeCompany(data, true);
+const analysis = analyzeCompany(data, true); // true → { value, status, insight } per metric
 
-// Valuation
-console.log(analysis.valuation.pe);
-// { value: 30, status: "Bad", insight: "Expensive. High growth is priced in." }
+analysis.valuation.pe;
+// { value: 30, status: "Bad", insight: "Expensive by generic standards. High growth is priced in; normal for some sectors." }
 
-console.log(analysis.valuation.evEbitda);
-// { value: 18.33, status: "Bad", insight: "Expensive relative to cash earnings." }
-
-// Solvency
-console.log(analysis.solvency.netDebtToEbitda);
-// { value: 1.5, status: "Good", insight: "Low leverage. Manageable debt load." }
-
-// Earnings Quality
-console.log(analysis.quality.cashConversionRatio);
-// { value: 1.5, status: "Good", insight: "Cash-backed earnings. Strong quality." }
-
-// Risk
-console.log(analysis.risk.altmanZScore);
-// { value: 3.71, status: "Good", insight: "Safe zone. Low bankruptcy risk." }
+analysis.valuation.peg;              // { value: 2, status: "Bad", ... }        P/E 30 ÷ 15 % growth
+analysis.valuation.evEbitda;         // { value: 16.5, status: "Bad", ... }     (150k + 20k − 5k) / 10k
+analysis.liquidity.currentRatio;     // { value: 1.6, status: "Good", ... }     40k / 25k
+analysis.solvency.netDebtToEbitda;   // { value: 1.5, status: "Neutral", ... }  (20k − 5k) / 10k
+analysis.quality.cashConversionRatio;// { value: 1.5, status: "Good", ... }     7.5k / 5k
+analysis.risk.altmanZScore;          // { value: 2.7075, status: "Neutral", insight: "Grey Zone (original Z, manufacturers)..." }
+analysis.risk.altmanZScoreDoublePrime; // { value: 2.84, status: "Good", insight: "Safe Zone (Z'', non-manufacturers)..." }
+analysis.risk.piotroski;
+// { value: 3, status: "Good", insight: "Strong fundamentals (3/3). Partial score: only 3 of 9 signals had data (prior-year inputs missing)." }
 ```
 
-Returns 7 analysis categories: `valuation` · `profitability` · `liquidity` · `solvency` · `efficiency` · `risk` · `quality`
+Call `analyzeCompany(data)` without `true` to get raw numbers only. Every input is optional; metrics whose inputs are missing come back as `null`.
 
-Every field in the input is **optional** — missing fields cause their dependent metrics to return `null` safely. The engine never throws.
-
----
-
-### Categorical Analyzers
-
-Run analysis on a single dimension — useful for dashboards, screeners, or compute-sensitive environments:
-
-```typescript
-import {
-  analyzeValuation,
-  analyzeProfitability,
-  analyzeLiquidity,
-  analyzeSolvency,
-  analyzeEfficiency,
-  analyzeRisk,
-  analyzeQuality,
-} from 'finance-calculator-pro';
-
-const solvency = analyzeSolvency(data, true);
-console.log(solvency.netDebtToEbitda);
-// { value: 1.5, status: "Good", insight: "..." }
-
-const quality = analyzeQuality(data, true);
-console.log(quality.cashConversionRatio);
-// { value: 1.5, status: "Good", insight: "Cash-backed earnings. Strong quality." }
-```
-
----
-
-### Batch Analysis — Stock Screener
-
-Evaluate an entire watchlist in one call:
+Analyzing one category: `analyzeValuation`, `analyzeProfitability`, `analyzeLiquidity`, `analyzeSolvency`, `analyzeEfficiency`, `analyzeRisk`, `analyzeQuality` take the same input. `analyzeBatch(companies, true)` runs a whole watchlist:
 
 ```typescript
 import { analyzeBatch } from 'finance-calculator-pro';
 
-const results = analyzeBatch([appleData, msftData, nvidiaData, tcsData], true);
-
-// Sort by P/E ascending — cheapest first
-const byPe = results
-  .filter(r => r.valuation.pe?.value !== null)
-  .sort((a, b) => (a.valuation.pe!.value as number) - (b.valuation.pe!.value as number));
+const results = analyzeBatch(watchlist, true);
+const cheapestFirst = results
+  .filter(r => r.valuation.pe.value !== null)
+  .sort((a, b) => a.valuation.pe.value! - b.valuation.pe.value!);
 ```
 
----
-
-### Timeseries & Growth Trend Analysis
-
-Pass chronological arrays (oldest → newest) to compute growth rates and margin trends automatically:
+### Growth trends from time series
 
 ```typescript
 import { analyzeFundamentalTrends } from 'finance-calculator-pro';
 
 const trends = analyzeFundamentalTrends({
-  revenue:   [365_817, 394_328, 383_285],
+  revenue:   [365_817, 394_328, 383_285],   // oldest → newest
   netIncome: [ 94_680,  99_803,  96_995],
 }, 'annual');
 
-console.log(trends.growth.revenueCagr);       // -0.022  (-2.2% CAGR)
-console.log(trends.growth.revenueGrowth);     // [0.0777, -0.0282]
-console.log(trends.margins.netProfitMargin);  // [0.259, 0.253, 0.253]
-console.log(trends.quality.fcfConversion);    // FCF / Net Income per period
+trends.growth.revenueCagr;     // 0.0236  (+2.36 % a year)
+trends.growth.revenueGrowth;   // [0.0779, -0.0280]
+trends.margins.netMargins;     // [0.2588, 0.2531, 0.2531]
 ```
 
 ---
 
-### Individual Math Functions
+## Input conventions — read this first
 
-Import any function directly for lightweight single-metric use. Every function returns `number | null` — `null` means a required input was absent; the library never throws:
+| Convention | Rule |
+|---|---|
+| Rates | **Decimals**: `0.15` means 15 %. This applies to growth rates, tax rates, discount rates and returns. |
+| Currency and units | Any currency, any unit (USD millions, INR crore, EUR thousands…) — but the same within one snapshot. Per-share inputs must match share-level prices. |
+| Periods | Flow items (revenue, income, cash flow) cover one period, normally trailing twelve months or last fiscal year. Balance-sheet items are period-end values. Day-count ratios accept a `daysInPeriod` argument (default 365) for quarterly data. |
+| Signs | Expenses (`costOfRevenue`, `interestExpense`) are positive numbers. Interest expense reported as a negative number is handled as a cost. |
+| Zero | Zero is a real value and is used (zero cost of revenue → 100 % gross margin). Leave a field out when you do not know it. |
+| `null` | A metric is `null` when an input is missing, a denominator is zero, or the result would not be meaningful (for example ROE with negative equity, PEG with negative growth, net debt/EBITDA with negative EBITDA). |
+| Missing debt or cash | For enterprise value and net debt, a missing `totalDebt` or `cashAndEquivalents` counts as 0 when the other one is supplied. |
+
+---
+
+## About the ratings
+
+The `status` and `insight` returned by `evaluate.*` and by the analyzers with `withInsights = true` come from **fixed, generic rules of thumb**. For example, P/E < 15 is "Good", current ratio 1.2–2.0 is "Good" and net debt/EBITDA < 1.5 is "Good".
+
+These thresholds do not know the company's sector, market or the interest-rate environment. A P/E of 30 is ordinary for a software company and high for a utility; a current ratio of 0.8 is normal for a supermarket. Use the ratings as a first-pass screen, compare against sector peers, and do not use them as investment advice.
+
+---
+
+## Metrics reference
+
+### Valuation
+| Metric | Function | Formula |
+|---|---|---|
+| Price-to-Earnings | `pe(price, eps)` | Price / EPS |
+| Price-to-Book | `pb(price, bvps)` · `pbFromMarketCap()` | Price / Book Value per Share |
+| Price-to-Sales | `ps(price, rps)` · `psFromMarketCap()` | Price / Revenue per Share |
+| PEG | `peg(pe, growth)` | P/E ÷ (growth × 100). Growth is a decimal: `peg(30, 0.15)` = 2.0. Null for growth ≤ 0 or P/E ≤ 0 |
+| EV/EBITDA | `evEbitda(ev, ebitda)` | Enterprise Value / EBITDA |
+| Enterprise Value | `calculateEnterpriseValue(mcap, debt, cash)` | Market Cap + Debt − Cash |
+| EV/Revenue | `evRevenue(ev, revenue)` | EV / Revenue |
+| EV/FCF | `evFcf(ev, fcf)` | EV / Free Cash Flow |
+| Price-to-Cash-Flow | `priceToCashFlow(mcap, ocf)` · `priceToCashFlowPerShare()` | Market Cap / Operating Cash Flow |
+| Earnings Yield | `earningsYield(eps, price)` | EPS / Price |
+| Dividend Yield | `dividendYield(dps, price)` | Annual Dividend per Share / Price |
+| Market Cap to Total Capital | `marketCapToDebtCap(mcap, debt)` | Market Cap / (Market Cap + Debt) |
+
+### Intrinsic value
+| Metric | Function | Method |
+|---|---|---|
+| Discounted Cash Flow | `calculateDCF(fcfs, rate, terminalGrowth)` | PV of projected FCF + Gordon-growth terminal value |
+| Implied Share Price | `impliedSharePrice(ev, debt, cash, shares)` | (EV − Debt + Cash) / Shares |
+| Graham Number | `grahamNumber(eps, bvps)` | √(22.5 × EPS × Book Value per Share) |
+| Intrinsic Value per Share | `computeIntrinsicValue(eps, growth, margin, { terminalPE, discountRate, years })` | EPS × (1+g)ⁿ × terminal P/E ÷ (1+r)ⁿ × (1 − margin). Defaults: P/E 15, r = 10 %, n = 5 |
+| Net Current Value per Share | `computeNCVPS(currentAssets, totalLiabilities, shares)` | (Current Assets − Total Liabilities) / Shares |
+
+### Profitability
+| Metric | Function | Formula |
+|---|---|---|
+| Return on Assets | `roa(netIncome, totalAssets)` | Net Income / Total Assets |
+| Return on Equity | `roe(netIncome, equity)` | Net Income / Equity (null if equity ≤ 0) |
+| Return on Invested Capital | `roic(opIncome, taxRate, debt, equity, cash)` | Operating Income × (1 − tax) / (Debt + Equity − Cash) |
+| Gross Margin | `grossMargin(revenue, costOfRevenue)` | (Revenue − Cost of Revenue) / Revenue |
+| Operating Margin | `operatingMargin(opIncome, revenue)` | Operating Income / Revenue |
+| Net Profit Margin | `netProfitMargin(netIncome, revenue)` | Net Income / Revenue |
+| FCF Margin | `fcfMargin(fcf, revenue)` | Free Cash Flow / Revenue |
+
+### Liquidity and leverage
+| Metric | Function | Formula |
+|---|---|---|
+| Current Ratio | `currentRatio(currentAssets, currentLiabilities)` | Current Assets / Current Liabilities |
+| Quick Ratio | `quickRatio(currentAssets, inventory, currentLiabilities)` | (Current Assets − Inventory) / Current Liabilities |
+| Debt-to-Equity | `debtToEquity(debt, equity)` | Total Debt / Total Equity |
+| Interest Coverage | `interestCoverage(ebit, interest)` | EBIT / Interest Expense |
+| Net Debt | `netDebt(debt, cash)` | Debt − Cash (negative = net cash) |
+| Net Cash | `netCash(debt, cash)` | max(Cash − Debt, 0) |
+| Net Debt / EBITDA | `netDebtToEbitda(debt, cash, ebitda)` | (Debt − Cash) / EBITDA (null if EBITDA ≤ 0) |
+| Debt-to-Assets | `debtToAssets(debt, totalAssets)` | Total Debt / Total Assets |
+
+### Efficiency
+| Metric | Function | Formula |
+|---|---|---|
+| Asset Turnover | `assetTurnover(revenue, totalAssets)` | Revenue / Total Assets (pass an average if you have one) |
+| Inventory Turnover | `inventoryTurnover(cogs, inventory)` | COGS / Inventory |
+| Receivables Turnover | `receivablesTurnover(revenue, receivables)` | Revenue / Trade Receivables |
+| Days Sales Outstanding | `daysSalesOutstanding(revenue, receivables, days = 365)` | Receivables / Revenue × days |
+| Days Payable Outstanding | `payableDays(payables, cogs, days = 365)` | Payables / COGS × days |
+| Working Capital Days | `workingCapitalDays(wc, revenue, days = 365)` | Working Capital / Revenue × days |
+| Cash Conversion Cycle | `cashConversionCycle(dso, dio, dpo)` | DSO + DIO − DPO |
+
+### Earnings quality
+| Metric | Function | Formula |
+|---|---|---|
+| Payout Ratio | `payoutRatio(dps, eps)` | Dividend per Share / EPS (null if EPS ≤ 0) |
+| Cash Conversion Ratio | `cashConversionRatio(ocf, netIncome)` | Operating Cash Flow / Net Income (null if net income ≤ 0) |
+
+### Risk and financial distress
+| Metric | Function | Notes |
+|---|---|---|
+| Altman Z-Score | `altmanZScore(wc, re, ebit, marketCap, sales, assets, liabilities)` | Original model for **public manufacturers**. > 2.99 safe, 1.81–2.99 grey, < 1.81 distress |
+| Altman Z''-Score | `altmanZScoreDoublePrime(wc, re, ebit, bookEquity, assets, liabilities)` | For **non-manufacturers and private firms**: 6.56A + 3.26B + 6.72C + 1.05D. > 2.6 safe, 1.1–2.6 grey, < 1.1 distress |
+| Piotroski F-Score | `piotroski({...})` | 9 binary signals; returns `{ score, maxScore, signals }`. Prior-year inputs enable 6 of the 9 |
+| Sharpe Ratio | `sharpe(return, riskFree, stdDev)` | Same period basis for all three (normally annualised) |
+| Sharpe from returns | `sharpeFromReturns(returns, rfPerPeriod = 0, periodsPerYear = 252)` | Annualised: mean excess × N ÷ (sample sd × √N) |
+| Analyst Target Upside | `targetUpside(price, target)` | (Target − Price) / Price |
+
+### Growth, TTM and history
+| Function | Description |
+|---|---|
+| `calculateGrowthRate(current, previous)` | (Current − Previous) / \|Previous\|; null if previous is 0 |
+| `growthRates(values)` | Period-over-period growth; `null` where the previous value is 0 |
+| `yoyGrowth(values)` · `qoqGrowth(values)` | Same, but reports undefined periods as 0 (kept for compatibility) |
+| `cagr(begin, end, periods)` | (End / Begin)^(1/periods) − 1 |
+| `medianGrowth(values)` | Median period growth, skipping undefined periods |
+| `computeTTM(quarters)` · `computeTTMAvg(quarters)` | Sum / average of the last 4 quarters (`computeTTM` needs 4) |
+| `computeNYearAverage(q, n)` · `computeNYearSum(q, n)` | Average / sum of the last n × 4 quarters |
+| `computeHistoricalPoint(q, back)` | Value `back` quarters before the latest |
+
+---
+
+## Individual functions
 
 ```typescript
 import {
-  // Valuation
-  pe, pb, ps, peg, evEbitda, evRevenue, evFcf,
-  priceToCashFlow, earningsYield, grahamNumber, calculateDCF,
-  marketCapToDebtCap,
-
-  // Profitability
-  roa, roe, roic, grossMargin, operatingMargin, netProfitMargin, fcfMargin,
-
-  // Liquidity
-  currentRatio, quickRatio, debtToEquity, interestCoverage,
-
-  // Solvency
-  netDebt, netDebtToEbitda, debtToAssets,
-
-  // Efficiency
-  assetTurnover, inventoryTurnover, receivablesTurnover, daysSalesOutstanding,
-  payableDays, workingCapitalDays, cashConversionCycle,
-
-  // Quality
-  payoutRatio, cashConversionRatio,
-
-  // Risk
-  altmanZScore, piotroski, sharpe, targetUpside,
-
-  // Intrinsic Valuation
-  computeNCVPS, computeGFactor, computeIntrinsicValue,
-
-  // Composite Scoring
-  computeQualityScore, computeGrowthScore, computeValueScore, computeMomentumScore,
-
-  // Growth
-  calculateGrowthRate, yoyGrowth, qoqGrowth, cagr, medianGrowth,
-
-  // TTM
-  computeTTM, computeTTMAvg,
-
-  // Historical
-  computeNYearAverage, computeNYearSum, computeHistoricalPoint,
-
-  // Insights Engine
-  evaluate,
+  pe, peg, priceToCashFlow, earningsYield, grahamNumber, marketCapToDebtCap,
+  netDebtToEbitda, netCash, debtToAssets,
+  daysSalesOutstanding, payableDays, cashConversionCycle,
+  altmanZScore, altmanZScoreDoublePrime, sharpe, sharpeFromReturns, piotroski,
+  calculateDCF, computeNCVPS, computeIntrinsicValue,
+  cagr, medianGrowth, computeTTM, evaluate,
 } from 'finance-calculator-pro';
 
-// Valuation
-pe(150, 5);                               // → 30
-priceToCashFlow(150_000, 7_000);          // → 21.43
-earningsYield(5, 150);                    // → 0.0333 (3.33%)
-grahamNumber(5, 20);                      // → 47.43
-marketCapToDebtCap(150_000, 20_000);      // → 0.882 (88.2% equity financed)
+pe(150, 5);                                // 30
+peg(30, 0.15);                             // 2      (P/E 30 with 15 % growth)
+priceToCashFlow(150_000, 7_000);           // 21.43
+earningsYield(5, 150);                     // 0.0333 (3.33 %)
+grahamNumber(5, 20);                       // 47.43
+marketCapToDebtCap(150_000, 20_000);       // 0.882
 
-// Solvency
-netDebtToEbitda(20_000, 5_000, 10_000);   // → 1.5
-debtToAssets(20_000, 100_000);            // → 0.20
+netDebtToEbitda(20_000, 5_000, 10_000);    // 1.5
+netDebtToEbitda(100, 10, -20);             // null   (negative EBITDA: not meaningful)
+netCash(10, 100);                          // 90
+debtToAssets(20_000, 100_000);             // 0.2
 
-// Efficiency
-daysSalesOutstanding(50_000, 6_250);      // → 45.6 days
-payableDays(30_000, 200_000);             // → 54.75 days
-cashConversionCycle(45, 60, 55);          // → 50 days
+daysSalesOutstanding(50_000, 6_250);       // 45.6 days
+payableDays(30_000, 200_000);              // 54.75 days
+cashConversionCycle(45, 60, 55);           // 50 days
 
-// Risk
-altmanZScore(15_000, 20_000, 7_500, 250_000, 50_000, 100_000, 60_000); // → 3.71
-sharpe(0.12, 0.04, 0.15);                 // → 0.533
+altmanZScore(15_000, 20_000, 7_500, 250_000, 50_000, 100_000, 60_000);  // 3.7075 (safe)
+altmanZScoreDoublePrime(15_000, 20_000, 7_500, 40_000, 100_000, 60_000); // 2.84   (safe)
+sharpe(0.12, 0.04, 0.15);                  // 0.533
+sharpeFromReturns([0.02, 0.01, -0.01, 0.03], 0, 12); // 2.54 (monthly returns, annualised)
 
-// Piotroski F-Score
-const result = piotroski({
+piotroski({
   netIncome: 5_000, totalAssets: 100_000, operatingCashFlow: 7_000,
   priorNetIncome: 4_000, priorTotalAssets: 100_000,
-});
-result.score;     // → 4
-result.maxScore;  // → 5
+});                                        // { score: 4, maxScore: 4, signals: {...} }
 
-// Intrinsic Valuation
-computeNCVPS(500_000, 300_000, 100_000);  // → 2.00 (net current value per share)
-computeIntrinsicValue(10, 0.15, 0.25);    // → 5-yr EPS projection with 25% safety margin
-computeGFactor(82, 78, 67);               // → composite G-Factor score
+calculateDCF([1_000, 1_100, 1_210], 0.10, 0.025); // 15151.5 (enterprise value)
+computeNCVPS(500_000, 300_000, 100_000);   // 2
+computeIntrinsicValue(10, 0.15, 0.25);     // 140.50  per share, after a 25 % margin of safety
+computeIntrinsicValue(10, 0.15, 0.25, { terminalPE: 20, discountRate: 0.08 }); // 205.33
 
-// Composite Scoring
-computeQualityScore({ piotroskiScore: 7, roeVsSector: 1.1,
-  marginsImproving: true, pledgeFree: true, promoterStable: true }); // → 82
-computeGrowthScore({ revenueGrowthVsSector: 1.3, profitGrowthRate: 0.20,
-  epsGrowthRate: 0.18, cfoPositive: true, revenueAccelerating: true }); // → 78
-computeValueScore({ peVs3yrAvg: 0.8, pbVsSector: 0.75, peg: 0.9,
-  historicalPePercentile: 30 }); // → 72
-computeMomentumScore({ priceVsSma200: 1.08, rsi: 58, adx: 28,
-  volumeRatio: 1.2, roc125: 0.18 }); // → 67
+cagr(1_000, 2_000, 5);                     // 0.1487 (14.87 %)
+medianGrowth([800, 900, 1_100, 1_050, 1_300]); // 0.1736
+computeTTM([2_200, 2_400, 2_600, 2_800]);  // 10000
 
-// TTM Aggregation
-const quarters = [2200, 2400, 2600, 2800]; // Q1–Q4 revenue
-computeTTM(quarters);     // → 10000  (annualised TTM)
-computeTTMAvg(quarters);  // → 2500   (average quarterly)
-
-// Historical Analysis
-const qData = [2000, 2200, 2400, 2600, 2800, 3000, 3200, 3400];
-computeNYearAverage(qData, 2);     // → 2700  (2-year average)
-computeNYearSum(qData, 1);         // → 12400 (last 4 quarters sum)
-computeHistoricalPoint(qData, 4);  // → 2600  (same quarter last year)
-
-// Growth
-cagr(1000, 2000, 5);                                       // → 0.1487 (14.87%)
-medianGrowth([800, 900, 1100, 1050, 1300]);                // → 0.176  (17.6%)
-
-// Pair raw math with the Insights Engine
-const ratio = pe(150, 5);  // → 30
-evaluate.pe(ratio);
-// { value: 30, status: "Bad", insight: "Expensive. High growth is priced in." }
+evaluate.pe(pe(150, 5));
+// { value: 30, status: "Bad", insight: "Expensive by generic standards. High growth is priced in; normal for some sectors." }
 ```
 
----
-
-### Works with any data source
-
-`finance-calculator-pro` accepts plain numbers — no proprietary data format required. Feed it data from `yahoo-finance2`, Alpha Vantage, Financial Modeling Prep, Polygon.io, your own database, or manually entered values. If you can get the numbers, the engine handles the rest.
+`computeIntrinsicValue(10, 0.15, 0.25)` step by step: 10 × 1.15⁵ = 20.11 EPS in year 5 → × 15 = 301.70 → ÷ 1.10⁵ = 187.33 today → × 0.75 = **140.50**.
 
 ---
 
-## TypeScript Support
+## Composite scores
 
-Full type declarations included. All input fields are optional:
+All four scores return 0–100. Weights are this library's heuristics, not an academic standard.
 
 ```typescript
-import type { CompanySnapshotInput, FundamentalTimeseriesInput } from 'finance-calculator-pro';
+import { computeQualityScore, computeGrowthScore, computeValueScore, computeMomentumScore, computeGFactor } from 'finance-calculator-pro';
 
-const snapshot: CompanySnapshotInput = {
-  price: 150,
-  eps: 5,
-  // Every field is optional — add only what you have
-};
+computeQualityScore({
+  piotroskiScore: 7, piotroskiMaxScore: 9,   // pass PiotroskiResult.score / .maxScore
+  roeVsSector: 1.1,                          // company ROE ÷ sector median ROE
+  marginsImproving: true,
+  insiderPledgeFree: true,                   // optional: insider/promoter shares pledged ≈ 0
+  insiderHoldingStable: true,                // optional: insider/promoter holding stable or rising
+});                                          // 93.33
+
+computeQualityScore({ piotroskiScore: 7, roeVsSector: 1.1, marginsImproving: true }); // 90.48
+// The insider/promoter signals are optional (common in India, rarely reported elsewhere).
+// When omitted, the remaining weights are rescaled so the score still spans 0–100.
+
+computeGrowthScore({ revenueGrowthVsSector: 1.3, profitGrowthRate: 0.20,
+  epsGrowthRate: 0.18, cfoPositive: true, revenueAccelerating: true });  // 86.07
+computeValueScore({ peVs3yrAvg: 0.8, pbVsSector: 0.75, peg: 0.9,
+  historicalPePercentile: 30 });                                         // 65.96
+computeMomentumScore({ priceVsSma200: 1.08, rsi: 58, adx: 28,
+  volumeRatio: 1.2, roc125: 0.18 });                                     // 81.67 (RSI/ADX/SMA computed elsewhere)
+computeGFactor(82, 78, 67);                  // 76.85 = 0.40 × Quality + 0.35 × Growth + 0.25 × Momentum
 ```
 
-**`CompanySnapshotInput` fields:**
+The older field names `pledgeFree` and `promoterStable` are still accepted.
+
+---
+
+## TypeScript
+
+Full declarations are included. With `withInsights = true` the analyzers are typed as `{ value, status, insight }` per metric; without it, as `number | null`:
+
+```typescript
+import { analyzeCompany, type CompanySnapshotInput } from 'finance-calculator-pro';
+
+const snapshot: CompanySnapshotInput = { price: 150, eps: 5 };
+
+const raw = analyzeCompany(snapshot);          // raw.valuation.pe: number | null
+const rated = analyzeCompany(snapshot, true);  // rated.valuation.pe.status: "Good" | "Neutral" | "Bad" | "N/A"
+```
+
+`CompanySnapshotInput` fields (all optional):
 
 ```typescript
 interface CompanySnapshotInput {
-  // Pricing
-  price?: number;
-  marketCap?: number;
-  eps?: number;
-  bookValuePerShare?: number;
-  revenuePerShare?: number;
-  annualDividendPerShare?: number;
-  analystTargetPrice?: number;
+  // Market data
+  price, marketCap, eps, bookValuePerShare, revenuePerShare,
+  annualDividendPerShare, analystTargetPrice,
+  expectedEarningsGrowthRate,      // decimal, for PEG
+  sharesOutstanding,
 
-  // Income Statement
-  totalRevenue?: number;
-  grossProfit?: number;
-  operatingIncome?: number;
-  netIncome?: number;
-  freeCashFlow?: number;
-  operatingCashFlow?: number;
-  ebitda?: number;
-  ebit?: number;
-  costOfRevenue?: number;
-  interestExpense?: number;
-  expectedEarningsGrowthRate?: number;
+  // Income statement
+  totalRevenue, costOfRevenue, grossProfit, operatingIncome, ebit, ebitda,
+  interestExpense, netIncome, taxRate,
 
-  // Balance Sheet
-  totalAssets?: number;
-  totalLiabilities?: number;
-  totalEquity?: number;
-  totalDebt?: number;
-  longTermDebt?: number;
-  cashAndEquivalents?: number;
-  inventory?: number;
-  tradeReceivables?: number;
-  workingCapital?: number;
-  retainedEarnings?: number;
-  sharesOutstanding?: number;
-  taxRate?: number;
+  // Cash flow
+  operatingCashFlow, freeCashFlow,
 
-  // Risk / Portfolio
-  returns?: number;
-  riskFree?: number;
-  stdDev?: number;
+  // Balance sheet
+  totalAssets, totalLiabilities, totalEquity,
+  currentAssets, currentLiabilities,  // current & quick ratio, working capital
+  totalDebt, longTermDebt, cashAndEquivalents, inventory, tradeReceivables,
+  workingCapital, retainedEarnings,
+
+  // Precomputed risk inputs (same period basis)
+  returns, riskFree, stdDev,
 }
 ```
 
----
-
-## API Summary
-
-| Function | Category | Description |
-|---|---|---|
-| `analyzeCompany(data, insights?)` | All-in-one | All 7 categories at once |
-| `analyzeValuation(data, insights?)` | Valuation | P/E, P/B, P/S, PEG, EV/EBITDA, Graham, P/CF, EY, EV/Rev, EV/FCF |
-| `analyzeProfitability(data, insights?)` | Profitability | ROA, ROE, ROIC, all margins |
-| `analyzeLiquidity(data, insights?)` | Liquidity | Current, Quick, D/E, Interest Coverage |
-| `analyzeSolvency(data, insights?)` | Solvency | Net Debt, Net Debt/EBITDA, Debt/Assets |
-| `analyzeEfficiency(data, insights?)` | Efficiency | Asset Turnover, Inventory, Receivables, DSO, Payable Days, WC Days, CCC |
-| `analyzeRisk(data, insights?)` | Risk | Altman Z-Score, Sharpe, Piotroski F-Score |
-| `analyzeQuality(data, insights?)` | Quality | Payout Ratio, Cash Conversion Ratio |
-| `analyzeBatch(dataArray, insights?)` | Batch | Array of snapshots → array of analyses |
-| `analyzeFundamentalTrends(data, period)` | Timeseries | YoY/QoQ growth, CAGR, margin trends |
-
----
-
-## Why finance-calculator-pro?
-
-| Feature | finance-calculator-pro |
+| Analyzer | Returns |
 |---|---|
-| Dependencies | **Zero** |
-| Bundle size | **< 50 KB** (tree-shakeable) |
-| TypeScript | **Full types included** |
-| Return type | `number \| null` (never throws) |
-| Insights engine | **Built-in** (value + status + insight) |
-| Batch processing | **Yes** |
-| Timeseries / growth | **Yes** |
-| Browser / Edge compatible | **Yes** |
-| ESM + CJS | **Both** |
+| `analyzeValuation` | pe, pb, ps, peg, evEbitda, dividendYield, grahamNumber, priceToCashFlow, earningsYield, evRevenue, evFcf |
+| `analyzeProfitability` | roa, roe, roic, grossMargin, operatingMargin, netProfitMargin, fcfMargin |
+| `analyzeLiquidity` | currentRatio, quickRatio, debtToEquity, interestCoverage |
+| `analyzeSolvency` | netDebt, netCash, netDebtToEbitda, debtToAssets, debtToEquity, interestCoverage |
+| `analyzeEfficiency` | assetTurnover, inventoryTurnover, receivablesTurnover, daysSalesOutstanding |
+| `analyzeRisk` | altmanZScore, altmanZScoreDoublePrime, sharpe, piotroski |
+| `analyzeQuality` | payoutRatio, cashConversionRatio, targetUpside |
+| `analyzeFundamentalTrends(series, 'annual' \| 'quarterly')` | growth arrays, CAGR (annual), margin arrays |
 
 ---
+
+## Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md). Version 1.3.0 corrects several outputs (PEG, intrinsic value, net debt/EBITDA, current ratio in the analyzer and others); read it before upgrading.
 
 ## License
 
-MIT © [Boffin Coders](https://boffincoders.com)
+[MIT](./LICENSE) © 2026 Boffin Coders
 
 ---
 
-## Keywords
+Maintained by [Boffin Coders](https://boffincoders.com/?utm_source=npm&utm_medium=readme&utm_campaign=finance-calculator-pro). Issues and pull requests: [github.com/boffincoders/finance-calculator](https://github.com/boffincoders/finance-calculator/issues).
 
-financial ratios · stock analysis · fundamental analysis · valuation metrics · P/E ratio · price-to-earnings · price-to-book · EV/EBITDA · enterprise value · DCF · discounted cash flow · Graham number · Altman Z-Score · Piotroski F-Score · Sharpe ratio · ROE · ROA · ROIC · profit margin · liquidity ratio · debt-to-equity · solvency · current ratio · quick ratio · asset turnover · days sales outstanding · payout ratio · cash conversion ratio · earnings yield · stock screener · investment analysis · equity analysis · portfolio analysis · FinTech · financial calculator · TypeScript · JavaScript · Node.js
+This library computes financial ratios from the numbers you supply. It is not investment advice.
