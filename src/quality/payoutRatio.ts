@@ -8,9 +8,10 @@ import { safeDivide } from "../core/safeDivide";
  *
  * @param annualDividendPerShare Total dividends paid per share
  * @param eps Earnings per share (trailing twelve months)
- * @returns Payout ratio as a decimal (e.g., 0.40 = 40%) or null
+ * @returns Payout ratio as a decimal (e.g., 0.40 = 40%), or null when EPS is
+ *          zero or negative (payout from losses is not meaningful)
  */
 export const payoutRatio = (
   annualDividendPerShare: number,
   eps: number
-): number | null => safeDivide(annualDividendPerShare, eps);
+): number | null => (eps > 0 ? safeDivide(annualDividendPerShare, eps) : null);

@@ -5,14 +5,19 @@
  * @param projectedFCF Array of projected Free Cash Flows for N years
  * @param discountRate The required rate of return or WACC (e.g., 0.10 for 10%)
  * @param terminalGrowthRate The expected perpetual growth rate after year N (e.g., 0.025 for 2.5%)
- * @returns The total present value of the company (Enterprise Value)
+ * @returns The total present value of the company (Enterprise Value), or null
+ *          when there are no cash flows, discountRate <= terminalGrowthRate,
+ *          or discountRate <= -1
+ *
+ * Uses end-of-year discounting and a Gordon-growth terminal value based on
+ * the last projected FCF. Pass unlevered FCF to get enterprise value.
  */
 export const calculateDCF = (
   projectedFCF: number[],
   discountRate: number,
   terminalGrowthRate: number
 ): number | null => {
-  if (projectedFCF.length === 0 || discountRate <= terminalGrowthRate) {
+  if (!projectedFCF || projectedFCF.length === 0 || discountRate <= terminalGrowthRate || discountRate <= -1) {
     return null;
   }
 
@@ -48,7 +53,7 @@ export const impliedSharePrice = (
   cashEquivalents: number,
   sharesOutstanding: number
 ): number | null => {
-  if (sharesOutstanding === 0) return null;
+  if (!(sharesOutstanding > 0)) return null;
   const equityValue = enterpriseValue - totalDebt + cashEquivalents;
   return equityValue / sharesOutstanding;
 };

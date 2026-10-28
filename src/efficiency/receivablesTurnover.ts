@@ -17,6 +17,7 @@ export const receivablesTurnover = (
 /**
  * Days Sales Outstanding (DSO)
  * The average number of days it takes to collect payment after a sale.
+ * Formula: (Trade Receivables / Revenue) × 365  (= 365 / receivables turnover)
  * Lower is better — under 45 days is generally healthy.
  *
  * @param totalRevenue Total revenue
@@ -26,7 +27,4 @@ export const receivablesTurnover = (
 export const daysSalesOutstanding = (
   totalRevenue: number,
   tradeReceivables: number
-): number | null => {
-  const rt = receivablesTurnover(totalRevenue, tradeReceivables);
-  return rt !== null ? safeDivide(365, rt) : null;
-};
+): number | null => safeDivide(tradeReceivables * 365, totalRevenue);

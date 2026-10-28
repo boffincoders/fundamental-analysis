@@ -22,34 +22,48 @@ import { assetTurnover } from "../efficiency/assetTurnover";
 import { inventoryTurnover } from "../efficiency/inventoryTurnover";
 import { receivablesTurnover, daysSalesOutstanding } from "../efficiency/receivablesTurnover";
 import { sharpe } from "../risk/sharpe";
-import { altmanZScore } from "../risk/altmanZScore";
+import { altmanZScore, altmanZScoreDoublePrime } from "../risk/altmanZScore";
 import { piotroski } from "../risk/piotroski";
 import { netDebt, netCash, netDebtToEbitda, debtToAssets } from "../solvency/netDebt";
 import { payoutRatio } from "../quality/payoutRatio";
 import { cashConversionRatio } from "../quality/cashConversionRatio";
 import { targetUpside } from "../insights/targetUpside";
+import { safeDivide } from "../core/safeDivide";
 import { evaluate, EvaluatedMetric } from "../evaluator/evaluate";
+
+// Conventions used below:
+// - `x != null` is used wherever zero is a legitimate value (net income, costs,
+//   cash flow, EBIT, dividends...). A plain truthiness check is used only for
+//   denominators, where zero would make the ratio undefined anyway.
+// - Missing inputs give null outputs; nothing is silently replaced by 0, except
+//   that total debt and cash default to 0 for EV / net debt when the other one
+//   is supplied (documented on CompanySnapshotInput).
+
+const isPositive = (v: number | undefined): v is number => v != null && v > 0;
 
 // ── Valuation ─────────────────────────────────────────────────────────────────
 
 export function analyzeValuation(data: CompanySnapshotInput, withInsights = false) {
-  const price     = data.price ?? 0;
-  const marketCap = data.marketCap ?? 0;
-  const ev        = calculateEnterpriseValue(marketCap, data.totalDebt ?? 0, data.cashAndEquivalents ?? 0);
+  const price      = isPositive(data.price) ? data.price : null;
+  const marketCap  = isPositive(data.marketCap) ? data.marketCap : null;
+  const ev         = marketCap !== null
+    ? calculateEnterpriseValue(marketCap, data.totalDebt ?? 0, data.cashAndEquivalents ?? 0)
+    : null;
+  const peValue    = price !== null && data.eps != null ? pe(price, data.eps) : null;
 
   const raw = {
-    pe:              data.eps ? pe(price, data.eps) : null,
-    pb:              data.bookValuePerShare ? pb(price, data.bookValuePerShare) : null,
-    ps:              data.revenuePerShare ? ps(price, data.revenuePerShare) : null,
+    pe:              peValue,
+    pb:              price !== null && data.bookValuePerShare != null ? pb(price, data.bookValuePerShare) : null,
+    ps:              price !== null && data.revenuePerShare != null ? ps(price, data.revenuePerShare) : null,
     // expectedEarningsGrowthRate is a decimal (0.15 = 15 %); peg() converts it to a percentage.
-    peg:             data.eps && data.expectedEarningsGrowthRate != null ? peg(pe(price, data.eps) ?? 0, data.expectedEarningsGrowthRate) : null,
-    evEbitda:        data.ebitda ? evEbitda(ev, data.ebitda) : null,
-    dividendYield:   data.annualDividendPerShare ? dividendYield(data.annualDividendPerShare, price) : null,
-    grahamNumber:    data.eps && data.bookValuePerShare ? grahamNumber(data.eps, data.bookValuePerShare) : null,
-    priceToCashFlow: data.operatingCashFlow && marketCap ? priceToCashFlow(marketCap, data.operatingCashFlow) : null,
-    earningsYield:   data.eps && price ? earningsYield(data.eps, price) : null,
-    evRevenue:       data.totalRevenue ? evRevenue(ev, data.totalRevenue) : null,
-    evFcf:           data.freeCashFlow ? evFcf(ev, data.freeCashFlow) : null,
+    peg:             peValue !== null && data.expectedEarningsGrowthRate != null ? peg(peValue, data.expectedEarningsGrowthRate) : null,
+    evEbitda:        ev !== null && data.ebitda != null ? evEbitda(ev, data.ebitda) : null,
+    dividendYield:   price !== null && data.annualDividendPerShare != null ? dividendYield(data.annualDividendPerShare, price) : null,
+    grahamNumber:    data.eps != null && data.bookValuePerShare != null ? grahamNumber(data.eps, data.bookValuePerShare) : null,
+    priceToCashFlow: marketCap !== null && data.operatingCashFlow != null ? priceToCashFlow(marketCap, data.operatingCashFlow) : null,
+    earningsYield:   price !== null && data.eps != null ? earningsYield(data.eps, price) : null,
+    evRevenue:       ev !== null && data.totalRevenue != null ? evRevenue(ev, data.totalRevenue) : null,
+    evFcf:           ev !== null && data.freeCashFlow != null ? evFcf(ev, data.freeCashFlow) : null,
   };
 
   if (!withInsights) return raw;
@@ -61,7 +75,7 @@ export function analyzeValuation(data: CompanySnapshotInput, withInsights = fals
     peg:             evaluate.peg(raw.peg),
     evEbitda:        evaluate.evEbitda(raw.evEbitda),
     dividendYield:   evaluate.dividendYield(raw.dividendYield),
-    grahamNumber:    evaluate.grahamNumber(raw.grahamNumber, price),
+    grahamNumber:    evaluate.grahamNumber(raw.grahamNumber, price ?? 0),
     priceToCashFlow: evaluate.priceToCashFlow(raw.priceToCashFlow),
     earningsYield:   evaluate.earningsYield(raw.earningsYield),
     evRevenue:       evaluate.evRevenue(raw.evRevenue),
@@ -72,14 +86,24 @@ export function analyzeValuation(data: CompanySnapshotInput, withInsights = fals
 // ── Profitability ─────────────────────────────────────────────────────────────
 
 export function analyzeProfitability(data: CompanySnapshotInput, withInsights = false) {
+  const revenue = data.totalRevenue;
+
+  let gross: number | null = null;
+  if (revenue) {
+    if (data.costOfRevenue != null) gross = grossMargin(revenue, data.costOfRevenue);
+    else if (data.grossProfit != null) gross = safeDivide(data.grossProfit, revenue);
+  }
+
   const raw = {
-    roa:            data.netIncome && data.totalAssets ? roa(data.netIncome, data.totalAssets) : null,
-    roe:            data.netIncome && data.totalEquity ? roe(data.netIncome, data.totalEquity) : null,
-    roic:           data.operatingIncome && data.taxRate !== undefined && data.totalEquity ? roic(data.operatingIncome, data.taxRate, data.totalDebt ?? 0, data.totalEquity, data.cashAndEquivalents ?? 0) : null,
-    grossMargin:    data.totalRevenue && data.costOfRevenue ? grossMargin(data.totalRevenue, data.costOfRevenue) : null,
-    operatingMargin: data.operatingIncome && data.totalRevenue ? operatingMargin(data.operatingIncome, data.totalRevenue) : null,
-    netProfitMargin: data.netIncome && data.totalRevenue ? netProfitMargin(data.netIncome, data.totalRevenue) : null,
-    fcfMargin:      data.freeCashFlow && data.totalRevenue ? fcfMargin(data.freeCashFlow, data.totalRevenue) : null,
+    roa:             data.netIncome != null && data.totalAssets ? roa(data.netIncome, data.totalAssets) : null,
+    roe:             data.netIncome != null && data.totalEquity != null ? roe(data.netIncome, data.totalEquity) : null,
+    roic:            data.operatingIncome != null && data.taxRate != null && data.totalEquity != null
+                       ? roic(data.operatingIncome, data.taxRate, data.totalDebt ?? 0, data.totalEquity, data.cashAndEquivalents ?? 0)
+                       : null,
+    grossMargin:     gross,
+    operatingMargin: data.operatingIncome != null && revenue ? operatingMargin(data.operatingIncome, revenue) : null,
+    netProfitMargin: data.netIncome != null && revenue ? netProfitMargin(data.netIncome, revenue) : null,
+    fcfMargin:       data.freeCashFlow != null && revenue ? fcfMargin(data.freeCashFlow, revenue) : null,
   };
 
   if (!withInsights) return raw;
@@ -98,19 +122,24 @@ export function analyzeProfitability(data: CompanySnapshotInput, withInsights = 
 // ── Liquidity ─────────────────────────────────────────────────────────────────
 
 export function analyzeLiquidity(data: CompanySnapshotInput, withInsights = false) {
+  // Current and quick ratios need CURRENT assets and liabilities. Total assets /
+  // total liabilities are a different (solvency) measure and are not used here.
+  const ca = data.currentAssets;
+  const cl = data.currentLiabilities;
+
   const raw = {
-    currentRatio:    data.totalAssets && data.totalLiabilities ? currentRatio(data.totalAssets, data.totalLiabilities) : null,
-    quickRatio:      data.totalAssets && data.inventory !== undefined && data.totalLiabilities ? quickRatio(data.totalAssets, data.inventory, data.totalLiabilities) : null,
-    debtToEquity:    data.totalEquity ? debtToEquity(data.totalDebt ?? 0, data.totalEquity) : null,
-    interestCoverage: data.ebit && data.interestExpense ? interestCoverage(data.ebit, data.interestExpense) : null,
+    currentRatio:     ca != null && cl ? currentRatio(ca, cl) : null,
+    quickRatio:       ca != null && data.inventory != null && cl ? quickRatio(ca, data.inventory, cl) : null,
+    debtToEquity:     data.totalDebt != null && data.totalEquity ? debtToEquity(data.totalDebt, data.totalEquity) : null,
+    interestCoverage: data.ebit != null && data.interestExpense ? interestCoverage(data.ebit, data.interestExpense) : null,
   };
 
   if (!withInsights) return raw;
 
   return {
-    currentRatio:    evaluate.currentRatio(raw.currentRatio),
-    quickRatio:      evaluate.quickRatio(raw.quickRatio),
-    debtToEquity:    evaluate.debtToEquity(raw.debtToEquity),
+    currentRatio:     evaluate.currentRatio(raw.currentRatio),
+    quickRatio:       evaluate.quickRatio(raw.quickRatio),
+    debtToEquity:     evaluate.debtToEquity(raw.debtToEquity),
     interestCoverage: evaluate.interestCoverage(raw.interestCoverage),
   };
 }
@@ -127,8 +156,8 @@ export function analyzeSolvency(data: CompanySnapshotInput, withInsights = false
     netDebt:          nd,
     netCash:          hasDebtData ? netCash(td, cash) : null,
     netDebtToEbitda:  hasDebtData && data.ebitda != null ? netDebtToEbitda(td, cash, data.ebitda) : null,
-    debtToAssets:     data.totalAssets ? debtToAssets(td, data.totalAssets) : null,
-    debtToEquity:     data.totalEquity ? debtToEquity(td, data.totalEquity) : null,
+    debtToAssets:     data.totalDebt != null && data.totalAssets ? debtToAssets(data.totalDebt, data.totalAssets) : null,
+    debtToEquity:     data.totalDebt != null && data.totalEquity ? debtToEquity(data.totalDebt, data.totalEquity) : null,
     interestCoverage: data.ebit != null && data.interestExpense ? interestCoverage(data.ebit, data.interestExpense) : null,
   };
 
@@ -148,18 +177,18 @@ export function analyzeSolvency(data: CompanySnapshotInput, withInsights = false
 
 export function analyzeEfficiency(data: CompanySnapshotInput, withInsights = false) {
   const raw = {
-    assetTurnover:       data.totalRevenue && data.totalAssets ? assetTurnover(data.totalRevenue, data.totalAssets) : null,
-    inventoryTurnover:   data.costOfRevenue && data.inventory ? inventoryTurnover(data.costOfRevenue, data.inventory) : null,
-    receivablesTurnover: data.totalRevenue && data.tradeReceivables ? receivablesTurnover(data.totalRevenue, data.tradeReceivables) : null,
-    daysSalesOutstanding: data.totalRevenue && data.tradeReceivables ? daysSalesOutstanding(data.totalRevenue, data.tradeReceivables) : null,
+    assetTurnover:        data.totalRevenue != null && data.totalAssets ? assetTurnover(data.totalRevenue, data.totalAssets) : null,
+    inventoryTurnover:    data.costOfRevenue != null && data.inventory ? inventoryTurnover(data.costOfRevenue, data.inventory) : null,
+    receivablesTurnover:  data.totalRevenue != null && data.tradeReceivables ? receivablesTurnover(data.totalRevenue, data.tradeReceivables) : null,
+    daysSalesOutstanding: data.totalRevenue && data.tradeReceivables != null ? daysSalesOutstanding(data.totalRevenue, data.tradeReceivables) : null,
   };
 
   if (!withInsights) return raw;
 
   return {
-    assetTurnover:       evaluate.assetTurnover(raw.assetTurnover),
-    inventoryTurnover:   evaluate.inventoryTurnover(raw.inventoryTurnover),
-    receivablesTurnover: evaluate.receivablesTurnover(raw.receivablesTurnover),
+    assetTurnover:        evaluate.assetTurnover(raw.assetTurnover),
+    inventoryTurnover:    evaluate.inventoryTurnover(raw.inventoryTurnover),
+    receivablesTurnover:  evaluate.receivablesTurnover(raw.receivablesTurnover),
     daysSalesOutstanding: evaluate.daysSalesOutstanding(raw.daysSalesOutstanding),
   };
 }
@@ -167,47 +196,73 @@ export function analyzeEfficiency(data: CompanySnapshotInput, withInsights = fal
 // ── Risk ──────────────────────────────────────────────────────────────────────
 
 export function analyzeRisk(data: CompanySnapshotInput, withInsights = false) {
-  const marketCap = data.marketCap ?? 0;
+  const ca = data.currentAssets;
+  const cl = data.currentLiabilities;
+  const workingCapital = data.workingCapital ?? (ca != null && cl != null ? ca - cl : undefined);
 
+  // Original Altman Z (public manufacturers) — needs market cap and sales.
   const altman = (
-    data.workingCapital !== undefined &&
-    data.retainedEarnings !== undefined &&
-    data.ebit !== undefined &&
-    data.totalAssets &&
-    data.totalLiabilities
+    workingCapital != null &&
+    data.retainedEarnings != null &&
+    data.ebit != null &&
+    data.marketCap != null &&
+    data.totalRevenue != null &&
+    data.totalAssets != null &&
+    data.totalLiabilities != null
   )
-    ? altmanZScore(data.workingCapital, data.retainedEarnings, data.ebit, marketCap, data.totalRevenue ?? 0, data.totalAssets, data.totalLiabilities)
+    ? altmanZScore(workingCapital, data.retainedEarnings, data.ebit, data.marketCap, data.totalRevenue, data.totalAssets, data.totalLiabilities)
     : null;
 
-  const sharpeVal = (data.returns !== undefined && data.riskFree !== undefined && data.stdDev !== undefined)
+  // Altman Z'' (non-manufacturers / private firms) — uses book equity, no sales term.
+  const altmanDoublePrime = (
+    workingCapital != null &&
+    data.retainedEarnings != null &&
+    data.ebit != null &&
+    data.totalEquity != null &&
+    data.totalAssets != null &&
+    data.totalLiabilities != null
+  )
+    ? altmanZScoreDoublePrime(workingCapital, data.retainedEarnings, data.ebit, data.totalEquity, data.totalAssets, data.totalLiabilities)
+    : null;
+
+  const sharpeVal = (data.returns != null && data.riskFree != null && data.stdDev != null)
     ? sharpe(data.returns, data.riskFree, data.stdDev)
     : null;
 
+  const revenue = data.totalRevenue;
+  const grossMarginValue = revenue
+    ? data.costOfRevenue != null ? grossMargin(revenue, data.costOfRevenue)
+      : data.grossProfit != null ? safeDivide(data.grossProfit, revenue) : null
+    : null;
+
   // Piotroski — compute only if minimum required fields are present
-  const piotroskiResult = (data.netIncome !== undefined && data.totalAssets && data.operatingCashFlow !== undefined)
+  const piotroskiResult = (data.netIncome != null && data.totalAssets && data.operatingCashFlow != null)
     ? piotroski({
         netIncome:            data.netIncome,
         totalAssets:          data.totalAssets,
         operatingCashFlow:    data.operatingCashFlow,
         longTermDebt:         data.longTermDebt,
         sharesOutstanding:    data.sharesOutstanding,
-        grossMarginValue:     data.totalRevenue && data.costOfRevenue ? grossMargin(data.totalRevenue, data.costOfRevenue) ?? undefined : undefined,
-        assetTurnoverValue:   data.totalRevenue && data.totalAssets ? assetTurnover(data.totalRevenue, data.totalAssets) ?? undefined : undefined,
+        currentRatioValue:    ca != null && cl ? currentRatio(ca, cl) ?? undefined : undefined,
+        grossMarginValue:     grossMarginValue ?? undefined,
+        assetTurnoverValue:   revenue != null ? assetTurnover(revenue, data.totalAssets) ?? undefined : undefined,
       })
     : null;
 
   const raw = {
-    altmanZScore:  altman,
-    sharpe:        sharpeVal,
-    piotroski:     piotroskiResult,
+    altmanZScore:            altman,
+    altmanZScoreDoublePrime: altmanDoublePrime,
+    sharpe:                  sharpeVal,
+    piotroski:               piotroskiResult,
   };
 
   if (!withInsights) return raw;
 
   return {
-    altmanZScore: evaluate.altmanZScore(raw.altmanZScore),
-    sharpe:       evaluate.sharpe(raw.sharpe),
-    piotroski:    raw.piotroski
+    altmanZScore:            evaluate.altmanZScore(raw.altmanZScore),
+    altmanZScoreDoublePrime: evaluate.altmanZScoreDoublePrime(raw.altmanZScoreDoublePrime),
+    sharpe:                  evaluate.sharpe(raw.sharpe),
+    piotroski:               raw.piotroski
       ? evaluate.piotroski(raw.piotroski.score, raw.piotroski.maxScore)
       : evaluate.piotroski(0, 0),
   };
@@ -217,16 +272,16 @@ export function analyzeRisk(data: CompanySnapshotInput, withInsights = false) {
 
 export function analyzeQuality(data: CompanySnapshotInput, withInsights = false) {
   const raw = {
-    payoutRatio:          data.annualDividendPerShare && data.eps ? payoutRatio(data.annualDividendPerShare, data.eps) : null,
-    cashConversionRatio:  data.operatingCashFlow !== undefined && data.netIncome ? cashConversionRatio(data.operatingCashFlow, data.netIncome) : null,
-    targetUpside:         data.price && data.analystTargetPrice ? targetUpside(data.price, data.analystTargetPrice) : null,
+    payoutRatio:         data.annualDividendPerShare != null && data.eps ? payoutRatio(data.annualDividendPerShare, data.eps) : null,
+    cashConversionRatio: data.operatingCashFlow != null && data.netIncome ? cashConversionRatio(data.operatingCashFlow, data.netIncome) : null,
+    targetUpside:        isPositive(data.price) && data.analystTargetPrice != null ? targetUpside(data.price, data.analystTargetPrice) : null,
   };
 
   if (!withInsights) return raw;
 
   return {
-    payoutRatio:          evaluate.payoutRatio(raw.payoutRatio),
-    cashConversionRatio:  evaluate.cashConversionRatio(raw.cashConversionRatio),
-    targetUpside:         evaluate.targetUpside(raw.targetUpside),
+    payoutRatio:         evaluate.payoutRatio(raw.payoutRatio),
+    cashConversionRatio: evaluate.cashConversionRatio(raw.cashConversionRatio),
+    targetUpside:        evaluate.targetUpside(raw.targetUpside),
   };
 }

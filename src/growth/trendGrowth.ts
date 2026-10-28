@@ -14,32 +14,44 @@ export const calculateGrowthRate = (currentValue: number, previousValue: number)
 };
 
 /**
- * Calculates Year-over-Year (YoY) growth rates for a chronological array of annual data points.
+ * Period-over-period growth rates, keeping undefined periods as null.
  * Expects oldest data first, newest data last. [2021, 2022, 2023]
+ * A period whose previous value is 0 has no defined growth rate and is null.
+ * Returns an array of length (N - 1).
  */
-export const yoyGrowth = (dataPoints: number[]): number[] => {
-  const growthRates: number[] = [];
-
+export const growthRates = (dataPoints: number[]): (number | null)[] => {
+  const rates: (number | null)[] = [];
   for (let i = 1; i < dataPoints.length; i++) {
-    const prev = dataPoints[i - 1];
-    const curr = dataPoints[i];
-
-    const rate = calculateGrowthRate(curr, prev);
-    growthRates.push(rate === null ? 0 : rate);
+    rates.push(calculateGrowthRate(dataPoints[i], dataPoints[i - 1]));
   }
-
-  return growthRates; // Returns array of length (N - 1)
+  return rates;
 };
 
 /**
- * Calculates Quarter-over-Quarter (QoQ) trailing growth rates for an array of quarterly data.
- * Usually QoQ means Q2 vs Q1. This assumes [Q1, Q2, Q3, Q4] in chronological order.
+ * Calculates Year-over-Year (YoY) growth rates for a chronological array of annual data points.
+ * Expects oldest data first, newest data last. [2021, 2022, 2023]
+ *
+ * Kept for backward compatibility: a period whose previous value is 0 (growth
+ * undefined) is reported as 0 so the result stays number[]. Use growthRates()
+ * to get null for those periods instead; medianGrowth() and
+ * analyzeFundamentalTrends() already skip / report them as null.
+ */
+export const yoyGrowth = (dataPoints: number[]): number[] =>
+  growthRates(dataPoints).map((rate) => (rate === null ? 0 : rate)); // length (N - 1)
+
+/**
+ * Calculates Quarter-over-Quarter (QoQ) growth rates for an array of quarterly data:
+ * each quarter vs the quarter immediately before it, [Q1, Q2, Q3, Q4] in chronological order.
+ * Same zero-handling as yoyGrowth(). For seasonal businesses, compare each quarter with the
+ * same quarter a year earlier instead (e.g. computeHistoricalPoint(values, 4)).
  */
 export const qoqGrowth = (dataPoints: number[]): number[] => yoyGrowth(dataPoints);
 
 /**
  * Compound Annual Growth Rate (CAGR)
  * Formula: (Ending Value / Beginning Value) ^ (1 / Years) - 1
+ * Returns null when the beginning value is <= 0 or the ending value is < 0
+ * (CAGR is undefined across a sign change), or periods <= 0.
  */
 export const cagr = (beginningValue: number, endingValue: number, periods: number): number | null => {
   if (periods <= 0 || beginningValue <= 0 || endingValue < 0) return null;
@@ -53,12 +65,14 @@ export const cagr = (beginningValue: number, endingValue: number, periods: numbe
  * Interpretation:
  * - More robust than mean growth because it is not skewed by outlier years.
  * - Useful for evaluating the "typical" annual growth of earnings, revenue, etc.
- * Returns null if fewer than 2 data points are provided.
+ * Periods whose previous value is 0 (growth undefined) are skipped.
+ * Returns null if fewer than 2 data points are provided or no period has a defined rate.
  */
 export const medianGrowth = (annualValues: number[]): number | null => {
   if (!annualValues || annualValues.length < 2) return null;
 
-  const rates = yoyGrowth(annualValues).filter(r => isFinite(r));
+  // Periods with an undefined growth rate (previous value 0) are skipped, not counted as 0 %.
+  const rates = growthRates(annualValues).filter((r): r is number => r !== null && isFinite(r));
   if (rates.length === 0) return null;
 
   const sorted = [...rates].sort((a, b) => a - b);

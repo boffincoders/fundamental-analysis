@@ -11,9 +11,23 @@ describe("Altman Z-Score", () => {
     expect(z!).toBeGreaterThanOrEqual(2.99);
   });
 
-  it("returns null when total assets or liabilities are zero", () => {
+  it("hand-checked value: 1.2×0.15 + 1.4×0.20 + 3.3×0.075 + 0.6×(250000/60000) + 0.5 = 3.7075", () => {
+    expect(altmanZScore(15000, 20000, 7500, 250000, 50000, 100000, 60000)).toBeCloseTo(3.7075, 4);
+  });
+
+  it("returns null when total assets are zero or negative", () => {
     expect(altmanZScore(15000, 20000, 7500, 150000, 50000, 0, 60000)).toBeNull();
-    expect(altmanZScore(15000, 20000, 7500, 150000, 50000, 100000, 0)).toBeNull();
+    expect(altmanZScore(15000, 20000, 7500, 150000, 50000, -1, 60000)).toBeNull();
+  });
+
+  it("debt-free company (zero liabilities) gets a score, equity/liabilities capped at 10", () => {
+    // 0.18 + 0.28 + 0.2475 + 0.6×10 + 0.5 = 7.2075
+    expect(altmanZScore(15000, 20000, 7500, 250000, 50000, 100000, 0)).toBeCloseTo(7.2075, 4);
+  });
+
+  it("returns null instead of hiding missing inputs as 0", () => {
+    expect(altmanZScore(undefined as any, 20000, 7500, 250000, 50000, 100000, 60000)).toBeNull();
+    expect(altmanZScore(15000, 20000, NaN, 250000, 50000, 100000, 60000)).toBeNull();
   });
 
   it("returns a low score for a distressed company", () => {

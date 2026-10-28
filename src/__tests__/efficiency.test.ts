@@ -24,7 +24,8 @@ describe("Days Sales Outstanding", () => {
   it("calculates correctly from receivables turnover of 8", () => {
     expect(daysSalesOutstanding(50000, 6250)).toBeCloseTo(365 / 8);
   });
-  it("returns null for zero receivables", () => expect(daysSalesOutstanding(50000, 0)).toBeNull());
+  it("is 0 days for zero receivables (cash business)", () => expect(daysSalesOutstanding(50000, 0)).toBe(0));
+  it("returns null for zero revenue", () => expect(daysSalesOutstanding(0, 5000)).toBeNull());
   it("is inversely correlated with receivables turnover", () => {
     const dso1 = daysSalesOutstanding(50000, 5000)!;
     const dso2 = daysSalesOutstanding(50000, 10000)!;

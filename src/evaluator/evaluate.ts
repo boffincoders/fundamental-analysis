@@ -8,31 +8,38 @@ export interface EvaluatedMetric {
 
 /**
  * The Evaluator centralizes interpretation of all financial metrics.
- * It provides newbie-friendly insights.
- * Note: These are generic rules of thumb and vary heavily by industry.
+ * It provides beginner-friendly insights.
+ *
+ * IMPORTANT: every threshold here is a fixed, generic rule of thumb. It is
+ * sector-blind and market-blind. Normal ranges differ widely by industry
+ * (a P/E of 30 is ordinary for software, high for a utility; a current ratio
+ * of 0.8 is normal for a supermarket) and by market and interest-rate regime.
+ * Ratios such as current ratio, EV/EBITDA, inventory turnover and Altman Z
+ * are not meaningful for banks and insurers. Use the status as a first-pass
+ * screen and compare against sector peers before drawing conclusions.
  */
 export const evaluate = {
   // ── Valuation ─────────────────────────────────────────────────────────────
 
   pe: (value: number | null): EvaluatedMetric => {
     if (value === null || value <= 0) return { value, status: "N/A", insight: "Earnings are negative or unavailable." };
-    if (value < 15) return { value, status: "Good", insight: "Potentially undervalued or a value stock." };
-    if (value <= 25) return { value, status: "Neutral", insight: "Fairly valued for most markets." };
-    return { value, status: "Bad", insight: "Expensive. High growth is priced in." };
+    if (value < 15) return { value, status: "Good", insight: "Potentially undervalued or a value stock (generic threshold; compare with sector peers)." };
+    if (value <= 25) return { value, status: "Neutral", insight: "Fairly valued by generic standards." };
+    return { value, status: "Bad", insight: "Expensive by generic standards. High growth is priced in; normal for some sectors." };
   },
 
   pb: (value: number | null): EvaluatedMetric => {
     if (value === null || value <= 0) return { value, status: "N/A", insight: "Book value negative or unavailable." };
-    if (value < 1) return { value, status: "Good", insight: "Trading below book value (undervalued)." };
-    if (value <= 3) return { value, status: "Neutral", insight: "Healthy evaluation." };
-    return { value, status: "Bad", insight: "Trading at a high premium to book value." };
+    if (value < 1) return { value, status: "Good", insight: "Trading below book value — possibly undervalued, or the market doubts the assets." };
+    if (value <= 3) return { value, status: "Neutral", insight: "Moderate premium to book value." };
+    return { value, status: "Bad", insight: "High premium to book value (common for asset-light businesses)." };
   },
 
   ps: (value: number | null): EvaluatedMetric => {
     if (value === null || value <= 0) return { value, status: "N/A", insight: "Sales data unavailable." };
-    if (value < 1) return { value, status: "Good", insight: "Excellent value per dollar of sales." };
-    if (value <= 2) return { value, status: "Neutral", insight: "Average pricing for sales." };
-    return { value, status: "Bad", insight: "High correlation to sales, could mean overvalued." };
+    if (value < 1) return { value, status: "Good", insight: "Cheap relative to sales." };
+    if (value <= 2) return { value, status: "Neutral", insight: "Average price relative to sales." };
+    return { value, status: "Bad", insight: "Expensive relative to sales by generic standards; high-margin sectors trade higher." };
   },
 
   /**
@@ -48,9 +55,9 @@ export const evaluate = {
 
   evEbitda: (value: number | null): EvaluatedMetric => {
     if (value === null || value <= 0) return { value, status: "N/A", insight: "Negative EBITDA or unavailable." };
-    if (value < 10) return { value, status: "Good", insight: "Generally considered healthy and cheap." };
-    if (value <= 15) return { value, status: "Neutral", insight: "Fairly valued." };
-    return { value, status: "Bad", insight: "Expensive relative to cash earnings." };
+    if (value < 10) return { value, status: "Good", insight: "Cheap relative to operating earnings by generic standards." };
+    if (value <= 15) return { value, status: "Neutral", insight: "Fairly valued by generic standards." };
+    return { value, status: "Bad", insight: "Expensive relative to operating earnings; compare with sector peers." };
   },
 
   dividendYield: (value: number | null): EvaluatedMetric => {
@@ -115,6 +122,7 @@ export const evaluate = {
    */
   grahamNumber: (grahamValue: number | null, currentPrice: number): EvaluatedMetric => {
     if (grahamValue === null || grahamValue <= 0) return { value: null, status: "N/A", insight: "Graham Number unavailable (negative EPS or book value)." };
+    if (!(currentPrice > 0)) return { value: grahamValue, status: "N/A", insight: "Current price unavailable — cannot compare with the Graham Number." };
     const margin = (grahamValue - currentPrice) / grahamValue;
     const pct = Math.round(margin * 100);
     if (margin >= 0.20) return { value: grahamValue, status: "Good", insight: `${pct}% margin of safety — trading well below Graham intrinsic value.` };
@@ -131,6 +139,7 @@ export const evaluate = {
    */
   dcf: (impliedPrice: number | null, currentPrice: number): EvaluatedMetric => {
     if (impliedPrice === null || impliedPrice <= 0) return { value: null, status: "N/A", insight: "DCF model could not produce a valid implied price." };
+    if (!(currentPrice > 0)) return { value: impliedPrice, status: "N/A", insight: "Current price unavailable — cannot compare with the DCF value." };
     const upside = (impliedPrice - currentPrice) / currentPrice;
     const pct = Math.round(upside * 100);
     if (upside >= 0.15) return { value: impliedPrice, status: "Good", insight: `DCF implies ${pct}% upside — potentially undervalued.` };
@@ -166,7 +175,8 @@ export const evaluate = {
     if (value > 0.20) return { value, status: "Good", insight: `Very strong ${name} margin.` };
     if (value > 0.05) return { value, status: "Neutral", insight: `Healthy ${name} margin.` };
     if (value > 0) return { value, status: "Bad", insight: `Very tight ${name} margin.` };
-    return { value, status: "Bad", insight: "Losing money (Negative margin)." };
+    if (value === 0) return { value, status: "Bad", insight: `Break-even ${name} margin.` };
+    return { value, status: "Bad", insight: `Negative ${name} margin.` };
   },
 
   // ── Liquidity & Solvency ───────────────────────────────────────────────────
@@ -186,13 +196,15 @@ export const evaluate = {
 
   debtToEquity: (value: number | null): EvaluatedMetric => {
     if (value === null) return { value, status: "N/A", insight: "Debt data unavailable." };
+    if (value < 0) return { value, status: "Bad", insight: "Negative shareholder equity — liabilities exceed assets." };
     if (value < 1.0) return { value, status: "Good", insight: "Funded mostly by equity. Low debt risk." };
     if (value <= 2.0) return { value, status: "Neutral", insight: "Average leverage." };
     return { value, status: "Bad", insight: "High financial leverage. High risk." };
   },
 
   interestCoverage: (value: number | null): EvaluatedMetric => {
-    if (value === null || value <= 0) return { value, status: "N/A", insight: "No debt, or no earnings to cover debt." };
+    if (value === null) return { value, status: "N/A", insight: "No interest expense, or EBIT unavailable." };
+    if (value <= 0) return { value, status: "Bad", insight: "EBIT is zero or negative — operating earnings do not cover interest." };
     if (value >= 3.0) return { value, status: "Good", insight: "Easily pays interest on outstanding debt." };
     if (value >= 1.5) return { value, status: "Neutral", insight: "Can pay interest, but margin of safety is narrow." };
     return { value, status: "Bad", insight: "High risk of default on debt interest." };
@@ -298,8 +310,9 @@ export const evaluate = {
    * Dividend Payout Ratio — sustainability check for dividend investors.
    */
   payoutRatio: (value: number | null): EvaluatedMetric => {
-    if (value === null || value < 0) return { value, status: "N/A", insight: "Earnings or dividend data unavailable." };
-    if (value > 0 && value <= 0.75) return { value, status: "Good", insight: "Sustainable payout — retaining enough earnings for growth." };
+    if (value === null || value < 0) return { value, status: "N/A", insight: "Earnings negative, or earnings/dividend data unavailable." };
+    if (value === 0) return { value, status: "N/A", insight: "No dividend paid." };
+    if (value <= 0.75) return { value, status: "Good", insight: "Sustainable payout — retaining enough earnings for growth." };
     if (value <= 1.0) return { value, status: "Neutral", insight: "Paying out most earnings as dividends. Watch for sustainability." };
     return { value, status: "Bad", insight: "Dividends exceed earnings. Not sustainable without external financing." };
   },
@@ -317,15 +330,31 @@ export const evaluate = {
 
   // ── Risk ──────────────────────────────────────────────────────────────────
 
+  /**
+   * Altman Z (original model for public manufacturers): > 2.99 safe,
+   * 1.81–2.99 grey, < 1.81 distress. Use altmanZScoreDoublePrime for
+   * non-manufacturers and private firms; neither applies to financials.
+   */
   altmanZScore: (value: number | null): EvaluatedMetric => {
     if (value === null) return { value, status: "N/A", insight: "Data unavailable." };
-    if (value >= 2.99) return { value, status: "Good", insight: "Safe Zone. Very low risk of bankruptcy." };
-    if (value >= 1.81) return { value, status: "Neutral", insight: "Grey Zone. Exercise caution." };
-    return { value, status: "Bad", insight: "Distress Zone. High risk of bankruptcy." };
+    if (value > 2.99) return { value, status: "Good", insight: "Safe Zone (original Z, manufacturers). Low risk of financial distress." };
+    if (value >= 1.81) return { value, status: "Neutral", insight: "Grey Zone (original Z, manufacturers). Exercise caution." };
+    return { value, status: "Bad", insight: "Distress Zone (original Z, manufacturers). Elevated risk of financial distress." };
   },
 
   /**
-   * Sharpe Ratio — risk-adjusted return.
+   * Altman Z'' (non-manufacturers / private firms): > 2.6 safe,
+   * 1.1–2.6 grey, < 1.1 distress.
+   */
+  altmanZScoreDoublePrime: (value: number | null): EvaluatedMetric => {
+    if (value === null) return { value, status: "N/A", insight: "Data unavailable." };
+    if (value > 2.6) return { value, status: "Good", insight: "Safe Zone (Z'', non-manufacturers). Low risk of financial distress." };
+    if (value >= 1.1) return { value, status: "Neutral", insight: "Grey Zone (Z'', non-manufacturers). Exercise caution." };
+    return { value, status: "Bad", insight: "Distress Zone (Z'', non-manufacturers). Elevated risk of financial distress." };
+  },
+
+  /**
+   * Sharpe Ratio — risk-adjusted return. Thresholds assume an ANNUALISED ratio.
    * > 2 is excellent, 1–2 is good, 0.5–1 is acceptable.
    */
   sharpe: (value: number | null): EvaluatedMetric => {
@@ -339,13 +368,19 @@ export const evaluate = {
 
   /**
    * Piotroski F-Score — 9-point financial health scorecard.
+   * With all 9 signals: 7–9 Good, 3–6 Neutral, 0–2 Bad. When prior-year data
+   * is missing (maxScore < 9) the same cut-offs are applied to the share of
+   * available signals met (≥ 7/9 Good, ≥ 3/9 Neutral), and the insight says
+   * the score is partial.
    */
   piotroski: (score: number, maxScore: number): EvaluatedMetric => {
     const value = score;
-    if (maxScore === 0) return { value, status: "N/A", insight: "Insufficient data for Piotroski scoring." };
-    if (score >= 7) return { value, status: "Good", insight: `Strong fundamentals (${score}/${maxScore}). Profitable, low-leverage, improving efficiency.` };
-    if (score >= 3) return { value, status: "Neutral", insight: `Mixed signals (${score}/${maxScore}). Some positives but not across the board.` };
-    return { value, status: "Bad", insight: `Weak fundamentals (${score}/${maxScore}). Multiple financial health signals are negative.` };
+    if (!(maxScore > 0)) return { value, status: "N/A", insight: "Insufficient data for Piotroski scoring." };
+    const share = score / maxScore;
+    const partial = maxScore < 9 ? ` Partial score: only ${maxScore} of 9 signals had data (prior-year inputs missing).` : "";
+    if (share >= 7 / 9) return { value, status: "Good", insight: `Strong fundamentals (${score}/${maxScore}).${partial}` };
+    if (share >= 3 / 9) return { value, status: "Neutral", insight: `Mixed signals (${score}/${maxScore}). Some positives but not across the board.${partial}` };
+    return { value, status: "Bad", insight: `Weak fundamentals (${score}/${maxScore}). Multiple financial health signals are negative.${partial}` };
   },
 
   // ── Analyst Targets ───────────────────────────────────────────────────────

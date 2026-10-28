@@ -8,6 +8,9 @@ import { safeDivide } from "../core/safeDivide";
  * - > 15% → strong
  * - 10–15% → average
  * - < 10% → weak
+ *
+ * Returns null when equity is zero or negative: with negative equity a loss
+ * would show as a positive ROE, so the ratio is not meaningful.
  */
 export const roe = (netIncome: number, equity: number): number | null =>
-  safeDivide(netIncome, equity);
+  equity > 0 ? safeDivide(netIncome, equity) : null;

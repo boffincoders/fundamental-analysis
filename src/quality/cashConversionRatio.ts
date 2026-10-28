@@ -8,9 +8,10 @@ import { safeDivide } from "../core/safeDivide";
  *
  * @param operatingCashFlow Cash flow from operations
  * @param netIncome Net income (profit after tax)
- * @returns CCR ratio or null
+ * @returns CCR ratio, or null when net income is zero or negative (a loss with
+ *          negative cash flow would otherwise show as a "high quality" ratio)
  */
 export const cashConversionRatio = (
   operatingCashFlow: number,
   netIncome: number
-): number | null => safeDivide(operatingCashFlow, netIncome);
+): number | null => (netIncome > 0 ? safeDivide(operatingCashFlow, netIncome) : null);

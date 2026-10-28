@@ -6,8 +6,11 @@ import { safeDivide } from "../core/safeDivide";
  * NOPAT = Operating Income * (1 - Tax Rate)
  * Invested Capital = Total Debt + Total Equity - Cash & Equivalents
  * Interpretation:
- * - > 2% over WACC is generally considered wealth-creating.
+ * - ROIC above the company's cost of capital (WACC) creates value.
  * - Shows how well a company allocates capital to generate returns.
+ *
+ * @param taxRate Effective tax rate as a decimal (0.25 = 25 %)
+ * Returns null when invested capital is zero or negative (not meaningful).
  */
 export const roic = (
   operatingIncome: number,
@@ -18,5 +21,6 @@ export const roic = (
 ): number | null => {
   const nopat = operatingIncome * (1 - taxRate);
   const investedCapital = totalDebt + totalEquity - cashAndEquivalents;
+  if (!(investedCapital > 0)) return null;
   return safeDivide(nopat, investedCapital);
 };
