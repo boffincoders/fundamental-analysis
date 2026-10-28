@@ -86,8 +86,10 @@ describe("growth with a zero base period", () => {
   it("yoyGrowth keeps its number[] shape (0 for the undefined period)", () => {
     expect(yoyGrowth(series)).toEqual([0, expect.closeTo(0.1), expect.closeTo(0.1)]);
   });
-  it("medianGrowth skips the undefined period (was 0.05 in 1.2.x, now 0.10)", () => {
+  it("medianGrowth skips the undefined period", () => {
     expect(medianGrowth(series)).toBeCloseTo(0.1);
+    // 1.2.x counted the undefined period as 0 %: median of [0, 0.1] = 0.05
+    expect(medianGrowth([0, 100, 110])).toBeCloseTo(0.1);
   });
   it("medianGrowth returns null when no period is defined", () => {
     expect(medianGrowth([0, 0, 0])).toBeNull();
