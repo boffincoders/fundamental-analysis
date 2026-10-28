@@ -22,8 +22,8 @@ export default function MetricView() {
   const [inputs, setInputs] = useState<Record<string, number>>({});
 
   usePageMeta(
-    metric ? `${metric.name} — formula, calculator & JavaScript example | finance-calculator-pro` : 'Metric not found | finance-calculator-pro',
-    metric ? `${metric.description} Formula: ${metric.formula}. Interactive calculator and TypeScript/JavaScript function in finance-calculator-pro.` : undefined,
+    metric ? `${metric.name} — formula, calculator & JavaScript example | fundamental-analysis` : 'Metric not found | fundamental-analysis',
+    metric ? `${metric.description} Formula: ${metric.formula}. Interactive calculator and TypeScript/JavaScript function in fundamental-analysis.` : undefined,
   );
 
   useEffect(() => {
@@ -216,7 +216,7 @@ export default function MetricView() {
             <svg width="12" height="12" fill="currentColor" viewBox="0 0 24 24" style={{ color: 'var(--green)', flexShrink: 0 }}>
               <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm-1 15v-5H9l3-7 3 7h-2v5h-2z"/>
             </svg>
-            Computed natively by <code className="font-mono px-1">finance-calculator-pro</code> — zero API calls
+            Computed natively by <code className="font-mono px-1">fundamental-analysis</code> — zero API calls
           </div>
         </div>
       </div>

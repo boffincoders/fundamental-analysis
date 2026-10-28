@@ -5,6 +5,6 @@ import { seoPages } from './seo-pages'
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: '/finance-calculator/',
+  base: '/fundamental-analysis/',
   plugins: [react(), tailwindcss(), seoPages()],
 })

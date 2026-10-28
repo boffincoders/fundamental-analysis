@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { analyzeCompany } from 'finance-calculator-pro';
+import { analyzeCompany } from 'fundamental-analysis';
 import { CATEGORIES } from '../data/navigation';
 import { usePageMeta } from '../seo';
 
@@ -164,7 +164,7 @@ const CONVENTIONS = [
 ];
 
 const FAQ = [
-  { q: 'Is finance-calculator-pro free?', a: 'Yes. It is open source under the MIT licence and has no runtime dependencies.' },
+  { q: 'Is fundamental-analysis free?', a: 'Yes. It is open source under the MIT licence and has no runtime dependencies.' },
   { q: 'Does it fetch stock prices or financial statements?', a: 'No. You pass in numbers from any source — your database, a CSV, or an API such as yahoo-finance2, Alpha Vantage or Financial Modeling Prep — and it computes the ratios.' },
   { q: 'Which markets does it work for?', a: 'Any market: US, UK, EU, Canada, Australia, India and others. Ratios are unit-free, so only consistency within one snapshot matters.' },
   { q: 'Can I use it for banks, insurers or REITs?', a: 'Only with care. Current ratio, EV/EBITDA, inventory turnover and Altman Z are not meaningful for financial companies, and REITs are usually valued on FFO rather than earnings.' },
@@ -188,7 +188,7 @@ function SectionTitle({ id, children, sub }: { id?: string; children: React.Reac
 export default function Home() {
   const [snapshot, setSnapshot] = useState<Record<string, number>>(DEFAULT_SNAPSHOT);
   usePageMeta(
-    'finance-calculator-pro — Financial ratio calculator & fundamental analysis library for JavaScript and TypeScript',
+    'fundamental-analysis — Financial ratio calculator & fundamental analysis library for JavaScript and TypeScript',
     'Free, zero-dependency TypeScript library and online calculator for financial ratios: P/E, PEG, EV/EBITDA, ROE, ROIC, current ratio, net debt/EBITDA, Altman Z-Score, Piotroski F-Score, DCF, Graham number and intrinsic value.',
   );
 
@@ -202,19 +202,19 @@ export default function Home() {
           Financial ratios and fundamental analysis for JavaScript & TypeScript
         </h1>
         <p className="text-[15px] max-w-2xl leading-relaxed mb-5" style={{ color: 'var(--text-3)' }}>
-          <code className="px-1.5 py-0.5 rounded text-[13px] font-mono" style={{ background: 'var(--bg-muted)', color: 'var(--blue)', border: '1px solid var(--border)' }}>finance-calculator-pro</code>{' '}
+          <code className="px-1.5 py-0.5 rounded text-[13px] font-mono" style={{ background: 'var(--bg-muted)', color: 'var(--blue)', border: '1px solid var(--border)' }}>fundamental-analysis</code>{' '}
           turns income-statement, balance-sheet and cash-flow numbers into valuation, profitability, liquidity, leverage,
           efficiency and distress-risk metrics — each with an optional plain-English rating. Zero dependencies, runs in
           Node.js, browsers and edge runtimes, works with any data source.
         </p>
         <div className="flex flex-wrap items-center gap-3">
-          <code className="px-3 py-2 rounded-lg text-[13px] font-mono" style={{ background: '#0d1117', color: '#4ade80' }}>npm install finance-calculator-pro</code>
+          <code className="px-3 py-2 rounded-lg text-[13px] font-mono" style={{ background: '#0d1117', color: '#4ade80' }}>npm install fundamental-analysis</code>
           <a href="#playground" className="px-4 py-2 rounded-lg text-[13px] font-medium no-underline" style={{ background: 'var(--blue)', color: '#fff' }}>Try the playground</a>
           <Link to="/api-docs" className="px-4 py-2 rounded-lg text-[13px] font-medium no-underline" style={{ border: '1px solid var(--border)', color: 'var(--text-2)' }}>API reference</Link>
         </div>
         <p className="text-[12px] mt-4 mb-0" style={{ color: 'var(--text-4)' }}>
           Open source (MIT), maintained by{' '}
-          <a href="https://boffincoders.com/?utm_source=docs&utm_medium=hero&utm_campaign=finance-calculator-pro" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>Boffin Coders</a>.
+          <a href="https://boffincoders.com/?utm_source=docs&utm_medium=hero&utm_campaign=fundamental-analysis" target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>Boffin Coders</a>.
         </p>
       </section>
 

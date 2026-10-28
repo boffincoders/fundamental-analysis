@@ -1,5 +1,5 @@
 {
-  "name": "finance-calculator-pro",
+  "name": "fundamental-analysis",
   "version": "1.3.0",
   "author": {
     "name": "Boffin Coders",
@@ -8,13 +8,13 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/boffincoders/finance-calculator.git"
+    "url": "git+https://github.com/boffincoders/fundamental-analysis.git"
   },
   "bugs": {
-    "url": "https://github.com/boffincoders/finance-calculator/issues"
+    "url": "https://github.com/boffincoders/fundamental-analysis/issues"
   },
-  "homepage": "https://boffincoders.github.io/finance-calculator/",
-  "description": "Zero-dependency TypeScript library for fundamental financial analysis: valuation ratios (P/E, P/B, P/S, PEG, EV/EBITDA, EV/FCF), profitability (ROE, ROA, ROIC, margins), liquidity and leverage (current and quick ratio, net debt/EBITDA, interest coverage), efficiency (DSO, DPO, cash conversion cycle), Altman Z and Z'' scores, Piotroski F-Score, Sharpe ratio, DCF, Graham number, intrinsic value, CAGR and TTM helpers, with plain-English ratings. Works with any data source.",
+  "homepage": "https://boffincoders.github.io/fundamental-analysis/",
+  "description": "Fundamental analysis for JavaScript/TypeScript: financial ratios, Piotroski F-Score, Altman Z-Score (Z and Z''), DCF, Graham Number, intrinsic value, valuation multiples (P/E, PEG, EV/EBITDA, EV/FCF), profitability (ROE, ROA, ROIC, margins), liquidity and leverage (current ratio, net debt/EBITDA, interest coverage), efficiency (DSO, DPO, cash conversion cycle), Sharpe ratio, CAGR and TTM helpers, with plain-English ratings. Zero dependencies; works with any data source.",
   "keywords": [
     "finance",
     "financial-ratios",
@@ -55,7 +55,8 @@
     "trailing-twelve-months",
     "intrinsic-value",
     "composite-scoring",
-    "f-score"
+    "f-score",
+    "finance-calculator-pro"
   ],
   "main": "dist/index.js",
   "module": "dist/index.mjs",

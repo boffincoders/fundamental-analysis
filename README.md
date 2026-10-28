@@ -1,15 +1,17 @@
-# finance-calculator-pro
+# fundamental-analysis
 
-[![NPM Version](https://img.shields.io/npm/v/finance-calculator-pro.svg)](https://www.npmjs.com/package/finance-calculator-pro)
+[![NPM Version](https://img.shields.io/npm/v/fundamental-analysis.svg)](https://www.npmjs.com/package/fundamental-analysis)
 [![TypeScript](https://img.shields.io/badge/TypeScript-ready-blue.svg)](https://www.typescriptlang.org/)
-[![Zero Dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen.svg)](https://www.npmjs.com/package/finance-calculator-pro?activeTab=dependencies)
+[![Zero Dependencies](https://img.shields.io/badge/dependencies-zero-brightgreen.svg)](https://www.npmjs.com/package/fundamental-analysis?activeTab=dependencies)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](./LICENSE)
 
-Maintained by [Boffin Coders](https://boffincoders.com/?utm_source=npm&utm_medium=readme&utm_campaign=finance-calculator-pro).
+Maintained by [Boffin Coders](https://boffincoders.com/?utm_source=npm&utm_medium=readme&utm_campaign=fundamental-analysis).
 
-📖 **[Documentation & live playground →](https://boffincoders.github.io/finance-calculator/)**
+> Formerly published as `finance-calculator-pro`. Switching: `npm uninstall finance-calculator-pro && npm install fundamental-analysis`, then change your imports to `'fundamental-analysis'` — the API is the same.
 
-![finance-calculator-pro banner](https://raw.githubusercontent.com/boffincoders/finance-calculator/refs/heads/master/.github/assets/finance-calculator-pro.png)
+📖 **[Documentation & live playground →](https://boffincoders.github.io/fundamental-analysis/)**
+
+![fundamental-analysis banner](https://raw.githubusercontent.com/boffincoders/fundamental-analysis/refs/heads/master/.github/assets/finance-calculator-pro.png)
 
 > **Zero-dependency fundamental analysis for JavaScript and TypeScript.**
 > Turn raw income-statement, balance-sheet and cash-flow numbers into valuation, profitability, liquidity, leverage, efficiency and financial-distress metrics — each with an optional plain-English rating. No API calls, no runtime dependencies. Runs in Node.js, browsers and edge runtimes.
@@ -34,7 +36,7 @@ Maintained by [Boffin Coders](https://boffincoders.com/?utm_source=npm&utm_mediu
 
 ## What it is (and is not)
 
-`finance-calculator-pro` is a library of financial-statement ratios plus a small analysis layer:
+`fundamental-analysis` is a library of financial-statement ratios plus a small analysis layer:
 
 1. **Pure metric functions** — `pe()`, `roe()`, `netDebtToEbitda()`, `altmanZScore()`, `calculateDCF()` … Each takes plain numbers and returns `number | null`.
 2. **Analyzers** — `analyzeCompany()` takes one flat object of fundamentals and returns every metric it can compute, grouped into valuation, profitability, liquidity, solvency, efficiency, risk and quality.
@@ -70,7 +72,7 @@ Works for companies in any market (US, UK, EU, Canada, Australia, India …) as 
 ## Installation
 
 ```bash
-npm install finance-calculator-pro
+npm install fundamental-analysis
 ```
 
 Ships as CommonJS + ES modules + TypeScript declarations, marked side-effect-free for tree-shaking. Node.js ≥ 16.
@@ -80,7 +82,7 @@ Ships as CommonJS + ES modules + TypeScript declarations, marked side-effect-fre
 ## Quick start
 
 ```typescript
-import { analyzeCompany } from 'finance-calculator-pro';
+import { analyzeCompany } from 'fundamental-analysis';
 
 const data = {
   price: 150, eps: 5, bookValuePerShare: 20, marketCap: 150_000,
@@ -114,7 +116,7 @@ Call `analyzeCompany(data)` without `true` to get raw numbers only. Every input 
 Analyzing one category: `analyzeValuation`, `analyzeProfitability`, `analyzeLiquidity`, `analyzeSolvency`, `analyzeEfficiency`, `analyzeRisk`, `analyzeQuality` take the same input. `analyzeBatch(companies, true)` runs a whole watchlist:
 
 ```typescript
-import { analyzeBatch } from 'finance-calculator-pro';
+import { analyzeBatch } from 'fundamental-analysis';
 
 const results = analyzeBatch(watchlist, true);
 const cheapestFirst = results
@@ -125,7 +127,7 @@ const cheapestFirst = results
 ### Growth trends from time series
 
 ```typescript
-import { analyzeFundamentalTrends } from 'finance-calculator-pro';
+import { analyzeFundamentalTrends } from 'fundamental-analysis';
 
 const trends = analyzeFundamentalTrends({
   revenue:   [365_817, 394_328, 383_285],   // oldest → newest
@@ -262,7 +264,7 @@ import {
   altmanZScore, altmanZScoreDoublePrime, sharpe, sharpeFromReturns, piotroski,
   calculateDCF, computeNCVPS, computeIntrinsicValue,
   cagr, medianGrowth, computeTTM, evaluate,
-} from 'finance-calculator-pro';
+} from 'fundamental-analysis';
 
 pe(150, 5);                                // 30
 peg(30, 0.15);                             // 2      (P/E 30 with 15 % growth)
@@ -312,7 +314,7 @@ evaluate.pe(pe(150, 5));
 All four scores return 0–100. Weights are this library's heuristics, not an academic standard.
 
 ```typescript
-import { computeQualityScore, computeGrowthScore, computeValueScore, computeMomentumScore, computeGFactor } from 'finance-calculator-pro';
+import { computeQualityScore, computeGrowthScore, computeValueScore, computeMomentumScore, computeGFactor } from 'fundamental-analysis';
 
 computeQualityScore({
   piotroskiScore: 7, piotroskiMaxScore: 9,   // pass PiotroskiResult.score / .maxScore
@@ -344,7 +346,7 @@ The older field names `pledgeFree` and `promoterStable` are still accepted.
 Full declarations are included. With `withInsights = true` the analyzers are typed as `{ value, status, insight }` per metric; without it, as `number | null`:
 
 ```typescript
-import { analyzeCompany, type CompanySnapshotInput } from 'finance-calculator-pro';
+import { analyzeCompany, type CompanySnapshotInput } from 'fundamental-analysis';
 
 const snapshot: CompanySnapshotInput = { price: 150, eps: 5 };
 
@@ -403,6 +405,6 @@ See [CHANGELOG.md](./CHANGELOG.md). Version 1.3.0 corrects several outputs (PEG,
 
 ---
 
-Maintained by [Boffin Coders](https://boffincoders.com/?utm_source=npm&utm_medium=readme&utm_campaign=finance-calculator-pro). Issues and pull requests: [github.com/boffincoders/finance-calculator](https://github.com/boffincoders/finance-calculator/issues).
+Maintained by [Boffin Coders](https://boffincoders.com/?utm_source=npm&utm_medium=readme&utm_campaign=fundamental-analysis). Issues and pull requests: [github.com/boffincoders/fundamental-analysis](https://github.com/boffincoders/fundamental-analysis/issues).
 
 This library computes financial ratios from the numbers you supply. It is not investment advice.

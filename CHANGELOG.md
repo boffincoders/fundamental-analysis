@@ -2,6 +2,15 @@
 
 ## 1.3.0 — 2026-10-28
 
+### Renamed
+
+The package is now published as **`fundamental-analysis`** (formerly
+`finance-calculator-pro`). Install with `npm install fundamental-analysis`
+and change imports from `'finance-calculator-pro'` to
+`'fundamental-analysis'`; the API is otherwise the same as described below.
+The GitHub repository is `boffincoders/fundamental-analysis` and the docs
+moved to https://boffincoders.github.io/fundamental-analysis/.
+
 A correctness release. Several functions returned wrong numbers or wrong
 ratings in 1.2.x; they are fixed here, so **some outputs change**. If you
 store or compare results, read the "Changed outputs" list before upgrading.

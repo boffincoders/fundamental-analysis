@@ -26,7 +26,7 @@ function App() {
 
   return (
     <DarkModeContext.Provider value={{ dark, toggle: () => setDark(d => !d) }}>
-      <BrowserRouter basename="/finance-calculator">
+      <BrowserRouter basename="/fundamental-analysis">
         <Routes>
           <Route path="/" element={<AppLayout />}>
             <Route index element={<Home />} />

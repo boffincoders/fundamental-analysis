@@ -115,12 +115,12 @@ function FnTag({ name }: { name: string }) {
 }
 
 // ── Main page ────────────────────────────────────────────────────────────────
-const INSTALL_CODE = `npm install finance-calculator-pro
+const INSTALL_CODE = `npm install fundamental-analysis
 # or
-yarn add finance-calculator-pro
-pnpm add finance-calculator-pro`;
+yarn add fundamental-analysis
+pnpm add fundamental-analysis`;
 
-const CORE_CODE = `import { analyzeCompany } from 'finance-calculator-pro';
+const CORE_CODE = `import { analyzeCompany } from 'fundamental-analysis';
 
 const data = {
   price: 150, eps: 5.50, marketCap: 1_500_000,
@@ -147,7 +147,7 @@ analysis.liquidity.currentRatio;
 const CATEGORICAL_CODE = `import {
   analyzeValuation, analyzeSolvency,
   analyzeEfficiency, analyzeQuality,
-} from 'finance-calculator-pro';
+} from 'fundamental-analysis';
 
 const data = {
   price: 150, eps: 5,
@@ -165,7 +165,7 @@ const quality = analyzeQuality(data, true);
 quality.cashConversionRatio; // { value: 1.4, status: "Good", ... }
 quality.payoutRatio;         // { value: 0.4, status: "Good", ... }  2 / 5`;
 
-const BATCH_CODE = `import { analyzeBatch, analyzeFundamentalTrends } from 'finance-calculator-pro';
+const BATCH_CODE = `import { analyzeBatch, analyzeFundamentalTrends } from 'fundamental-analysis';
 
 // Evaluate a watchlist at once — same shape as analyzeCompany(), fully typed
 const results = analyzeBatch(watchlist, true);
@@ -249,7 +249,7 @@ const SINGLE_CODE = `import {
   grahamNumber, calculateDCF,
   computeNCVPS, computeIntrinsicValue, computeGFactor,
   evaluate,
-} from 'finance-calculator-pro';
+} from 'fundamental-analysis';
 
 // Valuation & Profitability
 pe(150, 5);                                    // → 30
@@ -292,8 +292,8 @@ export default function ApiDocs() {
   const [search, setSearch] = useState('');
   const searchRef = useRef<HTMLInputElement>(null);
   usePageMeta(
-    'API reference & guide — finance-calculator-pro (TypeScript financial ratios)',
-    'Install and use finance-calculator-pro: analyzeCompany, categorical analyzers, batch screening, growth trends, input conventions and every ratio function with verified examples.',
+    'API reference & guide — fundamental-analysis (TypeScript financial ratios)',
+    'Install and use fundamental-analysis: analyzeCompany, categorical analyzers, batch screening, growth trends, input conventions and every ratio function with verified examples.',
   );
 
   // ⌘K shortcut
@@ -377,7 +377,7 @@ export default function ApiDocs() {
             Developer Documentation
           </h1>
           <p className="text-[15px] max-w-2xl leading-relaxed" style={{ color: 'var(--text-3)' }}>
-            Embed <code className="px-1.5 py-0.5 rounded text-[13px] font-mono" style={{ background: 'var(--bg-muted)', color: 'var(--blue)', border: '1px solid var(--border)' }}>finance-calculator-pro</code> directly into your app.
+            Embed <code className="px-1.5 py-0.5 rounded text-[13px] font-mono" style={{ background: 'var(--bg-muted)', color: 'var(--blue)', border: '1px solid var(--border)' }}>fundamental-analysis</code> directly into your app.
             Every field is optional — the engine skips metrics it can't compute and returns <code className="font-mono text-[13px]">null</code> safely.
           </p>
         </div>
@@ -541,7 +541,7 @@ export default function ApiDocs() {
                           <div className="flex items-start justify-between gap-3 mb-2">
                             <h4 className="text-[14px] font-semibold m-0" style={{ color: 'var(--text)' }}>{metric.name}</h4>
                             <a
-                              href={`/finance-calculator/metrics/${metric.id}`}
+                              href={`${import.meta.env.BASE_URL}metrics/${metric.id}/`}
                               className="shrink-0 text-[11px] no-underline px-2 py-0.5 rounded transition-colors"
                               style={{ background: 'var(--blue-bg)', color: 'var(--blue)', border: '1px solid var(--blue-border)' }}
                             >

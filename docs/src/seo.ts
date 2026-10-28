@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 
-export const SITE_URL = 'https://boffincoders.github.io/finance-calculator';
+export const SITE_URL = 'https://boffincoders.github.io/fundamental-analysis';
 
 function setMeta(selector: string, attr: 'name' | 'property', key: string, content: string) {
   let el = document.head.querySelector<HTMLMetaElement>(selector);

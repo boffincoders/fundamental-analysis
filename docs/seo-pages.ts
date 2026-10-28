@@ -10,7 +10,7 @@ import path from 'node:path';
 import type { Plugin } from 'vite';
 import { metricsData } from './src/data/metrics';
 
-const SITE_URL = 'https://boffincoders.github.io/finance-calculator';
+const SITE_URL = 'https://boffincoders.github.io/fundamental-analysis';
 
 const escapeHtml = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -21,16 +21,16 @@ function pages(): Page[] {
   const list: Page[] = [
     {
       route: 'api-docs/',
-      title: 'API reference & guide — finance-calculator-pro (TypeScript financial ratios)',
-      description: 'Install and use finance-calculator-pro: analyzeCompany, categorical analyzers, batch screening, growth trends, input conventions and every ratio function with verified examples.',
-      body: '<h1>finance-calculator-pro API reference</h1><p>Installation, analyzeCompany(), categorical analyzers, analyzeBatch(), analyzeFundamentalTrends(), input conventions and individual ratio functions for JavaScript and TypeScript.</p>',
+      title: 'API reference & guide — fundamental-analysis (TypeScript financial ratios)',
+      description: 'Install and use fundamental-analysis: analyzeCompany, categorical analyzers, batch screening, growth trends, input conventions and every ratio function with verified examples.',
+      body: '<h1>fundamental-analysis API reference</h1><p>Installation, analyzeCompany(), categorical analyzers, analyzeBatch(), analyzeFundamentalTrends(), input conventions and individual ratio functions for JavaScript and TypeScript.</p>',
     },
   ];
   for (const m of Object.values(metricsData)) {
-    const description = `${m.description} Formula: ${m.formula}. Interactive calculator and TypeScript/JavaScript function in finance-calculator-pro.`;
+    const description = `${m.description} Formula: ${m.formula}. Interactive calculator and TypeScript/JavaScript function in fundamental-analysis.`;
     list.push({
       route: `metrics/${m.id}/`,
-      title: `${m.name} — formula, calculator & JavaScript example | finance-calculator-pro`,
+      title: `${m.name} — formula, calculator & JavaScript example | fundamental-analysis`,
       description,
       body: `<h1>${escapeHtml(m.name)}</h1><p>${escapeHtml(m.description)}</p><p><strong>Formula:</strong> ${escapeHtml(m.formula)}</p>${m.benchmark ? `<p><strong>How to read it:</strong> ${escapeHtml(m.benchmark)}</p>` : ''}<p>${escapeHtml(m.history)}</p>`,
     });

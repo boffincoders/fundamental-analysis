@@ -74,7 +74,7 @@ const AppLayout: React.FC = () => {
           <div className="w-7 h-7 rounded-md flex items-center justify-center text-white text-xs font-black" style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)' }}>
             F
           </div>
-          <span className="font-semibold text-[15px]" style={{ color: 'var(--text)' }}>finance-calculator</span>
+          <span className="font-semibold text-[15px]" style={{ color: 'var(--text)' }}>fundamental-analysis</span>
         </Link>
       </div>
 
@@ -134,8 +134,8 @@ const AppLayout: React.FC = () => {
 
       {/* Bottom version badge */}
       <div className="px-5 mt-4 pt-4" style={{ borderTop: '1px solid var(--border)' }}>
-        <a href="https://www.npmjs.com/package/finance-calculator-pro" target="_blank" rel="noreferrer" className="no-underline">
-          <img src="https://img.shields.io/npm/v/finance-calculator-pro.svg?style=flat-square&label=npm&color=cb3837" alt="npm" className="h-5" />
+        <a href="https://www.npmjs.com/package/fundamental-analysis" target="_blank" rel="noreferrer" className="no-underline">
+          <img src="https://img.shields.io/npm/v/fundamental-analysis.svg?style=flat-square&label=npm&color=cb3837" alt="npm" className="h-5" />
         </a>
       </div>
     </nav>
@@ -179,7 +179,7 @@ const AppLayout: React.FC = () => {
 
           {/* Breadcrumb / page title hint on desktop */}
           <div className="hidden md:flex items-center gap-2 text-sm" style={{ color: 'var(--text-3)' }}>
-            <span className="font-medium" style={{ color: 'var(--text)' }}>finance-calculator-pro</span>
+            <span className="font-medium" style={{ color: 'var(--text)' }}>fundamental-analysis</span>
             {currentMetricId && metricsData[currentMetricId] && (
               <>
                 <span>/</span>
@@ -191,7 +191,7 @@ const AppLayout: React.FC = () => {
           <div className="flex items-center gap-2 ml-auto">
             {/* GitHub star button */}
             <a
-              href="https://github.com/boffincoders/finance-calculator"
+              href="https://github.com/boffincoders/fundamental-analysis"
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium no-underline transition-colors"
@@ -211,7 +211,7 @@ const AppLayout: React.FC = () => {
 
             {/* npm badge */}
             <a
-              href="https://www.npmjs.com/package/finance-calculator-pro"
+              href="https://www.npmjs.com/package/fundamental-analysis"
               target="_blank"
               rel="noreferrer"
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium no-underline transition-colors"
@@ -243,16 +243,16 @@ const AppLayout: React.FC = () => {
         {/* Footer */}
         <footer className="px-8 py-6 text-center text-sm" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-4)' }}>
           <p className="m-0">
-            finance-calculator-pro is open source (MIT) and maintained by{' '}
-            <a href="https://boffincoders.com/?utm_source=docs&utm_medium=footer&utm_campaign=finance-calculator-pro" target="_blank" rel="noopener" className="font-semibold no-underline" style={{ color: 'var(--blue)' }}>
+            fundamental-analysis is open source (MIT) and maintained by{' '}
+            <a href="https://boffincoders.com/?utm_source=docs&utm_medium=footer&utm_campaign=fundamental-analysis" target="_blank" rel="noopener" className="font-semibold no-underline" style={{ color: 'var(--blue)' }}>
               Boffin Coders
             </a>
             {' '}·{' '}
-            <a href="https://github.com/boffincoders/finance-calculator" target="_blank" rel="noopener" className="no-underline" style={{ color: 'var(--text-4)' }}>
+            <a href="https://github.com/boffincoders/fundamental-analysis" target="_blank" rel="noopener" className="no-underline" style={{ color: 'var(--text-4)' }}>
               GitHub
             </a>
             {' '}·{' '}
-            <a href="https://www.npmjs.com/package/finance-calculator-pro" target="_blank" rel="noopener" className="no-underline" style={{ color: 'var(--text-4)' }}>
+            <a href="https://www.npmjs.com/package/fundamental-analysis" target="_blank" rel="noopener" className="no-underline" style={{ color: 'var(--text-4)' }}>
               npm
             </a>
           </p>

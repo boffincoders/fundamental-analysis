@@ -14,7 +14,7 @@ import {
   computeTTM, computeTTMAvg,
   computeNYearAverage, computeNYearSum, computeHistoricalPoint,
   evaluate
-} from 'finance-calculator-pro';
+} from 'fundamental-analysis';
 
 export interface MetricDefinition {
   id: string;
