@@ -229,10 +229,29 @@ describe("computeGFactor", () => {
 // Intrinsic — computeIntrinsicValue
 // ---------------------------------------------------------------------------
 describe("computeIntrinsicValue", () => {
-  it("positive EPS with 15% growth, 25% margin of safety", () => {
-    const result = computeIntrinsicValue(10, 0.15, 0.25);
-    const futureEps = 10 * Math.pow(1.15, 5);
-    expect(result).toBeCloseTo(futureEps / 0.75);
+  // Hand-checked: 10 × 1.15^5 = 20.1136; × 15 = 301.704; ÷ 1.1^5 (1.61051) = 187.334; × 0.75 = 140.501
+  it("EPS 10, 15% growth, 25% margin, defaults (P/E 15, 10%, 5y) → 140.50", () => {
+    expect(computeIntrinsicValue(10, 0.15, 0.25)).toBeCloseTo(140.5006, 3);
+  });
+  it("margin of safety LOWERS the value (0% margin → 187.33)", () => {
+    const noMargin = computeIntrinsicValue(10, 0.15, 0)!;
+    expect(noMargin).toBeCloseTo(187.3342, 3);
+    expect(computeIntrinsicValue(10, 0.15, 0.25)!).toBeLessThan(noMargin);
+  });
+  it("zero growth, zero margin: 10 × 15 ÷ 1.1^5 = 93.14", () => {
+    expect(computeIntrinsicValue(10, 0, 0)).toBeCloseTo(93.1382, 3);
+  });
+  it("zero growth and zero discount rate returns EPS × terminal P/E (150)", () => {
+    expect(computeIntrinsicValue(10, 0, 0, { discountRate: 0 })).toBeCloseTo(150, 6);
+  });
+  it("custom terminal P/E 20 and 8% discount: 10 × 1.15^5 × 20 ÷ 1.08^5 × 0.75 = 205.33", () => {
+    expect(computeIntrinsicValue(10, 0.15, 0.25, { terminalPE: 20, discountRate: 0.08 })).toBeCloseTo(205.3344, 3);
+  });
+  it("growth equal to discount rate over 10 years cancels out: 10 × 15 = 150", () => {
+    expect(computeIntrinsicValue(10, 0.10, 0, { years: 10 })).toBeCloseTo(150, 6);
+  });
+  it("handles negative growth: 5 × 0.95^5 × 15 ÷ 1.1^5 × 0.7 = 25.22", () => {
+    expect(computeIntrinsicValue(5, -0.05, 0.3)).toBeCloseTo(25.2240, 3);
   });
   it("returns null for zero EPS", () => {
     expect(computeIntrinsicValue(0, 0.15, 0.25)).toBeNull();
@@ -245,6 +264,20 @@ describe("computeIntrinsicValue", () => {
   });
   it("returns null for negative safetyMargin", () => {
     expect(computeIntrinsicValue(10, 0.15, -0.1)).toBeNull();
+  });
+  it("returns null for growth <= -100%", () => {
+    expect(computeIntrinsicValue(10, -1, 0.25)).toBeNull();
+  });
+  it("returns null for discountRate <= -1", () => {
+    expect(computeIntrinsicValue(10, 0.15, 0.25, { discountRate: -1 })).toBeNull();
+  });
+  it("returns null for non-positive terminal P/E", () => {
+    expect(computeIntrinsicValue(10, 0.15, 0.25, { terminalPE: 0 })).toBeNull();
+    expect(computeIntrinsicValue(10, 0.15, 0.25, { terminalPE: -5 })).toBeNull();
+  });
+  it("returns null for non-positive years and non-finite input", () => {
+    expect(computeIntrinsicValue(10, 0.15, 0.25, { years: 0 })).toBeNull();
+    expect(computeIntrinsicValue(NaN, 0.15, 0.25)).toBeNull();
   });
 });
 
