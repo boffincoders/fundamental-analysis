@@ -244,3 +244,32 @@ describe("analyzeQuality", () => {
     expect(analyzeQuality({ operatingCashFlow: -100, netIncome: -200 }).cashConversionRatio).toBeNull();
   });
 });
+
+// ---------------------------------------------------------------------------
+// Robustness: non-finite input never leaks out as NaN / Infinity
+// ---------------------------------------------------------------------------
+import { safeDivide } from "../core/safeDivide";
+import { pe } from "../valuation/pe";
+import { grahamNumber } from "../intrinsic/graham";
+import { calculateDCF } from "../valuation/dcf";
+import { computeTTM } from "../ttm/index";
+
+describe("non-finite inputs", () => {
+  it("safeDivide returns null for NaN / Infinity inputs or results", () => {
+    expect(safeDivide(NaN, 2)).toBeNull();
+    expect(safeDivide(1, Infinity)).toBeNull();
+    expect(safeDivide(Infinity, 2)).toBeNull();
+    expect(safeDivide(1e308, 1e-308)).toBeNull();
+  });
+  it("ratio functions return null rather than NaN", () => {
+    expect(pe(NaN, 5)).toBeNull();
+    expect(grahamNumber(NaN, 20)).toBeNull();
+    expect(calculateDCF([1000, NaN], 0.1, 0.02)).toBeNull();
+    expect(calculateDCF([1000], NaN, 0.02)).toBeNull();
+  });
+  it("array helpers return null for non-array input instead of throwing", () => {
+    expect(computeTTM(undefined as any)).toBeNull();
+    expect(medianGrowth(null as any)).toBeNull();
+    expect(growthRates(undefined as any)).toEqual([]);
+  });
+});

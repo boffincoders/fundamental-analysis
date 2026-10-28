@@ -14,7 +14,7 @@
  * a twelve-month figure).
  */
 export const computeTTM = (quarterlyValues: number[]): number | null => {
-  if (!quarterlyValues || quarterlyValues.length < 4) return null;
+  if (!Array.isArray(quarterlyValues) || quarterlyValues.length < 4) return null;
   const last4 = quarterlyValues.slice(-4);
   return last4.reduce((sum, v) => sum + v, 0);
 };
@@ -26,7 +26,7 @@ export const computeTTM = (quarterlyValues: number[]): number | null => {
  * Expects chronological order: oldest first, most recent last.
  */
 export const computeTTMAvg = (quarterlyValues: number[]): number | null => {
-  if (!quarterlyValues || quarterlyValues.length === 0) return null;
+  if (!Array.isArray(quarterlyValues) || quarterlyValues.length === 0) return null;
   const last4 = quarterlyValues.slice(-4);
   return last4.reduce((sum, v) => sum + v, 0) / last4.length;
 };

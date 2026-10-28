@@ -21,6 +21,7 @@ export const calculateGrowthRate = (currentValue: number, previousValue: number)
  */
 export const growthRates = (dataPoints: number[]): (number | null)[] => {
   const rates: (number | null)[] = [];
+  if (!Array.isArray(dataPoints)) return rates;
   for (let i = 1; i < dataPoints.length; i++) {
     rates.push(calculateGrowthRate(dataPoints[i], dataPoints[i - 1]));
   }
@@ -54,7 +55,7 @@ export const qoqGrowth = (dataPoints: number[]): number[] => yoyGrowth(dataPoint
  * (CAGR is undefined across a sign change), or periods <= 0.
  */
 export const cagr = (beginningValue: number, endingValue: number, periods: number): number | null => {
-  if (periods <= 0 || beginningValue <= 0 || endingValue < 0) return null;
+  if (!(periods > 0) || !(beginningValue > 0) || !(endingValue >= 0) || !Number.isFinite(endingValue)) return null;
   return Math.pow(endingValue / beginningValue, 1 / periods) - 1;
 };
 
@@ -69,7 +70,7 @@ export const cagr = (beginningValue: number, endingValue: number, periods: numbe
  * Returns null if fewer than 2 data points are provided or no period has a defined rate.
  */
 export const medianGrowth = (annualValues: number[]): number | null => {
-  if (!annualValues || annualValues.length < 2) return null;
+  if (!Array.isArray(annualValues) || annualValues.length < 2) return null;
 
   // Periods with an undefined growth rate (previous value 0) are skipped, not counted as 0 %.
   const rates = growthRates(annualValues).filter((r): r is number => r !== null && isFinite(r));

@@ -1,3 +1,5 @@
+import { safeDivide } from "../core/safeDivide";
+
 /**
  * Discounted Cash Flow (DCF) Model
  * Used to estimate the value of an investment based on its expected future cash flows.
@@ -17,7 +19,8 @@ export const calculateDCF = (
   discountRate: number,
   terminalGrowthRate: number
 ): number | null => {
-  if (!projectedFCF || projectedFCF.length === 0 || discountRate <= terminalGrowthRate || discountRate <= -1) {
+  if (!Array.isArray(projectedFCF) || projectedFCF.length === 0 || !projectedFCF.every(Number.isFinite) ||
+      !Number.isFinite(discountRate) || !Number.isFinite(terminalGrowthRate) || discountRate <= terminalGrowthRate || discountRate <= -1) {
     return null;
   }
 
@@ -55,5 +58,5 @@ export const impliedSharePrice = (
 ): number | null => {
   if (!(sharesOutstanding > 0)) return null;
   const equityValue = enterpriseValue - totalDebt + cashEquivalents;
-  return equityValue / sharesOutstanding;
+  return safeDivide(equityValue, sharesOutstanding);
 };

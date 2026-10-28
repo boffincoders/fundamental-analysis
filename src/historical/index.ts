@@ -13,7 +13,7 @@
  * If fewer values are available than requested, averages all available values.
  */
 export const computeNYearAverage = (quarterlyValues: number[], years: number): number | null => {
-  if (!quarterlyValues || quarterlyValues.length === 0 || years <= 0) return null;
+  if (!Array.isArray(quarterlyValues) || quarterlyValues.length === 0 || !(years > 0)) return null;
   const window = quarterlyValues.slice(-(years * 4));
   return window.reduce((sum, v) => sum + v, 0) / window.length;
 };
@@ -25,7 +25,7 @@ export const computeNYearAverage = (quarterlyValues: number[], years: number): n
  * shorter sum would not cover N years.
  */
 export const computeNYearSum = (quarterlyValues: number[], years: number): number | null => {
-  if (!quarterlyValues || years <= 0 || quarterlyValues.length < years * 4) return null;
+  if (!Array.isArray(quarterlyValues) || !(years > 0) || quarterlyValues.length < years * 4) return null;
   const window = quarterlyValues.slice(-(years * 4));
   return window.reduce((sum, v) => sum + v, 0);
 };
@@ -41,7 +41,7 @@ export const computeHistoricalPoint = (
   quarterlyValues: number[],
   quartersBack: number
 ): number | null => {
-  if (!quarterlyValues || quarterlyValues.length === 0 || quartersBack < 0) return null;
+  if (!Array.isArray(quarterlyValues) || quarterlyValues.length === 0 || !(quartersBack >= 0)) return null;
   const idx = quarterlyValues.length - 1 - quartersBack;
   if (idx < 0) return null;
   return quarterlyValues[idx];

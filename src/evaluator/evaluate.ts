@@ -54,7 +54,7 @@ export const evaluate = {
   },
 
   evEbitda: (value: number | null): EvaluatedMetric => {
-    if (value === null || value <= 0) return { value, status: "N/A", insight: "Negative EBITDA or unavailable." };
+    if (value === null || value <= 0) return { value, status: "N/A", insight: "Not meaningful: EBITDA negative/unavailable, or enterprise value zero/negative." };
     if (value < 10) return { value, status: "Good", insight: "Cheap relative to operating earnings by generic standards." };
     if (value <= 15) return { value, status: "Neutral", insight: "Fairly valued by generic standards." };
     return { value, status: "Bad", insight: "Expensive relative to operating earnings; compare with sector peers." };
@@ -96,7 +96,7 @@ export const evaluate = {
    * EV/Revenue — especially relevant for pre-profit or high-growth companies.
    */
   evRevenue: (value: number | null): EvaluatedMetric => {
-    if (value === null || value <= 0) return { value, status: "N/A", insight: "Revenue data unavailable." };
+    if (value === null || value <= 0) return { value, status: "N/A", insight: "Not meaningful: revenue unavailable, or enterprise value zero/negative." };
     if (value < 1) return { value, status: "Good", insight: "Very cheap relative to revenue." };
     if (value <= 3) return { value, status: "Neutral", insight: "Reasonable revenue multiple." };
     return { value, status: "Bad", insight: "High revenue multiple — growth must justify the premium." };
@@ -106,7 +106,7 @@ export const evaluate = {
    * EV/FCF — one of the most reliable valuation multiples for mature businesses.
    */
   evFcf: (value: number | null): EvaluatedMetric => {
-    if (value === null || value <= 0) return { value, status: "N/A", insight: "Negative FCF or unavailable." };
+    if (value === null || value <= 0) return { value, status: "N/A", insight: "Not meaningful: free cash flow negative/unavailable, or enterprise value zero/negative." };
     if (value < 15) return { value, status: "Good", insight: "Attractively priced on a free cash flow basis." };
     if (value <= 25) return { value, status: "Neutral", insight: "Fairly valued on a free cash flow basis." };
     return { value, status: "Bad", insight: "Expensive on a free cash flow basis." };
