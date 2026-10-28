@@ -3,7 +3,7 @@ import { currentRatio } from "../liquidity/currentRatio";
 import { quickRatio } from "../liquidity/quickRatio";
 import { debtToEquity } from "../liquidity/debtToEquity";
 import { interestCoverage } from "../liquidity/interestCoverage";
-import { netDebt, netDebtToEbitda, debtToAssets } from "../solvency/netDebt";
+import { netDebt, netCash, netDebtToEbitda, debtToAssets } from "../solvency/netDebt";
 
 describe("Current Ratio", () => {
   it("calculates correctly", () => expect(currentRatio(100000, 60000)).toBeCloseTo(1.667));
@@ -37,6 +37,12 @@ describe("Net Debt to EBITDA", () => {
   it("calculates correctly", () => expect(netDebtToEbitda(20000, 5000, 10000)).toBeCloseTo(1.5));
   it("returns negative for net cash position", () => expect(netDebtToEbitda(5000, 20000, 10000)).toBeCloseTo(-1.5));
   it("returns null for zero EBITDA", () => expect(netDebtToEbitda(20000, 5000, 0)).toBeNull());
+  it("returns null for negative EBITDA (loss-maker), not a negative ratio", () => expect(netDebtToEbitda(100, 10, -20)).toBeNull());
+});
+
+describe("Net Cash", () => {
+  it("is cash minus debt when cash exceeds debt", () => expect(netCash(10, 100)).toBe(90));
+  it("is 0 when debt exceeds cash", () => expect(netCash(100, 10)).toBe(0));
 });
 
 describe("Debt to Assets", () => {

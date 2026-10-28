@@ -199,12 +199,39 @@ export const evaluate = {
   },
 
   /**
-   * Net Debt to EBITDA — key leverage metric used by credit analysts.
-   * Negative values indicate a net cash position (always Good).
+   * Net Debt (total debt − cash). Negative = net cash. A positive figure is
+   * not good or bad on its own; judge it with netDebtToEbitda.
    */
-  netDebtToEbitda: (value: number | null): EvaluatedMetric => {
-    if (value === null) return { value, status: "N/A", insight: "EBITDA or debt data unavailable." };
-    if (value < 0) return { value, status: "Good", insight: "Net cash position — more cash than debt on the balance sheet." };
+  netDebt: (value: number | null): EvaluatedMetric => {
+    if (value === null) return { value, status: "N/A", insight: "Debt or cash data unavailable." };
+    if (value < 0) return { value, status: "Good", insight: `Net cash position of ${Math.abs(value).toLocaleString()}.` };
+    if (value === 0) return { value, status: "Neutral", insight: "Cash exactly offsets debt." };
+    return { value, status: "Neutral", insight: `Net debt of ${value.toLocaleString()}. Judge it against EBITDA (Net Debt / EBITDA).` };
+  },
+
+  /**
+   * Net Debt to EBITDA — key leverage metric used by credit analysts.
+   *
+   * Pass `context` ({ netDebt, ebitda }) whenever you have it: the rating then
+   * comes from the sign of net debt and EBITDA themselves, so a loss-maker
+   * (negative EBITDA) with net debt is rated Bad, never "net cash".
+   * Without context, `value` is assumed to come from netDebtToEbitda(), which
+   * returns null for EBITDA <= 0 — so a negative value can only mean net cash.
+   */
+  netDebtToEbitda: (
+    value: number | null,
+    context?: { netDebt?: number | null; ebitda?: number | null }
+  ): EvaluatedMetric => {
+    const nd = context?.netDebt;
+    const ebitda = context?.ebitda;
+    if (ebitda != null && ebitda <= 0 && nd != null) {
+      if (nd > 0) return { value: null, status: "Bad", insight: "Net debt with zero or negative EBITDA — operating earnings cannot service the debt." };
+      return { value: null, status: "Neutral", insight: "No net debt, but EBITDA is zero or negative, so the ratio is not meaningful." };
+    }
+    if (value === null) return { value, status: "N/A", insight: "EBITDA (positive) or debt data unavailable." };
+    const isNetCash = nd != null ? nd < 0 : value < 0;
+    if (isNetCash) return { value, status: "Good", insight: "Net cash position — more cash than debt on the balance sheet." };
+    if (value < 0) return { value, status: "N/A", insight: "Negative ratio without net cash — EBITDA must be negative; ratio not meaningful." };
     if (value < 1.5) return { value, status: "Good", insight: "Low leverage. Debt is very manageable." };
     if (value <= 3.0) return { value, status: "Neutral", insight: "Moderate leverage. Within acceptable range for most industries." };
     return { value, status: "Bad", insight: "High leverage. Could be restrictive if earnings deteriorate." };

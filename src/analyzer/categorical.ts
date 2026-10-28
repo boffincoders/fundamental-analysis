@@ -24,11 +24,11 @@ import { receivablesTurnover, daysSalesOutstanding } from "../efficiency/receiva
 import { sharpe } from "../risk/sharpe";
 import { altmanZScore } from "../risk/altmanZScore";
 import { piotroski } from "../risk/piotroski";
-import { netDebt, netDebtToEbitda, debtToAssets } from "../solvency/netDebt";
+import { netDebt, netCash, netDebtToEbitda, debtToAssets } from "../solvency/netDebt";
 import { payoutRatio } from "../quality/payoutRatio";
 import { cashConversionRatio } from "../quality/cashConversionRatio";
 import { targetUpside } from "../insights/targetUpside";
-import { evaluate } from "../evaluator/evaluate";
+import { evaluate, EvaluatedMetric } from "../evaluator/evaluate";
 
 // ── Valuation ─────────────────────────────────────────────────────────────────
 
@@ -118,22 +118,26 @@ export function analyzeLiquidity(data: CompanySnapshotInput, withInsights = fals
 // ── Solvency ──────────────────────────────────────────────────────────────────
 
 export function analyzeSolvency(data: CompanySnapshotInput, withInsights = false) {
+  const hasDebtData = data.totalDebt != null || data.cashAndEquivalents != null;
   const td   = data.totalDebt ?? 0;
   const cash = data.cashAndEquivalents ?? 0;
+  const nd   = hasDebtData ? netDebt(td, cash) : null;
 
   const raw = {
-    netDebt:          netDebt(td, cash),
-    netDebtToEbitda:  data.ebitda ? netDebtToEbitda(td, cash, data.ebitda) : null,
+    netDebt:          nd,
+    netCash:          hasDebtData ? netCash(td, cash) : null,
+    netDebtToEbitda:  hasDebtData && data.ebitda != null ? netDebtToEbitda(td, cash, data.ebitda) : null,
     debtToAssets:     data.totalAssets ? debtToAssets(td, data.totalAssets) : null,
     debtToEquity:     data.totalEquity ? debtToEquity(td, data.totalEquity) : null,
-    interestCoverage: data.ebit && data.interestExpense ? interestCoverage(data.ebit, data.interestExpense) : null,
+    interestCoverage: data.ebit != null && data.interestExpense ? interestCoverage(data.ebit, data.interestExpense) : null,
   };
 
   if (!withInsights) return raw;
 
   return {
-    netDebt:          { value: raw.netDebt, status: raw.netDebt < 0 ? "Good" : "N/A", insight: raw.netDebt < 0 ? `Net cash position of ${Math.abs(raw.netDebt).toLocaleString()}.` : `Net debt of ${raw.netDebt.toLocaleString()}.` } as const,
-    netDebtToEbitda:  evaluate.netDebtToEbitda(raw.netDebtToEbitda),
+    netDebt:          evaluate.netDebt(raw.netDebt),
+    netCash:          { value: raw.netCash, status: raw.netCash === null ? "N/A" : raw.netCash > 0 ? "Good" : "Neutral", insight: raw.netCash === null ? "Debt or cash data unavailable." : raw.netCash > 0 ? `Cash exceeds debt by ${raw.netCash.toLocaleString()}.` : "No net cash — debt is greater than or equal to cash." } as EvaluatedMetric,
+    netDebtToEbitda:  evaluate.netDebtToEbitda(raw.netDebtToEbitda, { netDebt: nd, ebitda: data.ebitda }),
     debtToAssets:     evaluate.debtToAssets(raw.debtToAssets),
     debtToEquity:     evaluate.debtToEquity(raw.debtToEquity),
     interestCoverage: evaluate.interestCoverage(raw.interestCoverage),

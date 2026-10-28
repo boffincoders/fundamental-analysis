@@ -128,6 +128,30 @@ describe("analyzeSolvency", () => {
   });
 });
 
+describe("analyzeSolvency net debt / EBITDA sign handling", () => {
+  it("debt 100, cash 10, EBITDA -20 → ratio null and rated Bad (not 'net cash')", () => {
+    const input = { totalDebt: 100, cashAndEquivalents: 10, ebitda: -20 };
+    expect(analyzeSolvency(input).netDebtToEbitda).toBeNull();
+    const ins = analyzeSolvency(input, true) as any;
+    expect(ins.netDebtToEbitda.status).toBe("Bad");
+    expect(ins.netDebtToEbitda.insight).not.toMatch(/net cash/i);
+    expect(ins.netCash.value).toBe(0);
+  });
+  it("debt 10, cash 100, EBITDA 50 → net cash, rated Good", () => {
+    const input = { totalDebt: 10, cashAndEquivalents: 100, ebitda: 50 };
+    const raw = analyzeSolvency(input);
+    expect(raw.netDebtToEbitda).toBeCloseTo(-1.8);
+    expect(raw.netCash).toBe(90);
+    const ins = analyzeSolvency(input, true) as any;
+    expect(ins.netDebtToEbitda.status).toBe("Good");
+    expect(ins.netDebtToEbitda.insight).toMatch(/net cash/i);
+    expect(ins.netCash.status).toBe("Good");
+  });
+  it("netDebt is null when neither debt nor cash is provided", () => {
+    expect(analyzeSolvency({}).netDebt).toBeNull();
+  });
+});
+
 describe("analyzeBatch", () => {
   it("processes multiple companies", () => {
     const results = analyzeBatch([fullSnapshot, { price: 50, eps: 10 }]);

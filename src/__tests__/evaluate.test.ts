@@ -68,7 +68,16 @@ describe("evaluate.inventoryTurnover", () => {
 });
 
 describe("evaluate.netDebtToEbitda", () => {
-  it("Good for net cash position (negative value)", () => expect(evaluate.netDebtToEbitda(-1).status).toBe("Good"));
+  it("Good for net cash position (negative value from netDebtToEbitda)", () => expect(evaluate.netDebtToEbitda(-1).status).toBe("Good"));
+  it("net cash with context: debt 10, cash 100, EBITDA 50 → Good", () =>
+    expect(evaluate.netDebtToEbitda(-1.8, { netDebt: -90, ebitda: 50 }).status).toBe("Good"));
+  it("loss-maker with net debt: debt 100, cash 10, EBITDA -20 → Bad, not net cash", () => {
+    const r = evaluate.netDebtToEbitda(-4.5, { netDebt: 90, ebitda: -20 });
+    expect(r.status).toBe("Bad");
+    expect(r.insight).not.toMatch(/net cash/i);
+  });
+  it("negative ratio with positive net debt in context is never Good", () =>
+    expect(evaluate.netDebtToEbitda(-4.5, { netDebt: 90 }).status).not.toBe("Good"));
   it("Good for < 1.5", () => expect(evaluate.netDebtToEbitda(1.0).status).toBe("Good"));
   it("Neutral for 1.5-3.0", () => expect(evaluate.netDebtToEbitda(2.0).status).toBe("Neutral"));
   it("Bad for > 3.0", () => expect(evaluate.netDebtToEbitda(4.0).status).toBe("Bad"));
