@@ -11,7 +11,7 @@ Maintained by [Boffin Coders](https://boffincoders.com/?utm_source=npm&utm_mediu
 
 📖 **[Documentation & live playground →](https://boffincoders.github.io/fundamental-analysis/)**
 
-![fundamental-analysis banner](https://raw.githubusercontent.com/boffincoders/fundamental-analysis/refs/heads/master/.github/assets/finance-calculator-pro.png)
+![fundamental-analysis: financial ratios for TypeScript, by Boffin Coders](https://raw.githubusercontent.com/boffincoders/fundamental-analysis/refs/heads/master/.github/assets/banner.png)
 
 > **Zero-dependency fundamental analysis for JavaScript and TypeScript.**
 > Turn raw income-statement, balance-sheet and cash-flow numbers into valuation, profitability, liquidity, leverage, efficiency and financial-distress metrics — each with an optional plain-English rating. No API calls, no runtime dependencies. Runs in Node.js, browsers and edge runtimes.
@@ -385,6 +385,14 @@ See [CHANGELOG.md](./CHANGELOG.md). Version 1.3.0 corrects several outputs (PEG,
 
 ---
 
-Maintained by [Boffin Coders](https://boffincoders.com/?utm_source=npm&utm_medium=readme&utm_campaign=fundamental-analysis). Issues and pull requests: [github.com/boffincoders/fundamental-analysis](https://github.com/boffincoders/fundamental-analysis/issues).
+## About Boffin Coders
+
+<img src="https://raw.githubusercontent.com/boffincoders/fundamental-analysis/refs/heads/master/docs/public/brand/bc-gold.png" alt="Boffin Coders logo" width="48" align="left">
+
+fundamental-analysis is built and maintained by [Boffin Coders](https://boffincoders.com/?utm_source=npm&utm_medium=readme&utm_campaign=fundamental-analysis). We design and build websites, web applications and mobile apps, and run their SEO, for businesses and agencies. Building a screener, a finance dashboard or fundamentals into your product? See our [web application development](https://boffincoders.com/services/web-application-development?utm_source=npm&utm_medium=readme&utm_campaign=fundamental-analysis) work or [talk to us](https://boffincoders.com/contact-us?utm_source=npm&utm_medium=readme&utm_campaign=fundamental-analysis).
+
+More open source by Boffin Coders: [ts-netstorageapi-akamai](https://boffincoders.github.io/akamai-netstorageapi-typescript/) · [github.com/boffincoders](https://github.com/boffincoders)
+
+Issues and pull requests: [github.com/boffincoders/fundamental-analysis](https://github.com/boffincoders/fundamental-analysis/issues).
 
 This library computes financial ratios from the numbers you supply. It is not investment advice.

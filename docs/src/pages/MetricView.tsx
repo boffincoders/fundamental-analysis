@@ -44,8 +44,8 @@ export default function MetricView() {
         </p>
         <Link
           to="/"
-          className="px-4 py-2 rounded-lg text-[13px] font-medium no-underline transition-colors"
-          style={{ background: 'var(--blue)', color: 'var(--accent-text)' }}
+          className="btn-primary px-4 py-2 rounded-lg text-[13px] font-medium no-underline transition-colors"
+          style={{ background: 'var(--accent-fill)', color: 'var(--accent-text)' }}
         >
           ← Back to playground
         </Link>

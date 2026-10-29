@@ -5,78 +5,80 @@
 
 @media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
 </style>
-<rect width="1000" height="630" rx="14" fill="#0b1220"/>
-<rect x="0.5" y="0.5" width="999" height="629" rx="14" fill="none" stroke="#24314d"/>
-<text x="20" y="40" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="20" font-weight="700" fill="#e6edf6">Every metric, grouped the way analysts read them</text>
-<text x="20" y="64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#8b9bb4">Each analyzer returns plain numbers, or { value, status, insight } with insights on. Every metric has its own page.</text>
-<rect x="16" y="84" width="231.5" height="218" rx="10" fill="#111a2e" stroke="#24314d" stroke-width="1.5"/>
-<rect x="16" y="84" width="231.5" height="4" rx="2" fill="#34d3b4"/>
-<text x="30" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#34d3b4">Valuation</text>
-<text x="30" y="132" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#8b9bb4">analyzeValuation()</text>
-<text x="30" y="158" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">P/E · P/B · P/S</text>
-<text x="30" y="180" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">PEG</text>
-<text x="30" y="202" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">EV/EBITDA · EV/Revenue</text>
-<text x="30" y="224" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">EV/FCF · Price/Cash flow</text>
-<text x="30" y="246" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Earnings &amp; dividend yield</text>
-<text x="30" y="268" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Graham number</text>
-<text x="30" y="290" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">DCF · intrinsic value</text>
-<rect x="261.5" y="84" width="231.5" height="218" rx="10" fill="#111a2e" stroke="#24314d" stroke-width="1.5"/>
-<rect x="261.5" y="84" width="231.5" height="4" rx="2" fill="#7ee787"/>
-<text x="275.5" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#7ee787">Profitability</text>
-<text x="275.5" y="132" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#8b9bb4">analyzeProfitability()</text>
-<text x="275.5" y="158" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">ROE · ROA · ROIC</text>
-<text x="275.5" y="180" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Gross margin</text>
-<text x="275.5" y="202" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Operating margin</text>
-<text x="275.5" y="224" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Net margin</text>
-<text x="275.5" y="246" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">FCF margin</text>
-<rect x="507" y="84" width="231.5" height="218" rx="10" fill="#111a2e" stroke="#24314d" stroke-width="1.5"/>
+<rect width="1000" height="630" rx="14" fill="#0d0d0d"/>
+<rect x="0.5" y="0.5" width="999" height="629" rx="14" fill="none" stroke="#2a2a2a"/>
+<text x="20" y="40" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="20" font-weight="700" fill="#ffffff">Every metric, grouped the way analysts read them</text>
+<text x="20" y="64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#a3a3a3">Each analyzer returns plain numbers, or { value, status, insight } with insights on. Every metric has its own page.</text>
+<text x="954" y="38" text-anchor="end" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#a3a3a3">fundamental-analysis · by Boffin Coders</text>
+<image href="data:image/png;base64,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" x="960" y="20" width="24" height="24"/>
+<rect x="16" y="84" width="231.5" height="218" rx="10" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+<rect x="16" y="84" width="231.5" height="4" rx="2" fill="#d4a012"/>
+<text x="30" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#d4a012">Valuation</text>
+<text x="30" y="132" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#a3a3a3">analyzeValuation()</text>
+<text x="30" y="158" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">P/E · P/B · P/S</text>
+<text x="30" y="180" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">PEG</text>
+<text x="30" y="202" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">EV/EBITDA · EV/Revenue</text>
+<text x="30" y="224" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">EV/FCF · Price/Cash flow</text>
+<text x="30" y="246" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Earnings &amp; dividend yield</text>
+<text x="30" y="268" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Graham number</text>
+<text x="30" y="290" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">DCF · intrinsic value</text>
+<rect x="261.5" y="84" width="231.5" height="218" rx="10" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+<rect x="261.5" y="84" width="231.5" height="4" rx="2" fill="#4ade80"/>
+<text x="275.5" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#4ade80">Profitability</text>
+<text x="275.5" y="132" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#a3a3a3">analyzeProfitability()</text>
+<text x="275.5" y="158" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">ROE · ROA · ROIC</text>
+<text x="275.5" y="180" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Gross margin</text>
+<text x="275.5" y="202" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Operating margin</text>
+<text x="275.5" y="224" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Net margin</text>
+<text x="275.5" y="246" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">FCF margin</text>
+<rect x="507" y="84" width="231.5" height="218" rx="10" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
 <rect x="507" y="84" width="231.5" height="4" rx="2" fill="#6ea8fe"/>
 <text x="521" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#6ea8fe">Liquidity</text>
-<text x="521" y="132" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#8b9bb4">analyzeLiquidity()</text>
-<text x="521" y="158" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Current ratio</text>
-<text x="521" y="180" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Quick ratio</text>
-<text x="521" y="202" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Debt / equity</text>
-<text x="521" y="224" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Interest coverage</text>
-<rect x="752.5" y="84" width="231.5" height="218" rx="10" fill="#111a2e" stroke="#24314d" stroke-width="1.5"/>
+<text x="521" y="132" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#a3a3a3">analyzeLiquidity()</text>
+<text x="521" y="158" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Current ratio</text>
+<text x="521" y="180" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Quick ratio</text>
+<text x="521" y="202" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Debt / equity</text>
+<text x="521" y="224" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Interest coverage</text>
+<rect x="752.5" y="84" width="231.5" height="218" rx="10" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
 <rect x="752.5" y="84" width="231.5" height="4" rx="2" fill="#6ea8fe"/>
 <text x="766.5" y="114" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#6ea8fe">Solvency</text>
-<text x="766.5" y="132" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#8b9bb4">analyzeSolvency()</text>
-<text x="766.5" y="158" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Net debt · net cash</text>
-<text x="766.5" y="180" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Net debt / EBITDA</text>
-<text x="766.5" y="202" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Debt / assets</text>
-<text x="766.5" y="224" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Interest coverage</text>
-<rect x="16" y="316" width="231.5" height="218" rx="10" fill="#111a2e" stroke="#24314d" stroke-width="1.5"/>
+<text x="766.5" y="132" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#a3a3a3">analyzeSolvency()</text>
+<text x="766.5" y="158" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Net debt · net cash</text>
+<text x="766.5" y="180" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Net debt / EBITDA</text>
+<text x="766.5" y="202" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Debt / assets</text>
+<text x="766.5" y="224" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Interest coverage</text>
+<rect x="16" y="316" width="231.5" height="218" rx="10" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
 <rect x="16" y="316" width="231.5" height="4" rx="2" fill="#c49bff"/>
 <text x="30" y="346" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#c49bff">Efficiency</text>
-<text x="30" y="364" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#8b9bb4">analyzeEfficiency()</text>
-<text x="30" y="390" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Asset turnover</text>
-<text x="30" y="412" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Inventory turnover</text>
-<text x="30" y="434" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Receivables turnover</text>
-<text x="30" y="456" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">DSO · DPO</text>
-<text x="30" y="478" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Cash conversion cycle</text>
-<rect x="261.5" y="316" width="231.5" height="218" rx="10" fill="#111a2e" stroke="#24314d" stroke-width="1.5"/>
-<rect x="261.5" y="316" width="231.5" height="4" rx="2" fill="#f5b544"/>
-<text x="275.5" y="346" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#f5b544">Risk</text>
-<text x="275.5" y="364" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#8b9bb4">analyzeRisk()</text>
-<text x="275.5" y="390" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Altman Z · Z''</text>
-<text x="275.5" y="412" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Piotroski F-Score</text>
-<text x="275.5" y="434" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Sharpe ratio</text>
-<rect x="507" y="316" width="231.5" height="218" rx="10" fill="#111a2e" stroke="#24314d" stroke-width="1.5"/>
-<rect x="507" y="316" width="231.5" height="4" rx="2" fill="#f5b544"/>
-<text x="521" y="346" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#f5b544">Quality</text>
-<text x="521" y="364" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#8b9bb4">analyzeQuality()</text>
-<text x="521" y="390" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Payout ratio</text>
-<text x="521" y="412" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Cash conversion</text>
-<text x="521" y="434" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Analyst target upside</text>
-<rect x="752.5" y="316" width="231.5" height="218" rx="10" fill="#111a2e" stroke="#24314d" stroke-width="1.5"/>
-<rect x="752.5" y="316" width="231.5" height="4" rx="2" fill="#8b9bb4"/>
-<text x="766.5" y="346" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#8b9bb4">Over time</text>
-<text x="766.5" y="364" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#8b9bb4">analyzeFundamentalTrends()</text>
-<text x="766.5" y="390" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">YoY / QoQ growth</text>
-<text x="766.5" y="412" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">CAGR · median growth</text>
-<text x="766.5" y="434" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">TTM · N-year sums</text>
-<text x="766.5" y="456" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#e6edf6">Quality / value scores</text>
-<rect x="16" y="550" width="968" height="62" rx="10" fill="#16223b" stroke="#24314d"/>
-<text x="32" y="574" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#8b9bb4">One call runs all seven snapshot analyzers</text>
-<text x="32" y="596" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" fill="#e6edf6"><tspan fill="#c49bff">const</tspan> r = <tspan fill="#6ea8fe">analyzeCompany</tspan>(data, <tspan fill="#f5b544">true</tspan>);  <tspan fill="#8b9bb4">// r.valuation.pe, r.risk.piotroski, …  or call any single ratio function directly</tspan></text>
+<text x="30" y="364" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#a3a3a3">analyzeEfficiency()</text>
+<text x="30" y="390" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Asset turnover</text>
+<text x="30" y="412" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Inventory turnover</text>
+<text x="30" y="434" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Receivables turnover</text>
+<text x="30" y="456" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">DSO · DPO</text>
+<text x="30" y="478" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Cash conversion cycle</text>
+<rect x="261.5" y="316" width="231.5" height="218" rx="10" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+<rect x="261.5" y="316" width="231.5" height="4" rx="2" fill="#fb923c"/>
+<text x="275.5" y="346" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#fb923c">Risk</text>
+<text x="275.5" y="364" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#a3a3a3">analyzeRisk()</text>
+<text x="275.5" y="390" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Altman Z · Z''</text>
+<text x="275.5" y="412" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Piotroski F-Score</text>
+<text x="275.5" y="434" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Sharpe ratio</text>
+<rect x="507" y="316" width="231.5" height="218" rx="10" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+<rect x="507" y="316" width="231.5" height="4" rx="2" fill="#fb923c"/>
+<text x="521" y="346" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#fb923c">Quality</text>
+<text x="521" y="364" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#a3a3a3">analyzeQuality()</text>
+<text x="521" y="390" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Payout ratio</text>
+<text x="521" y="412" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Cash conversion</text>
+<text x="521" y="434" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Analyst target upside</text>
+<rect x="752.5" y="316" width="231.5" height="218" rx="10" fill="#1a1a1a" stroke="#2a2a2a" stroke-width="1.5"/>
+<rect x="752.5" y="316" width="231.5" height="4" rx="2" fill="#a3a3a3"/>
+<text x="766.5" y="346" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="15" font-weight="700" fill="#a3a3a3">Over time</text>
+<text x="766.5" y="364" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#a3a3a3">analyzeFundamentalTrends()</text>
+<text x="766.5" y="390" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">YoY / QoQ growth</text>
+<text x="766.5" y="412" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">CAGR · median growth</text>
+<text x="766.5" y="434" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">TTM · N-year sums</text>
+<text x="766.5" y="456" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#ffffff">Quality / value scores</text>
+<rect x="16" y="550" width="968" height="62" rx="10" fill="#222222" stroke="#2a2a2a"/>
+<text x="32" y="574" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#a3a3a3">One call runs all seven snapshot analyzers</text>
+<text x="32" y="596" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="13" fill="#ffffff"><tspan fill="#c49bff">const</tspan> r = <tspan fill="#6ea8fe">analyzeCompany</tspan>(data, <tspan fill="#fb923c">true</tspan>);  <tspan fill="#a3a3a3">// r.valuation.pe, r.risk.piotroski, …  or call any single ratio function directly</tspan></text>
 </svg>

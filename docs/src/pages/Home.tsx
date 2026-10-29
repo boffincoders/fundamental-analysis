@@ -10,6 +10,8 @@ import { usePageMeta } from '../seo';
 const METRIC_COUNT = CATEGORIES.reduce((n, c) => n + c.items.length, 0);
 // "P/E = Price / EPS" → "Price / EPS": the name is already shown next to it.
 const formulaRhs = (f: string) => (f.includes(' = ') ? f.slice(f.indexOf(' = ') + 3) : f);
+// boffincoders.com links from the home page, tagged so visits can be traced.
+const bc = (path: string) => `https://boffincoders.com${path}?utm_source=docs&utm_medium=home&utm_campaign=fundamental-analysis`;
 const diagram = (name: string) => `${import.meta.env.BASE_URL}diagrams/${name}`;
 
 const STATUS_COLORS: Record<string, string> = {
@@ -301,11 +303,12 @@ function Figure({ name, alt }: { name: string; alt: string }) {
 function Button({ to, href, primary, children }: { to?: string; href?: string; primary?: boolean; children: React.ReactNode }) {
   const cls = 'inline-flex items-center h-11 px-4.5 rounded-[10px] text-[14.5px] font-semibold no-underline transition-colors';
   const style = primary
-    ? { background: 'var(--blue)', color: 'var(--accent-text)', border: '1px solid var(--blue)', paddingInline: 18 }
+    ? { background: 'var(--accent-fill)', color: 'var(--accent-text)', border: '1px solid var(--accent-fill)', paddingInline: 18 }
     : { background: 'var(--bg)', color: 'var(--text)', border: '1px solid var(--border)', paddingInline: 18 };
+  const classes = `${cls} ${primary ? 'btn-primary' : 'btn-secondary'}`;
   return to
-    ? <Link to={to} className={cls} style={style}>{children}</Link>
-    : <a href={href} className={cls} style={style}>{children}</a>;
+    ? <Link to={to} className={classes} style={style}>{children}</Link>
+    : <a href={href} className={classes} style={style}>{children}</a>;
 }
 
 function Install() {
@@ -526,14 +529,16 @@ export default function Home() {
       </Section>
 
       <section className="reveal text-center max-w-[720px] mx-auto">
-        <p className="text-[15px] mb-4" style={{ color: 'var(--text-3)' }}>
-          Built and maintained by{' '}
-          <a href="https://boffincoders.com/?utm_source=docs&utm_medium=home&utm_campaign=fundamental-analysis" target="_blank" rel="noopener" className="font-semibold" style={{ color: 'var(--blue)' }}>Boffin Coders</a>.
-          Need fundamentals in your product, a screener or a finance dashboard? We build those.
+        <h2 className="text-[1.35rem] font-bold tracking-tight mt-0 mb-2" style={{ color: 'var(--text)' }}>Built by Boffin Coders</h2>
+        <p className="text-[15px] mb-4 leading-relaxed" style={{ color: 'var(--text-3)' }}>
+          <a href={bc('/')} target="_blank" rel="noopener" className="font-semibold" style={{ color: 'var(--blue)' }}>Boffin Coders</a>{' '}
+          designs and builds websites, web applications and mobile apps, and runs their SEO, for businesses and agencies.
+          Need fundamentals in your product, a stock screener or a finance dashboard? See our{' '}
+          <a href={bc('/services/web-application-development')} target="_blank" rel="noopener" style={{ color: 'var(--blue)' }}>web application development</a> work.
         </p>
         <div className="flex flex-wrap justify-center gap-3">
-          <Button to="/api-docs" primary>Read the guide</Button>
-          <Button href="https://github.com/boffincoders/fundamental-analysis">Star on GitHub</Button>
+          <Button href={bc('/contact-us')} primary>Talk to us</Button>
+          <Button to="/api-docs">Read the guide</Button>
         </div>
       </section>
     </div>

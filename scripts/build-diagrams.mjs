@@ -19,22 +19,26 @@ const distEntry = path.join(root, 'dist/index.js');
 if (!fs.existsSync(distEntry)) throw new Error('dist/index.js is missing. Run `npm run build` first.');
 const fa = createRequire(import.meta.url)(distEntry);
 
+// Boffin Coders brand: gold accent on near-black (boffincoders.com).
 const C = {
-  bg: '#0b1220',
-  panel: '#111a2e',
-  panelHi: '#16223b',
-  border: '#24314d',
-  text: '#e6edf6',
-  muted: '#8b9bb4',
-  teal: '#34d3b4',
+  bg: '#0d0d0d',
+  panel: '#1a1a1a',
+  panelHi: '#222222',
+  border: '#2a2a2a',
+  text: '#ffffff',
+  muted: '#a3a3a3',
+  gold: '#d4a012',
   blue: '#6ea8fe',
-  amber: '#f5b544',
+  orange: '#fb923c',
   purple: '#c49bff',
-  green: '#7ee787',
-  red: '#ff8a7a',
+  green: '#4ade80',
+  red: '#f87171',
 };
 const MONO = "ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace";
 const SANS = "-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif";
+
+// Brand logo embedded as a data URI so each SVG stands alone (in a README too).
+const LOGO = `data:image/png;base64,${fs.readFileSync(path.join(root, 'docs/public/brand/bc-gold-48.png')).toString('base64')}`;
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 // Keeps runs of spaces in SVG text without relying on xml:space.
@@ -58,12 +62,14 @@ ${body}
 const frame = (W, H, title, sub) => `<rect width="${W}" height="${H}" rx="14" fill="${C.bg}"/>
 <rect x="0.5" y="0.5" width="${W - 1}" height="${H - 1}" rx="14" fill="none" stroke="${C.border}"/>
 <text x="20" y="40" font-family="${SANS}" font-size="20" font-weight="700" fill="${C.text}">${esc(title)}</text>
-<text x="20" y="64" font-family="${SANS}" font-size="13.5" fill="${C.muted}">${esc(sub)}</text>`;
+<text x="20" y="64" font-family="${SANS}" font-size="13.5" fill="${C.muted}">${esc(sub)}</text>
+<text x="${W - 46}" y="38" text-anchor="end" font-family="${SANS}" font-size="12" fill="${C.muted}">fundamental-analysis · by Boffin Coders</text>
+<image href="${LOGO}" x="${W - 40}" y="20" width="24" height="24"/>`;
 
 const text = (x, y, s, { size = 12.5, color = C.muted, font = SANS, weight = 400, anchor = 'start' } = {}) =>
   `<text x="${x}" y="${y}" font-family="${font}" font-size="${size}"${weight !== 400 ? ` font-weight="${weight}"` : ''}${anchor !== 'start' ? ` text-anchor="${anchor}"` : ''} fill="${color}">${pre(s)}</text>`;
 
-function card({ x, y, w, h, n, title, lines, color = C.teal, cls = '' }) {
+function card({ x, y, w, h, n, title, lines, color = C.gold, cls = '' }) {
   const badge = n
     ? `<circle cx="${x + 20}" cy="${y + 21}" r="10" fill="${color}"/><text x="${x + 20}" y="${y + 25}" text-anchor="middle" font-family="${SANS}" font-size="12" font-weight="700" fill="${C.bg}">${n}</text>`
     : '';
@@ -82,7 +88,7 @@ ${body}
 const arrowHead = `<defs><marker id="head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="${C.muted}"/></marker></defs>`;
 
 /** Keyframes that light a card or arrow during the given windows of a loop. */
-function highlight(windows, loop, colorFor = () => C.teal) {
+function highlight(windows, loop, colorFor = () => C.gold) {
   const css = [];
   for (const [cls, spans] of Object.entries(windows)) {
     const on = colorFor(cls);
@@ -199,13 +205,13 @@ ${text(20, H - 20, `Example: Apple's SEC figures with an illustrative $${PRICE} 
 function metricMapSvg() {
   const W = 1000;
   const groups = [
-    { title: 'Valuation', fn: 'analyzeValuation', color: C.teal, items: ['P/E · P/B · P/S', 'PEG', 'EV/EBITDA · EV/Revenue', 'EV/FCF · Price/Cash flow', 'Earnings & dividend yield', 'Graham number', 'DCF · intrinsic value'] },
+    { title: 'Valuation', fn: 'analyzeValuation', color: C.gold, items: ['P/E · P/B · P/S', 'PEG', 'EV/EBITDA · EV/Revenue', 'EV/FCF · Price/Cash flow', 'Earnings & dividend yield', 'Graham number', 'DCF · intrinsic value'] },
     { title: 'Profitability', fn: 'analyzeProfitability', color: C.green, items: ['ROE · ROA · ROIC', 'Gross margin', 'Operating margin', 'Net margin', 'FCF margin'] },
     { title: 'Liquidity', fn: 'analyzeLiquidity', color: C.blue, items: ['Current ratio', 'Quick ratio', 'Debt / equity', 'Interest coverage'] },
     { title: 'Solvency', fn: 'analyzeSolvency', color: C.blue, items: ['Net debt · net cash', 'Net debt / EBITDA', 'Debt / assets', 'Interest coverage'] },
     { title: 'Efficiency', fn: 'analyzeEfficiency', color: C.purple, items: ['Asset turnover', 'Inventory turnover', 'Receivables turnover', 'DSO · DPO', 'Cash conversion cycle'] },
-    { title: 'Risk', fn: 'analyzeRisk', color: C.amber, items: ["Altman Z · Z''", 'Piotroski F-Score', 'Sharpe ratio'] },
-    { title: 'Quality', fn: 'analyzeQuality', color: C.amber, items: ['Payout ratio', 'Cash conversion', 'Analyst target upside'] },
+    { title: 'Risk', fn: 'analyzeRisk', color: C.orange, items: ["Altman Z · Z''", 'Piotroski F-Score', 'Sharpe ratio'] },
+    { title: 'Quality', fn: 'analyzeQuality', color: C.orange, items: ['Payout ratio', 'Cash conversion', 'Analyst target upside'] },
     { title: 'Over time', fn: 'analyzeFundamentalTrends', color: C.muted, items: ['YoY / QoQ growth', 'CAGR · median growth', 'TTM · N-year sums', 'Quality / value scores'] },
   ];
   const cols = 4, gap = 14, x0 = 16, top = 84, rowH = 22;
@@ -226,7 +232,7 @@ ${g.items.map((it, j) => text(x + 14, y + 74 + j * rowH, it, { size: 12.5, color
   const by = top + 2 * panelH + gap + 16;
   const code = `<rect x="${x0}" y="${by}" width="${W - 2 * x0}" height="62" rx="10" fill="${C.panelHi}" stroke="${C.border}"/>
 ${text(x0 + 16, by + 24, 'One call runs all seven snapshot analyzers', { weight: 600 })}
-<text x="${x0 + 16}" y="${by + 46}" font-family="${MONO}" font-size="13" fill="${C.text}"><tspan fill="${C.purple}">const</tspan> r = <tspan fill="${C.blue}">analyzeCompany</tspan>(data, <tspan fill="${C.amber}">true</tspan>);  <tspan fill="${C.muted}">// r.valuation.pe, r.risk.piotroski, …  or call any single ratio function directly</tspan></text>`;
+<text x="${x0 + 16}" y="${by + 46}" font-family="${MONO}" font-size="13" fill="${C.text}"><tspan fill="${C.purple}">const</tspan> r = <tspan fill="${C.blue}">analyzeCompany</tspan>(data, <tspan fill="${C.orange}">true</tspan>);  <tspan fill="${C.muted}">// r.valuation.pe, r.risk.piotroski, …  or call any single ratio function directly</tspan></text>`;
 
   const body = `${frame(W, H, 'Every metric, grouped the way analysts read them', 'Each analyzer returns plain numbers, or { value, status, insight } with insights on. Every metric has its own page.')}
 ${panels.join('\n')}
@@ -279,7 +285,7 @@ function nullSafetySvg() {
   const header = `<rect x="${x0}" y="${top}" width="${W - 2 * x0}" height="${headH}" rx="10" fill="${C.panelHi}" stroke="${C.border}"/>
 ${text(x0 + 16, top + 25, 'Situation', { weight: 600, color: C.text })}
 ${text(x0 + colA + 16, top + 25, 'Plain arithmetic', { weight: 600, color: C.red })}
-${text(x0 + colA + colB + 16, top + 25, 'fundamental-analysis', { weight: 600, color: C.teal })}`;
+${text(x0 + colA + colB + 16, top + 25, 'fundamental-analysis', { weight: 600, color: C.gold })}`;
 
   const body = rows.map((r, i) => {
     const y = top + headH + i * rowH;
@@ -289,7 +295,7 @@ ${text(x0 + 16, y + 39, r.what, { size: 13.5, color: C.text, weight: 600 })}
 ${text(x0 + colA + 16, y + 30, `${r.naive}  →  ${r.naiveOut}`, { size: 12.5, font: MONO, color: C.text })}
 ${text(x0 + colA + 16, y + 50, r.naiveNote, { size: 12, color: C.red })}
 ${text(x0 + colA + colB + 16, y + 30, `${r.call}  →  ${out}`, { size: 12.5, font: MONO, color: C.text })}
-${text(x0 + colA + colB + 16, y + 50, r.note ?? (r.out === null ? 'not meaningful, so null' : ''), { size: 12, color: C.teal })}`;
+${text(x0 + colA + colB + 16, y + 50, r.note ?? (r.out === null ? 'not meaningful, so null' : ''), { size: 12, color: C.gold })}`;
   }).join('\n');
 
   const doc = `${frame(W, H, 'null, never a misleading number', 'Ratios that cannot be computed honestly return null, so a screener can skip them instead of ranking garbage.')}
@@ -341,7 +347,7 @@ ${frame(W, H, 'How the rule-based verdict is formed', 'Four published rule sets,
 ${lenses.join('\n')}
 ${arrows.join('\n')}
 ${half(0, 'Financial health', ['Both strong → strong', 'Either weak → weak', 'Otherwise → mixed'], C.green)}
-${half(1, 'Price vs classic limits', ['Graham passes or PEG ≤ 1 → within', 'PEG ≥ 2 → well above', 'Needs a share price you enter'], C.amber)}
+${half(1, 'Price vs classic limits', ['Graham passes or PEG ≤ 1 → within', 'PEG ≥ 2 → well above', 'Needs a share price you enter'], C.orange)}
 <rect x="${x0}" y="${H - 72}" width="${W - 2 * x0}" height="52" rx="10" fill="${C.panelHi}" stroke="${C.border}"/>
 ${text(x0 + 16, H - 41, 'Not financial advice. The rules ignore the business, sector norms and your circumstances, and were written for other times and markets.', { size: 12.5, color: C.text })}`;
 

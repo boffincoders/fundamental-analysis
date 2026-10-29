@@ -13,20 +13,43 @@ export const DarkModeContext = createContext<{ dark: boolean; toggle: () => void
 });
 export const useDark = () => useContext(DarkModeContext);
 
-function App() {
-  const [dark, setDark] = useState(() => {
+const media = () => window.matchMedia('(prefers-color-scheme: dark)');
+
+function readSaved(): boolean | null {
+  try {
     const saved = localStorage.getItem('dark');
-    if (saved !== null) return saved === 'true';
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
-  });
+    return saved === null ? null : saved === 'true';
+  } catch {
+    return null;
+  }
+}
+
+function App() {
+  // Follow the OS theme until the visitor picks one with the toggle; only
+  // that choice is saved (same behaviour as the other Boffin Coders docs).
+  const [saved, setSaved] = useState<boolean | null>(readSaved);
+  const [systemDark, setSystemDark] = useState(() => media().matches);
+  const dark = saved ?? systemDark;
+
+  useEffect(() => {
+    const mq = media();
+    const onChange = (e: MediaQueryListEvent) => setSystemDark(e.matches);
+    mq.addEventListener('change', onChange);
+    return () => mq.removeEventListener('change', onChange);
+  }, []);
 
   useEffect(() => {
     document.documentElement.classList.toggle('dark', dark);
-    localStorage.setItem('dark', String(dark));
   }, [dark]);
 
+  const toggle = () => {
+    const next = !dark;
+    setSaved(next);
+    try { localStorage.setItem('dark', String(next)); } catch { /* storage unavailable */ }
+  };
+
   return (
-    <DarkModeContext.Provider value={{ dark, toggle: () => setDark(d => !d) }}>
+    <DarkModeContext.Provider value={{ dark, toggle }}>
       <BrowserRouter basename="/fundamental-analysis">
         <Routes>
           <Route path="/" element={<AppLayout />}>

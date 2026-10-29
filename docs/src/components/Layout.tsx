@@ -39,15 +39,17 @@ function GitHubIcon() {
   );
 }
 
-export function BrandMark({ size = 28 }: { size?: number }) {
+/** Boffin Coders logo: the gold mark on a transparent background, in both
+ *  themes (shared with the other Boffin Coders docs). */
+export function BrandMark({ size = 30 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
-      <rect width="32" height="32" rx="8" fill="#0d9488" />
-      <rect x="7" y="17" width="4" height="8" rx="1" fill="#e6f6f4" />
-      <rect x="14" y="12" width="4" height="13" rx="1" fill="#e6f6f4" />
-      <rect x="21" y="8" width="4" height="17" rx="1" fill="#e6f6f4" />
-      <path d="M6 13.5 L12.5 9 L17 11 L26 5" fill="none" stroke="#99f0dd" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-    </svg>
+    <img
+      src={`${import.meta.env.BASE_URL}brand/bc-gold.png`}
+      alt=""
+      width={size}
+      height={size}
+      className="block shrink-0"
+    />
   );
 }
 
@@ -168,7 +170,10 @@ const AppLayout: React.FC = () => {
         </button>
         <Link to="/" className="flex items-center gap-2.5 no-underline shrink-0" aria-label="fundamental-analysis home">
           <BrandMark />
-          <span className="hidden min-[440px]:inline font-bold text-[15px]" style={{ color: 'var(--text)' }}>fundamental-analysis</span>
+          <span className="hidden min-[440px]:flex flex-col leading-tight">
+            <span className="font-bold text-[15px]" style={{ color: 'var(--text)', fontFamily: 'var(--font-heading)' }}>fundamental-analysis</span>
+            <span className="text-[11px]" style={{ color: 'var(--text-4)' }}>by Boffin Coders</span>
+          </span>
         </Link>
         <nav className="hidden min-[900px]:flex gap-1 ml-2" aria-label="Main">
           <TopLink to="/try" label="Try it" />
@@ -216,20 +221,28 @@ const AppLayout: React.FC = () => {
 
       <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
 
-      <footer className="px-6 py-7 text-center text-sm" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-4)' }}>
+      {/* Shared Boffin Coders footer pattern (same as the other package docs) */}
+      <footer className="px-6 py-8 text-center text-sm" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-4)' }}>
+        <a
+          href="https://boffincoders.com/?utm_source=docs&utm_medium=footer&utm_campaign=fundamental-analysis"
+          target="_blank"
+          rel="noopener"
+          className="inline-flex items-center gap-3 no-underline mb-3"
+        >
+          <BrandMark size={36} />
+          <span className="text-[15px] font-semibold" style={{ color: 'var(--text)', fontFamily: 'var(--font-heading)' }}>Built and maintained by Boffin Coders</span>
+        </a>
         <p className="m-0">
-          fundamental-analysis is open source (MIT) and maintained by{' '}
-          <a href="https://boffincoders.com/?utm_source=docs&utm_medium=footer&utm_campaign=fundamental-analysis" target="_blank" rel="noopener" className="font-semibold no-underline" style={{ color: 'var(--blue)' }}>
-            Boffin Coders
-          </a>
+          fundamental-analysis {__PKG_VERSION__} · MIT licence ·{' '}
+          <a href="https://github.com/boffincoders/fundamental-analysis" target="_blank" rel="noopener" style={{ color: 'var(--text-4)' }}>GitHub</a>
           {' '}·{' '}
-          <a href="https://github.com/boffincoders/fundamental-analysis" target="_blank" rel="noopener" className="no-underline" style={{ color: 'var(--text-4)' }}>
-            GitHub
-          </a>
+          <a href="https://www.npmjs.com/package/fundamental-analysis" target="_blank" rel="noopener" style={{ color: 'var(--text-4)' }}>npm</a>
+        </p>
+        <p className="m-0 mt-2">
+          More open source by Boffin Coders:{' '}
+          <a href="https://boffincoders.github.io/akamai-netstorageapi-typescript/" target="_blank" rel="noopener" style={{ color: 'var(--text-4)' }}>ts-netstorageapi-akamai</a>
           {' '}·{' '}
-          <a href="https://www.npmjs.com/package/fundamental-analysis" target="_blank" rel="noopener" className="no-underline" style={{ color: 'var(--text-4)' }}>
-            npm
-          </a>
+          <a href="https://github.com/boffincoders" target="_blank" rel="noopener" style={{ color: 'var(--text-4)' }}>github.com/boffincoders</a>
         </p>
         <p className="m-0 mt-2 text-[12px]">
           Ratings and verdicts are generic rules of thumb, not investment advice. Thresholds vary by sector.

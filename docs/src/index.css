@@ -1,59 +1,65 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@500;600;700&display=swap');
 @import "tailwindcss";
 
 *, *::before, *::after { box-sizing: border-box; }
 
 :root {
   --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-heading: 'Space Grotesk', 'Inter', system-ui, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
   --sidebar-w: 260px;
 
-  /* Teal-and-navy palette shared with Boffin Coders' other package docs.
-     --blue is the accent (links, active states, primary buttons);
-     --neutral is the colour for "Neutral" ratings. */
+  /* Boffin Coders brand: gold on near-black (boffincoders.com).
+     --blue is the accent for links and active states; it is a darker gold in
+     light mode so text stays readable on white. --accent-fill is the brand
+     gold used for primary buttons in both themes. --neutral colours
+     "Neutral" ratings; --yellow is the warning colour, kept orange so it
+     doesn't read as the accent. */
   --bg:        #ffffff;
-  --bg-subtle: #f6f8fb;
-  --bg-muted:  #eef2f7;
-  --border:    #e3e8f0;
-  --border-subtle: #eef2f7;
-  --text:      #0f172a;
-  --text-2:    #334155;
-  --text-3:    #475569;
-  --text-4:    #64748b;
-  --blue:      #0d9488;
-  --blue-bg:   #e6f6f4;
-  --blue-border: #99e0d6;
-  --accent-text: #ffffff;
+  --bg-subtle: #fafaf7;
+  --bg-muted:  #f3f2ec;
+  --border:    #e6e3da;
+  --border-subtle: #f0eee7;
+  --text:      #0d0d0d;
+  --text-2:    #262626;
+  --text-3:    #525252;
+  --text-4:    #737373;
+  --blue:      #8a6500;
+  --blue-bg:   #fbf3d9;
+  --blue-border: #ecd38a;
+  --accent-fill: #d4a012;
+  --accent-text: #0d0d0d;
   --neutral:   #2563eb;
   --neutral-bg: #eff6ff;
-  --green:     #067647;
-  --red:       #b42318;
-  --yellow:    #b45309;
-  --code-bg:   #0d1424;
-  --shadow:    0 1px 2px rgb(15 23 42 / 6%), 0 8px 24px rgb(15 23 42 / 6%);
+  --green:     #15803d;
+  --red:       #b91c1c;
+  --yellow:    #c2410c;
+  --code-bg:   #111111;
+  --shadow:    0 1px 2px rgb(13 13 13 / 6%), 0 8px 24px rgb(13 13 13 / 6%);
 }
 
 html.dark {
-  --bg:        #0b1220;
-  --bg-subtle: #0f182b;
-  --bg-muted:  #111a2e;
-  --border:    #24314d;
-  --border-subtle: #1a2540;
-  --text:      #e6edf6;
-  --text-2:    #cfd8e6;
-  --text-3:    #b6c2d6;
-  --text-4:    #8b9bb4;
-  --blue:      #34d3b4;
-  --blue-bg:   #11302e;
-  --blue-border: #1f6f63;
-  --accent-text: #052420;
+  --bg:        #0d0d0d;
+  --bg-subtle: #141414;
+  --bg-muted:  #1a1a1a;
+  --border:    #2a2a2a;
+  --border-subtle: #1f1f1f;
+  --text:      #ffffff;
+  --text-2:    #e5e5e5;
+  --text-3:    #d4d4d4;
+  --text-4:    #a3a3a3;
+  --blue:      #d4a012;
+  --blue-bg:   #2a2108;
+  --blue-border: #6b5209;
+  --accent-fill: #d4a012;
+  --accent-text: #0d0d0d;
   --neutral:   #6ea8fe;
   --neutral-bg: #16223b;
-  --green:     #7ee787;
-  --red:       #ff8a7a;
-  --yellow:    #f5b544;
-  --code-bg:   #080e1a;
-  --shadow:    0 1px 2px rgb(0 0 0 / 30%), 0 8px 24px rgb(0 0 0 / 25%);
+  --green:     #4ade80;
+  --red:       #f87171;
+  --yellow:    #fb923c;
+  --code-bg:   #111111;
+  --shadow:    0 1px 2px rgb(0 0 0 / 40%), 0 8px 24px rgb(0 0 0 / 35%);
 }
 
 html, body {
@@ -66,6 +72,14 @@ html, body {
   -moz-osx-font-smoothing: grayscale;
   transition: background 0.2s, color 0.2s;
 }
+
+h1, h2, h3 { font-family: var(--font-heading); }
+
+/* Shared Boffin Coders interaction styles */
+:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 4px; }
+.btn-primary:hover { background: #e4b022 !important; border-color: #e4b022 !important; }
+.btn-secondary:hover { border-color: var(--accent-fill) !important; }
+
 
 /* Scrollbar */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
