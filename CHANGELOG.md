@@ -1,5 +1,39 @@
 # Changelog
 
+## 1.3.2 — 2026-10-29
+
+A patch release: functions that already return `number | null` no longer
+leak `NaN` or `±Infinity`. Valid inputs give exactly the same results as
+1.3.1.
+
+### Changed outputs
+
+| Function | 1.3.1 | 1.3.2 |
+|---|---|---|
+| `computeTTM([1, 2, undefined, 4])` | `NaN` | `null` (skipping a missing quarter would give a nine-month figure) |
+| `computeTTMAvg`, `computeNYearSum`, `computeNYearAverage` with a missing or non-finite value in the window | `NaN` | `null` |
+| `computeHistoricalPoint` landing on a missing or non-finite value | that value (`NaN`, `undefined`…) | `null` |
+| `cagr(1e-300, 1e300, 0.001)` and other overflowing growth | `Infinity` | `null` |
+| `computeIntrinsicValue`, `calculateDCF`, `grahamNumber` with results too large to represent | `Infinity` | `null` |
+| `analyzeSolvency().netDebt` / `netCash` with a non-finite or overflowing debt or cash input | `NaN` / `Infinity` | `null` |
+| Sums of the last N quarters that overflow | `Infinity` | `null` |
+
+### Not changed yet
+
+The plain-arithmetic helpers typed `number` (`netDebt`, `netCash`,
+`calculateEnterpriseValue`, `cashConversionCycle`, `computeGFactor`) and the
+composite score functions (`computeQualityScore`, `computeGrowthScore`,
+`computeValueScore`, `computeMomentumScore`) still pass `NaN` through when
+given invalid input. Making them return `null` changes their TypeScript
+return type, so it is planned for the next minor release.
+
+### Also
+
+- Tests run in GitHub Actions on Node 18, 20 and 22 for every push and pull
+  request (`.github/workflows/test.yml`).
+- Docs: the "null instead of NaN" wording now says exactly which functions
+  it covers.
+
 ## 1.3.1 — 2026-10-29
 
 Documentation-only release. **No code changes:** every function returns

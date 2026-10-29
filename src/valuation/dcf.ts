@@ -1,3 +1,4 @@
+import { finiteOrNull } from "../core/finite";
 import { safeDivide } from "../core/safeDivide";
 
 /**
@@ -39,7 +40,7 @@ export const calculateDCF = (
   // 3. Discount Terminal Value to present
   const presentTerminalValue = terminalValue / Math.pow(1 + discountRate, projectedFCF.length);
 
-  return presentValue + presentTerminalValue;
+  return finiteOrNull(presentValue + presentTerminalValue);
 };
 
 /**

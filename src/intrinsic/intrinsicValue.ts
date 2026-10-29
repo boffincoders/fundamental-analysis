@@ -1,3 +1,5 @@
+import { finiteOrNull } from "../core/finite";
+
 /**
  * Options for computeIntrinsicValue.
  */
@@ -36,7 +38,8 @@ export interface IntrinsicValueOptions {
  * - Market price < intrinsic value → potential undervaluation even after the margin of safety
  * - Highly sensitive to growthRate and terminalPE — stress-test with pessimistic inputs
  *
- * Returns null for non-positive EPS or any out-of-range / non-finite input.
+ * Returns null for non-positive EPS, any out-of-range / non-finite input, or a
+ * result too large to represent.
  */
 export const computeIntrinsicValue = (
   eps: number,
@@ -58,5 +61,5 @@ export const computeIntrinsicValue = (
   const futureEps = eps * Math.pow(1 + growthRate, years);
   const futurePrice = futureEps * terminalPE;
   const presentValue = futurePrice / Math.pow(1 + discountRate, years);
-  return presentValue * (1 - safetyMargin);
+  return finiteOrNull(presentValue * (1 - safetyMargin));
 };

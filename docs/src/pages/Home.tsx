@@ -136,7 +136,7 @@ const COMPARISON: [string, string, string][] = [
   ['Units', 'Is growth 15 or 0.15? Easy to get 100× wrong', 'Rates are always decimals; amounts in any one currency'],
   ['Ratings', 'You write and maintain the thresholds', 'Optional Good / Neutral / Bad and a one-line insight per metric'],
   ['Types', 'Whatever you declare', 'Typed inputs and typed results for every analyzer'],
-  ['Examples you can trust', 'Copied from a blog post', 'Every documented output is recomputed from the built package'],
+  ['Examples you can trust', 'Copied from a blog post', 'Documented example outputs were recomputed from the built package, and tests use fixed expected values'],
   ['Dependencies', '—', 'None'],
 ];
 
@@ -345,8 +345,8 @@ export default function Home() {
         </h1>
         <p className="text-[17.5px] max-w-[700px] mx-auto mb-7 leading-relaxed" style={{ color: 'var(--text-3)' }}>
           Financial ratio analysis for TypeScript: turn financial-statement numbers into {METRIC_COUNT} valuation, profitability,
-          debt and distress-risk metrics, each with an optional plain-English rating. Inputs that can't give an honest answer
-          return <code className="font-mono text-[0.9em]">null</code>, never <code className="font-mono text-[0.9em]">NaN</code>.
+          debt and distress-risk metrics, each with an optional plain-English rating. When inputs can't give an honest answer,
+          ratios and analyzers return <code className="font-mono text-[0.9em]">null</code> instead of <code className="font-mono text-[0.9em]">NaN</code>.
         </p>
         <div className="flex flex-wrap justify-center gap-3 mb-5">
           <Button to="/try/AAPL" primary>See it on Apple</Button>

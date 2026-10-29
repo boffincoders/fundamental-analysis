@@ -35,6 +35,7 @@ import { sharpe } from "../risk/sharpe";
 import { altmanZScore, altmanZScoreDoublePrime } from "../risk/altmanZScore";
 import { piotroski } from "../risk/piotroski";
 import { netDebt, netCash, netDebtToEbitda, debtToAssets } from "../solvency/netDebt";
+import { finiteOrNull } from "../core/finite";
 import { payoutRatio } from "../quality/payoutRatio";
 import { cashConversionRatio } from "../quality/cashConversionRatio";
 import { targetUpside } from "../insights/targetUpside";
@@ -172,11 +173,11 @@ export function analyzeSolvency(data: CompanySnapshotInput, withInsights = false
   const hasDebtData = data.totalDebt != null || data.cashAndEquivalents != null;
   const td   = data.totalDebt ?? 0;
   const cash = data.cashAndEquivalents ?? 0;
-  const nd   = hasDebtData ? netDebt(td, cash) : null;
+  const nd   = hasDebtData ? finiteOrNull(netDebt(td, cash)) : null;
 
   const raw = {
     netDebt:          nd,
-    netCash:          hasDebtData ? netCash(td, cash) : null,
+    netCash:          hasDebtData ? finiteOrNull(netCash(td, cash)) : null,
     netDebtToEbitda:  hasDebtData && data.ebitda != null ? netDebtToEbitda(td, cash, data.ebitda) : null,
     debtToAssets:     data.totalDebt != null && data.totalAssets ? debtToAssets(data.totalDebt, data.totalAssets) : null,
     debtToEquity:     data.totalDebt != null && data.totalEquity ? debtToEquity(data.totalDebt, data.totalEquity) : null,

@@ -4,7 +4,10 @@
  * Functions for computing averages, sums, and point lookups over
  * rolling windows of quarterly (or annual) data.
  * All functions expect chronological order: oldest first, most recent last.
+ * A missing or non-finite value inside the window gives null, not NaN.
  */
+
+import { allFinite, finiteOrNull } from "../core/finite";
 
 /**
  * N-Year Average
@@ -15,7 +18,8 @@
 export const computeNYearAverage = (quarterlyValues: number[], years: number): number | null => {
   if (!Array.isArray(quarterlyValues) || quarterlyValues.length === 0 || !(years > 0)) return null;
   const window = quarterlyValues.slice(-(years * 4));
-  return window.reduce((sum, v) => sum + v, 0) / window.length;
+  if (!allFinite(window)) return null;
+  return finiteOrNull(window.reduce((sum, v) => sum + v, 0) / window.length);
 };
 
 /**
@@ -27,7 +31,8 @@ export const computeNYearAverage = (quarterlyValues: number[], years: number): n
 export const computeNYearSum = (quarterlyValues: number[], years: number): number | null => {
   if (!Array.isArray(quarterlyValues) || !(years > 0) || quarterlyValues.length < years * 4) return null;
   const window = quarterlyValues.slice(-(years * 4));
-  return window.reduce((sum, v) => sum + v, 0);
+  if (!allFinite(window)) return null;
+  return finiteOrNull(window.reduce((sum, v) => sum + v, 0));
 };
 
 /**
@@ -35,7 +40,8 @@ export const computeNYearSum = (quarterlyValues: number[], years: number): numbe
  * Returns the value at exactly `quartersBack` quarters from the most recent value.
  * quartersBack = 0 → most recent value
  * quartersBack = 4 → value from 1 year ago (same quarter last year)
- * Returns null if the index is out of bounds.
+ * Returns null if the index is out of bounds or the value there is missing or
+ * not a finite number.
  */
 export const computeHistoricalPoint = (
   quarterlyValues: number[],
@@ -44,5 +50,6 @@ export const computeHistoricalPoint = (
   if (!Array.isArray(quarterlyValues) || quarterlyValues.length === 0 || !(quartersBack >= 0)) return null;
   const idx = quarterlyValues.length - 1 - quartersBack;
   if (idx < 0) return null;
-  return quarterlyValues[idx];
+  const value = quarterlyValues[idx];
+  return typeof value === "number" ? finiteOrNull(value) : null;
 };

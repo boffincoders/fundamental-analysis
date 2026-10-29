@@ -1,3 +1,4 @@
+import { finiteOrNull } from "../core/finite";
 import { safeDivide } from "../core/safeDivide";
 
 /**
@@ -52,11 +53,12 @@ export const qoqGrowth = (dataPoints: number[]): number[] => yoyGrowth(dataPoint
  * Compound Annual Growth Rate (CAGR)
  * Formula: (Ending Value / Beginning Value) ^ (1 / Years) - 1
  * Returns null when the beginning value is <= 0 or the ending value is < 0
- * (CAGR is undefined across a sign change), or periods <= 0.
+ * (CAGR is undefined across a sign change), or periods <= 0, and when the
+ * result overflows (e.g. a tiny beginning value over a fraction of a period).
  */
 export const cagr = (beginningValue: number, endingValue: number, periods: number): number | null => {
-  if (!(periods > 0) || !(beginningValue > 0) || !(endingValue >= 0) || !Number.isFinite(endingValue)) return null;
-  return Math.pow(endingValue / beginningValue, 1 / periods) - 1;
+  if (!(periods > 0) || !(beginningValue > 0) || !(endingValue >= 0) || !Number.isFinite(endingValue) || !Number.isFinite(beginningValue)) return null;
+  return finiteOrNull(Math.pow(endingValue / beginningValue, 1 / periods) - 1);
 };
 
 /**

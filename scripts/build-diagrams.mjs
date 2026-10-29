@@ -298,14 +298,14 @@ ${text(x0 + colA + colB + 16, y + 30, `${r.call}  →  ${out}`, { size: 12.5, fo
 ${text(x0 + colA + colB + 16, y + 50, r.note ?? (r.out === null ? 'not meaningful, so null' : ''), { size: 12, color: C.gold })}`;
   }).join('\n');
 
-  const doc = `${frame(W, H, 'null, never a misleading number', 'Ratios that cannot be computed honestly return null, so a screener can skip them instead of ranking garbage.')}
+  const doc = `${frame(W, H, 'Ratios return null, not a misleading number', 'Ratios that cannot be computed honestly return null, so a screener can skip them instead of ranking garbage.')}
 ${header}
 ${body}
 ${text(20, H - 22, 'Check for null before you sort, average or display. With insights on, each null comes with a status of N/A and a reason.')}`;
 
   return svgDoc({
     width: W, height: H, body: doc,
-    title: 'null, never a misleading number',
+    title: 'Ratios return null, not a misleading number',
     desc: rows.map(r => `${r.what}: plain arithmetic ${r.naive} gives ${r.naiveOut} (${r.naiveNote}); ${r.call} returns ${r.out === null ? 'null' : r.out}.`).join(' '),
   });
 }

@@ -151,6 +151,7 @@ trends.margins.netMargins;     // [0.2588, 0.2531, 0.2531]
 | Signs | Expenses (`costOfRevenue`, `interestExpense`) are positive numbers. Interest expense reported as a negative number is handled as a cost. |
 | Zero | Zero is a real value and is used (zero cost of revenue → 100 % gross margin). Leave a field out when you do not know it. |
 | `null` | A metric is `null` when an input is missing, a denominator is zero, or the result would not be meaningful (for example ROE with negative equity, PEG with negative growth, net debt/EBITDA with negative EBITDA). |
+| `NaN` and `Infinity` | Functions typed `number \| null` (the ratio functions, TTM and history helpers, CAGR, intrinsic value, DCF and all analyzers) return `null` rather than `NaN` or `±Infinity`. The few plain-arithmetic helpers typed `number` (`netDebt`, `netCash`, `calculateEnterpriseValue`, `cashConversionCycle`, `computeGFactor`) and the composite score functions expect valid numbers and pass `NaN` through. |
 | Missing debt or cash | For enterprise value and net debt, a missing `totalDebt` or `cashAndEquivalents` counts as 0 when the other one is supplied. |
 
 ---

@@ -129,12 +129,13 @@ function llmsTxt(tickers: string[]): string {
 - Package: fundamental-analysis ${version} on npm (https://www.npmjs.com/package/fundamental-analysis)
 - Install: npm install fundamental-analysis
 - Runtime dependencies: none
-- Tests: 317 unit tests (Vitest) as of 1.3.1
+- Tests: 300+ unit tests (Vitest) with fixed expected values
 - Formats: CommonJS and ES modules, with TypeScript type definitions
 - Runs on: Node.js ${engines?.node ?? '>=16'}, browsers and edge runtimes
 - Licence: MIT
 - Renamed from finance-calculator-pro in 1.3.0 (same functions; see the changelog for outputs that changed)
 - Conventions: rates are decimals (0.15 = 15 %); amounts in any one currency per snapshot; null means "not meaningful"; ratings are generic, sector-blind rules of thumb and not investment advice
+- NaN and Infinity: ratio functions, TTM and history helpers, CAGR, intrinsic value, DCF and all analyzers return null instead (from 1.3.2); the plain-arithmetic helpers netDebt, netCash, calculateEnterpriseValue, cashConversionCycle, computeGFactor and the composite score functions expect valid numbers and pass NaN through
 - Source: https://github.com/boffincoders/fundamental-analysis
 
 ## What it is (and is not)
