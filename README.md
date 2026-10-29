@@ -391,7 +391,7 @@ See [CHANGELOG.md](./CHANGELOG.md). Version 1.3.0 corrects several outputs (PEG,
 
 fundamental-analysis is built and maintained by [Boffin Coders](https://boffincoders.com/?utm_source=npm&utm_medium=readme&utm_campaign=fundamental-analysis). We design and build websites, web applications and mobile apps, and run their SEO, for businesses and agencies. Building a screener, a finance dashboard or fundamentals into your product? See our [web application development](https://boffincoders.com/services/web-application-development?utm_source=npm&utm_medium=readme&utm_campaign=fundamental-analysis) work or [talk to us](https://boffincoders.com/contact-us?utm_source=npm&utm_medium=readme&utm_campaign=fundamental-analysis).
 
-More open source by Boffin Coders: [ts-netstorageapi-akamai](https://boffincoders.github.io/akamai-netstorageapi-typescript/) · [durable_queue](https://boffincoders.github.io/durable_queue/) · [github.com/boffincoders](https://github.com/boffincoders)
+More open source by Boffin Coders: [ts-netstorageapi-akamai](https://boffincoders.github.io/akamai-netstorageapi-typescript/) · [durable_queue](https://boffincoders.github.io/durable_queue/) · [all Boffin Coders open source](https://boffincoders.github.io/) · [github.com/boffincoders](https://github.com/boffincoders)
 
 Issues and pull requests: [github.com/boffincoders/fundamental-analysis](https://github.com/boffincoders/fundamental-analysis/issues).
 

@@ -28,4 +28,5 @@ Maintained by Boffin Coders (https://boffincoders.com), who design and build web
 
 - [ts-netstorageapi-akamai](https://boffincoders.github.io/akamai-netstorageapi-typescript/): TypeScript client and CLI for the Akamai NetStorage HTTP API
 - [durable_queue](https://boffincoders.github.io/durable_queue/): Persistent, retryable tasks for Dart and Flutter
+- [All Boffin Coders open source](https://boffincoders.github.io/): hub page listing every package
 - https://github.com/boffincoders

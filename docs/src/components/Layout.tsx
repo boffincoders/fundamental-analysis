@@ -245,6 +245,8 @@ const AppLayout: React.FC = () => {
           <a href="https://boffincoders.github.io/durable_queue/" target="_blank" rel="noopener" style={{ color: 'var(--text-4)' }}>durable_queue</a>
           {' '}·{' '}
           <a href="https://github.com/boffincoders" target="_blank" rel="noopener" style={{ color: 'var(--text-4)' }}>github.com/boffincoders</a>
+          {' '}·{' '}
+          <a href="https://boffincoders.github.io/" style={{ color: 'var(--text-4)' }}>All Boffin Coders open source</a>
         </p>
         <p className="m-0 mt-2 text-[12px]">
           Ratings and verdicts are generic rules of thumb, not investment advice. Thresholds vary by sector.
