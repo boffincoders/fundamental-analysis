@@ -7,7 +7,7 @@
 
 Maintained by [Boffin Coders](https://boffincoders.com/?utm_source=npm&utm_medium=readme&utm_campaign=fundamental-analysis).
 
-> Formerly published as `finance-calculator-pro`. Switching: `npm uninstall finance-calculator-pro && npm install fundamental-analysis`, then change your imports to `'fundamental-analysis'` — the API is the same.
+> Formerly published as `finance-calculator-pro`. Switching: `npm uninstall finance-calculator-pro && npm install fundamental-analysis`, then change your imports to `'fundamental-analysis'`. The functions and their names are the same; see the [CHANGELOG](./CHANGELOG.md) for outputs that changed in 1.3.0 (PEG, intrinsic value, net debt/EBITDA and others).
 
 📖 **[Documentation & live playground →](https://boffincoders.github.io/fundamental-analysis/)**
 
@@ -21,7 +21,7 @@ Maintained by [Boffin Coders](https://boffincoders.com/?utm_source=npm&utm_mediu
 ## Contents
 
 - [What it is (and is not)](#what-it-is-and-is-not)
-- [Who uses it, and for what](#who-uses-it-and-for-what)
+- [Who it's for](#who-its-for)
 - [Installation](#installation)
 - [Quick start](#quick-start)
 - [Input conventions — read this first](#input-conventions--read-this-first)
@@ -52,7 +52,7 @@ It does **not**:
 
 ---
 
-## Who uses it, and for what
+## Who it's for
 
 | Who | Typical use | Main APIs |
 |---|---|---|
@@ -354,33 +354,13 @@ const raw = analyzeCompany(snapshot);          // raw.valuation.pe: number | nul
 const rated = analyzeCompany(snapshot, true);  // rated.valuation.pe.status: "Good" | "Neutral" | "Bad" | "N/A"
 ```
 
-`CompanySnapshotInput` fields (all optional):
+`CompanySnapshotInput` fields — all optional numbers:
 
-```typescript
-interface CompanySnapshotInput {
-  // Market data
-  price, marketCap, eps, bookValuePerShare, revenuePerShare,
-  annualDividendPerShare, analystTargetPrice,
-  expectedEarningsGrowthRate,      // decimal, for PEG
-  sharesOutstanding,
-
-  // Income statement
-  totalRevenue, costOfRevenue, grossProfit, operatingIncome, ebit, ebitda,
-  interestExpense, netIncome, taxRate,
-
-  // Cash flow
-  operatingCashFlow, freeCashFlow,
-
-  // Balance sheet
-  totalAssets, totalLiabilities, totalEquity,
-  currentAssets, currentLiabilities,  // current & quick ratio, working capital
-  totalDebt, longTermDebt, cashAndEquivalents, inventory, tradeReceivables,
-  workingCapital, retainedEarnings,
-
-  // Precomputed risk inputs (same period basis)
-  returns, riskFree, stdDev,
-}
-```
+- **Market data:** `price`, `marketCap`, `eps`, `bookValuePerShare`, `revenuePerShare`, `annualDividendPerShare`, `analystTargetPrice`, `expectedEarningsGrowthRate` (decimal, for PEG), `sharesOutstanding`
+- **Income statement:** `totalRevenue`, `costOfRevenue`, `grossProfit`, `operatingIncome`, `ebit`, `ebitda`, `interestExpense`, `netIncome`, `taxRate`
+- **Cash flow:** `operatingCashFlow`, `freeCashFlow`
+- **Balance sheet:** `totalAssets`, `totalLiabilities`, `totalEquity`, `currentAssets`, `currentLiabilities` (current & quick ratio, working capital), `totalDebt`, `longTermDebt`, `cashAndEquivalents`, `inventory`, `tradeReceivables`, `workingCapital`, `retainedEarnings`
+- **Precomputed risk inputs** (same period basis): `returns`, `riskFree`, `stdDev`
 
 | Analyzer | Returns |
 |---|---|
