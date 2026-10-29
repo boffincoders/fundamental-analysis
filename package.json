@@ -56,7 +56,12 @@
     "intrinsic-value",
     "composite-scoring",
     "f-score",
-    "finance-calculator-pro"
+    "finance-calculator-pro",
+    "dcf-calculator",
+    "intrinsic-value-calculator",
+    "piotroski-score",
+    "financial-ratio-analysis",
+    "financial-ratios-api"
   ],
   "main": "dist/index.js",
   "module": "dist/index.mjs",

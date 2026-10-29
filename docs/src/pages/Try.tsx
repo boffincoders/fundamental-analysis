@@ -434,7 +434,7 @@ export default function Try() {
   usePageMeta(
     entry
       ? `${entry.name} (${entry.ticker}) fundamental analysis: P/E, ROE, Altman Z, Piotroski | fundamental-analysis`
-      : 'Try fundamental analysis on real companies | fundamental-analysis',
+      : 'Stock fundamental analysis of 20 US companies, live | fundamental-analysis',
     entry
       ? `Free fundamental analysis of ${entry.name} (${entry.ticker}) from its latest SEC filing: valuation, profitability, debt, liquidity, Altman Z-score, Piotroski F-score and growth, computed live with the open-source fundamental-analysis package.`
       : 'Pick Apple, Microsoft, NVIDIA or 17 other US companies and see the open-source fundamental-analysis package compute valuation, profitability, debt and distress-risk metrics from their latest SEC filings, live in your browser.',
@@ -451,7 +451,7 @@ export default function Try() {
       {!entry && (
         <>
           <h1 className="text-[1.85rem] font-bold tracking-tight mb-2" style={{ color: 'var(--text)', letterSpacing: '-0.03em' }}>
-            Try it on real companies
+            Stock fundamental analysis on real companies
           </h1>
           <p className="text-[15px] mb-6 max-w-2xl leading-relaxed" style={{ color: 'var(--text-3)' }}>
             Pick a company. Its numbers come from its latest filings with the US SEC, refreshed every night, and the{' '}

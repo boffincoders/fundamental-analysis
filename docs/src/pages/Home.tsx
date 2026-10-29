@@ -6,6 +6,7 @@ import { metricsData } from '../data/metrics';
 import { DEMO_INDEX } from '../data/demo';
 import { DarkCode } from '../components/CodeBlock';
 import { usePageMeta } from '../seo';
+import { FAQ } from '../data/faq';
 
 const METRIC_COUNT = CATEGORIES.reduce((n, c) => n + c.items.length, 0);
 // "P/E = Price / EPS" → "Price / EPS": the name is already shown next to it.
@@ -164,14 +165,6 @@ const CONVENTIONS = [
   { title: 'Ratings are rules of thumb', text: 'Good / Neutral / Bad use fixed generic thresholds. They ignore sector, so compare with peers before concluding anything.' },
 ];
 
-const FAQ = [
-  { q: 'Is fundamental-analysis free?', a: 'Yes. It is open source under the MIT licence and has no runtime dependencies.' },
-  { q: 'Does it fetch stock prices or financial statements?', a: 'No. You pass in numbers from any source (your database, a CSV, SEC filings or a market-data API) and it computes the ratios. The demo on this site uses SEC EDGAR filings.' },
-  { q: 'Which markets does it work for?', a: 'Any market: US, UK, EU, Canada, Australia, India and others. Ratios are unit-free, so only consistency within one snapshot matters.' },
-  { q: 'Can I use it for banks, insurers or REITs?', a: 'Only with care. Current ratio, EV/EBITDA, inventory turnover and Altman Z are not meaningful for financial companies, and REITs are usually valued on FFO rather than earnings.' },
-  { q: 'Does it calculate RSI, MACD or other technical indicators?', a: 'No. It focuses on fundamental analysis. The momentum score accepts RSI, ADX and moving-average values that you compute elsewhere.' },
-  { q: 'Are the ratings and verdicts investment advice?', a: 'No. They are generic rules of thumb meant as a first-pass screen, not recommendations to buy, sell or hold anything.' },
-];
 
 // ── Playground ──────────────────────────────────────────────────────────────
 
@@ -334,8 +327,8 @@ export default function Home() {
   const [snapshot, setSnapshot] = useState<Record<string, number>>(DEFAULT_SNAPSHOT);
   const root = useReveal();
   usePageMeta(
-    'fundamental-analysis — Financial ratio calculator & fundamental analysis library for JavaScript and TypeScript',
-    'Free, zero-dependency TypeScript library and online calculator for financial ratios: P/E, PEG, EV/EBITDA, ROE, ROIC, current ratio, net debt/EBITDA, Altman Z-Score, Piotroski F-Score, DCF, Graham number and intrinsic value.',
+    'Financial ratio analysis & calculators for JavaScript and TypeScript | fundamental-analysis',
+    'Free financial ratio analysis for JavaScript and TypeScript, with online calculators: DCF, intrinsic value, Piotroski F-Score, Altman Z-Score, PEG, EV/EBITDA, Graham number, ROE, ROIC, current ratio and net debt/EBITDA. Zero-dependency library with plain-English ratings.',
   );
 
   const analysis = analyzeCompany(snapshot, true);
@@ -351,8 +344,8 @@ export default function Home() {
           Fundamental analysis, <span style={{ color: 'var(--blue)' }}>typed</span>.
         </h1>
         <p className="text-[17.5px] max-w-[700px] mx-auto mb-7 leading-relaxed" style={{ color: 'var(--text-3)' }}>
-          A TypeScript library that turns financial-statement numbers into {METRIC_COUNT} valuation, profitability, debt and
-          distress-risk metrics, each with an optional plain-English rating. Inputs that can't give an honest answer
+          Financial ratio analysis for TypeScript: turn financial-statement numbers into {METRIC_COUNT} valuation, profitability,
+          debt and distress-risk metrics, each with an optional plain-English rating. Inputs that can't give an honest answer
           return <code className="font-mono text-[0.9em]">null</code>, never <code className="font-mono text-[0.9em]">NaN</code>.
         </p>
         <div className="flex flex-wrap justify-center gap-3 mb-5">

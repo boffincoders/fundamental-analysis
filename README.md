@@ -14,7 +14,7 @@ Maintained by [Boffin Coders](https://boffincoders.com/?utm_source=npm&utm_mediu
 ![fundamental-analysis: financial ratios for TypeScript, by Boffin Coders](https://raw.githubusercontent.com/boffincoders/fundamental-analysis/refs/heads/master/.github/assets/banner.png)
 
 > **Zero-dependency fundamental analysis for JavaScript and TypeScript.**
-> Turn raw income-statement, balance-sheet and cash-flow numbers into valuation, profitability, liquidity, leverage, efficiency and financial-distress metrics — each with an optional plain-English rating. No API calls, no runtime dependencies. Runs in Node.js, browsers and edge runtimes.
+> Financial ratio analysis from raw income-statement, balance-sheet and cash-flow numbers: valuation (P/E, PEG, EV/EBITDA, DCF and intrinsic value), profitability, liquidity, leverage, efficiency and financial-distress metrics (Altman Z-Score, Piotroski score) — each with an optional plain-English rating. No API calls, no runtime dependencies. Runs in Node.js, browsers and edge runtimes.
 
 ---
 

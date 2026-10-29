@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { metricsData } from '../data/metrics';
 import { usePageMeta } from '../seo';
+import { isCalculatorPage, metricDescription, metricH1, metricTitle } from '../data/metricSeo';
 import { useDark } from '../App';
 
 const STATUS_COLORS: Record<string, string> = {
@@ -22,8 +23,8 @@ export default function MetricView() {
   const [inputs, setInputs] = useState<Record<string, number>>({});
 
   usePageMeta(
-    metric ? `${metric.name} — formula, calculator & JavaScript example | fundamental-analysis` : 'Metric not found | fundamental-analysis',
-    metric ? `${metric.description} Formula: ${metric.formula}. Interactive calculator and TypeScript/JavaScript function in fundamental-analysis.` : undefined,
+    metric ? metricTitle(metric) : 'Metric not found | fundamental-analysis',
+    metric ? metricDescription(metric) : undefined,
   );
 
   useEffect(() => {
@@ -74,7 +75,7 @@ export default function MetricView() {
 
       {/* Title */}
       <h1 className="text-[1.85rem] font-bold tracking-tight mb-2" style={{ color: 'var(--text)', letterSpacing: '-0.03em' }}>
-        {metric.name}
+        {metricH1(metric)}
       </h1>
       <p className="text-[15px] mb-8 max-w-xl leading-relaxed" style={{ color: 'var(--text-3)' }}>
         {metric.description}
@@ -218,6 +219,12 @@ export default function MetricView() {
             </svg>
             Computed natively by <code className="font-mono px-1">fundamental-analysis</code> — zero API calls
           </div>
+          {isCalculatorPage(metric.id) && (
+            <p className="px-5 py-2.5 m-0 text-[11.5px]" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-4)' }}>
+              Educational calculator, not investment advice.
+              {metric.id === 'piotroski' && <> This calculator scores 4 of the 9 signals; see the full 9-signal score on real companies in the <Link to="/try" style={{ color: 'var(--blue)' }}>live demo</Link>.</>}
+            </p>
+          )}
         </div>
       </div>
     </div>

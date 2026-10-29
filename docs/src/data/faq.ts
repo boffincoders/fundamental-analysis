@@ -1,0 +1,16 @@
+// Home-page FAQ. The same wording feeds the FAQPage JSON-LD on the home page
+// and the FAQ in llms.txt (both written by seo-pages.ts at build time), so
+// keep answers plain text. Example outputs are from the built package.
+export const FAQ: { q: string; a: string }[] = [
+  { q: 'Is there a JavaScript library for financial ratios?', a: 'Yes. fundamental-analysis is a zero-dependency TypeScript library for financial ratio analysis: npm install fundamental-analysis, then analyzeCompany(data, true) returns valuation, profitability, liquidity, solvency, efficiency, risk and quality metrics, each with a Good / Neutral / Bad rating and a one-line insight.' },
+  { q: 'How do I calculate a Piotroski F-Score in JavaScript?', a: 'Call piotroski({ netIncome, totalAssets, operatingCashFlow, ... }). It returns { score, maxScore, signals }. Pass the prior-year values (priorNetIncome, priorTotalAssets, priorLongTermDebt and the rest) to score all 9 signals; without them it scores the signals it can and maxScore says how many.' },
+  { q: 'How is PEG calculated and what growth unit does it use?', a: 'PEG is P/E divided by earnings growth in whole percent, and growth is passed as a decimal: peg(30, 0.15) returns 2. It returns null when P/E or growth is zero or negative, because PEG is not meaningful there.' },
+  { q: 'How do I calculate DCF intrinsic value in TypeScript?', a: 'calculateDCF([100, 110, 120, 130, 140], 0.10, 0.03) discounts projected free cash flows with a Gordon-growth terminal value and returns about 1726.79. For a per-share estimate, computeIntrinsicValue(10, 0.15, 0.25) grows EPS for 5 years, applies a terminal P/E of 15, discounts at 10 % and takes a 25 % margin of safety: 140.50.' },
+  { q: 'Why does it return null instead of NaN?', a: 'Ratios that cannot be computed honestly (missing input, zero denominator, ROE on negative equity, PEG with shrinking earnings, net debt / EBITDA with negative EBITDA) return null, so a screener can skip them instead of sorting or averaging a misleading number.' },
+  { q: 'Is fundamental-analysis free?', a: 'Yes. It is open source under the MIT licence and has no runtime dependencies.' },
+  { q: 'Does it fetch stock prices or financial statements?', a: 'No. You pass in numbers from any source (your database, a CSV, SEC filings or a market-data API) and it computes the ratios. The demo on this site uses SEC EDGAR filings.' },
+  { q: 'Which markets does it work for?', a: 'Any market: US, UK, EU, Canada, Australia, India and others. Ratios are unit-free, so only consistency within one snapshot matters.' },
+  { q: 'Can I use it for banks, insurers or REITs?', a: 'Only with care. Current ratio, EV/EBITDA, inventory turnover and Altman Z are not meaningful for financial companies, and REITs are usually valued on FFO rather than earnings.' },
+  { q: 'Does it calculate RSI, MACD or other technical indicators?', a: 'No. It focuses on fundamental analysis. The momentum score accepts RSI, ADX and moving-average values that you compute elsewhere.' },
+  { q: 'Are the ratings and verdicts investment advice?', a: 'No. They are generic rules of thumb meant as a first-pass screen, not recommendations to buy, sell or hold anything.' },
+];
