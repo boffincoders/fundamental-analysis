@@ -7,12 +7,12 @@ import { useDark } from '../App';
 const STATUS_COLORS: Record<string, string> = {
   Good:    'var(--green)',
   Bad:     'var(--red)',
-  Neutral: 'var(--blue)',
+  Neutral: 'var(--neutral)',
 };
 const STATUS_BG: Record<string, string> = {
-  Good:    '#f0fdf4',
-  Bad:     '#fef2f2',
-  Neutral: 'var(--blue-bg)',
+  Good:    'color-mix(in srgb, var(--green) 12%, transparent)',
+  Bad:     'color-mix(in srgb, var(--red) 12%, transparent)',
+  Neutral: 'var(--neutral-bg)',
 };
 
 export default function MetricView() {
@@ -45,7 +45,7 @@ export default function MetricView() {
         <Link
           to="/"
           className="px-4 py-2 rounded-lg text-[13px] font-medium no-underline transition-colors"
-          style={{ background: 'var(--blue)', color: '#fff' }}
+          style={{ background: 'var(--blue)', color: 'var(--accent-text)' }}
         >
           ← Back to playground
         </Link>

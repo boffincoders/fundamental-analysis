@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, Outlet, useLocation } from 'react-router-dom';
 import { useDark } from '../App';
 import { CATEGORIES } from '../data/navigation';
-import { metricsData } from '../data/metrics';
+import { SearchDialog, SearchIcon } from './Search';
 
 function SunIcon() {
   return (
@@ -39,10 +39,14 @@ function GitHubIcon() {
   );
 }
 
-function NpmIcon() {
+export function BrandMark({ size = 28 }: { size?: number }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M0 0h24v24H0V0zm3 3v18h18V3H3zm16 16H5V5h14v14zm-9-2h2V9h-4v8h2z" />
+    <svg width={size} height={size} viewBox="0 0 32 32" aria-hidden="true">
+      <rect width="32" height="32" rx="8" fill="#0d9488" />
+      <rect x="7" y="17" width="4" height="8" rx="1" fill="#e6f6f4" />
+      <rect x="14" y="12" width="4" height="13" rx="1" fill="#e6f6f4" />
+      <rect x="21" y="8" width="4" height="17" rx="1" fill="#e6f6f4" />
+      <path d="M6 13.5 L12.5 9 L17 11 L26 5" fill="none" stroke="#99f0dd" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
     </svg>
   );
 }
@@ -51,6 +55,16 @@ const AppLayout: React.FC = () => {
   const location = useLocation();
   const { dark, toggle } = useDark();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); setSearchOpen(true); }
+      if (e.key === '/' && !(e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement)) { e.preventDefault(); setSearchOpen(true); }
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
   const [expandedCats, setExpandedCats] = useState<Record<string, boolean>>(() => {
     const init: Record<string, boolean> = {};
     CATEGORIES.forEach(c => { init[c.label] = false; });
@@ -58,7 +72,9 @@ const AppLayout: React.FC = () => {
     return init;
   });
 
-  const currentMetricId = location.pathname.startsWith('/metrics/') ? location.pathname.split('/')[2] : null;
+  // Like the other Boffin Coders docs: the home page has no sidebar; doc
+  // pages put a sticky sidebar under the top bar and use the full width.
+  const isHome = location.pathname === '/';
 
   const toggleCat = (label: string) => {
     setExpandedCats(prev => ({ ...prev, [label]: !prev[label] }));
@@ -66,20 +82,10 @@ const AppLayout: React.FC = () => {
 
   const isMetricActive = (id: string) => location.pathname === `/metrics/${id}`;
 
-  const Sidebar = () => (
-    <nav className="flex flex-col h-full overflow-y-auto py-6">
-      {/* Logo */}
-      <div className="px-5 mb-6">
-        <Link to="/" className="flex items-center gap-2 no-underline" onClick={() => setMobileOpen(false)}>
-          <div className="w-7 h-7 rounded-md flex items-center justify-center text-white text-xs font-black" style={{ background: 'linear-gradient(135deg, #2563eb, #7c3aed)' }}>
-            F
-          </div>
-          <span className="font-semibold text-[15px]" style={{ color: 'var(--text)' }}>fundamental-analysis</span>
-        </Link>
-      </div>
-
-      {/* Top nav links */}
+  const sidebar = (
+    <nav className="flex flex-col min-h-full py-6" aria-label="Documentation">
       <div className="px-3 mb-2">
+        <p className="px-2 mb-2 text-[11px] font-semibold uppercase tracking-widest" style={{ color: 'var(--text-4)' }}>Pages</p>
         <NavLink to="/" label="Overview & Playground" onClick={() => setMobileOpen(false)} />
         <NavLink to="/try" label="Try it on real stocks" onClick={() => setMobileOpen(false)} />
         <NavLink to="/api-docs" label="API Reference & Guide" onClick={() => setMobileOpen(false)} />
@@ -142,129 +148,111 @@ const AppLayout: React.FC = () => {
     </nav>
   );
 
-  return (
-    <div className="flex min-h-screen" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
-      {/* Fixed Sidebar — desktop */}
-      <aside
-        className="hidden md:flex flex-col fixed top-0 left-0 bottom-0 z-30"
-        style={{ width: '260px', borderRight: '1px solid var(--border)', background: 'var(--bg-subtle)' }}
-      >
-        <Sidebar />
-      </aside>
+  const iconBtn = { background: 'var(--bg)', color: 'var(--text-3)', border: '1px solid var(--border)' };
+  const content = <div className="page-enter"><Outlet /></div>;
 
-      {/* Mobile sidebar overlay */}
+  return (
+    <div className="min-h-screen flex flex-col" style={{ background: 'var(--bg)', color: 'var(--text)' }}>
+      <header
+        className="sticky top-0 z-30 flex items-center gap-4 h-[60px] px-4 sm:px-5"
+        style={{ background: 'color-mix(in srgb, var(--bg) 88%, transparent)', borderBottom: '1px solid var(--border)', backdropFilter: 'saturate(150%) blur(10px)' }}
+      >
+        <button
+          className="min-[900px]:hidden flex items-center justify-center w-9 h-9 rounded-lg cursor-pointer"
+          style={iconBtn}
+          onClick={() => setMobileOpen(o => !o)}
+          aria-label="Menu"
+          aria-expanded={mobileOpen}
+        >
+          <MenuIcon />
+        </button>
+        <Link to="/" className="flex items-center gap-2.5 no-underline shrink-0" aria-label="fundamental-analysis home">
+          <BrandMark />
+          <span className="hidden min-[440px]:inline font-bold text-[15px]" style={{ color: 'var(--text)' }}>fundamental-analysis</span>
+        </Link>
+        <nav className="hidden min-[900px]:flex gap-1 ml-2" aria-label="Main">
+          <TopLink to="/try" label="Try it" />
+          <TopLink to="/api-docs" label="Guide & API" />
+          <TopLink to="/metrics/pe" match="/metrics/" label="Metrics" />
+        </nav>
+
+        <div className="flex items-center gap-2 ml-auto">
+          <button
+            onClick={() => setSearchOpen(true)}
+            className="flex items-center gap-2 h-9 px-2.5 rounded-lg text-[13px] cursor-pointer"
+            style={iconBtn}
+            aria-label="Search"
+          >
+            <SearchIcon />
+            <span className="hidden sm:inline">Search</span>
+            <kbd className="hidden sm:inline font-mono text-[11px] px-1.5 rounded" style={{ border: '1px solid var(--border)' }}>⌘K</kbd>
+          </button>
+          <button onClick={toggle} className="flex items-center justify-center w-9 h-9 rounded-lg cursor-pointer" style={iconBtn} aria-label="Toggle dark mode">
+            {dark ? <SunIcon /> : <MoonIcon />}
+          </button>
+          <a href="https://github.com/boffincoders/fundamental-analysis" target="_blank" rel="noreferrer" className="flex items-center justify-center w-9 h-9 rounded-lg no-underline" style={iconBtn} aria-label="GitHub repository">
+            <GitHubIcon />
+          </a>
+        </div>
+      </header>
+
+      {/* Small screens: the sidebar opens over the page on every route */}
       {mobileOpen && (
-        <div className="md:hidden fixed inset-0 z-40 flex">
-          <div className="fixed inset-0 bg-black/40" onClick={() => setMobileOpen(false)} />
-          <aside className="relative z-50 flex flex-col w-72 h-full" style={{ background: 'var(--bg-subtle)', borderRight: '1px solid var(--border)' }}>
-            <Sidebar />
-          </aside>
+        <div className="min-[900px]:hidden fixed inset-x-0 bottom-0 top-[60px] z-20 overflow-y-auto" style={{ background: 'var(--bg)' }}>
+          {sidebar}
         </div>
       )}
 
-      {/* Main content */}
-      <div className="flex flex-col flex-1 min-w-0 md:ml-[260px]">
-        {/* Top navbar */}
-        <header
-          className="sticky top-0 z-20 flex items-center justify-between px-4 md:px-6 h-14"
-          style={{ background: 'var(--bg)', borderBottom: '1px solid var(--border)', backdropFilter: 'blur(12px)' }}
-        >
-          {/* Mobile hamburger */}
-          <button
-            className="md:hidden p-1.5 rounded-md mr-3 transition-colors"
-            style={{ color: 'var(--text-3)', background: 'transparent', border: 'none', cursor: 'pointer' }}
-            onClick={() => setMobileOpen(true)}
-          >
-            <MenuIcon />
-          </button>
+      {isHome ? (
+        <main className="flex-1 w-full px-4 sm:px-5 pt-8 pb-12">{content}</main>
+      ) : (
+        <div className="flex-1 w-full grid grid-cols-1 min-[900px]:grid-cols-[260px_minmax(0,1fr)]">
+          <aside className="hidden min-[900px]:block sticky top-[60px] self-start h-[calc(100vh-60px)] overflow-y-auto" style={{ borderRight: '1px solid var(--border)' }}>
+            {sidebar}
+          </aside>
+          <main className="min-w-0 pt-10 pb-20" style={{ paddingInline: 'clamp(16px, 3vw, 48px)' }}>{content}</main>
+        </div>
+      )}
 
-          {/* Breadcrumb / page title hint on desktop */}
-          <div className="hidden md:flex items-center gap-2 text-sm" style={{ color: 'var(--text-3)' }}>
-            <span className="font-medium" style={{ color: 'var(--text)' }}>fundamental-analysis</span>
-            {currentMetricId && metricsData[currentMetricId] && (
-              <>
-                <span>/</span>
-                <span>{metricsData[currentMetricId].name}</span>
-              </>
-            )}
-          </div>
+      <SearchDialog open={searchOpen} onClose={() => setSearchOpen(false)} />
 
-          <div className="flex items-center gap-2 ml-auto">
-            {/* GitHub star button */}
-            <a
-              href="https://github.com/boffincoders/fundamental-analysis"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium no-underline transition-colors"
-              style={{ background: 'var(--bg-muted)', color: 'var(--text-2)', border: '1px solid var(--border)' }}
-              onMouseEnter={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--blue)'; (e.currentTarget as HTMLElement).style.color = 'var(--blue)'; }}
-              onMouseLeave={e => { (e.currentTarget as HTMLElement).style.borderColor = 'var(--border)'; (e.currentTarget as HTMLElement).style.color = 'var(--text-2)'; }}
-            >
-              <GitHubIcon />
-              <span className="hidden sm:inline">Star on GitHub</span>
-              <span
-                className="hidden sm:flex items-center justify-center text-[11px] font-bold px-1.5 py-0.5 rounded"
-                style={{ background: 'var(--border)', color: 'var(--text-3)', minWidth: '20px' }}
-              >
-                ★
-              </span>
-            </a>
-
-            {/* npm badge */}
-            <a
-              href="https://www.npmjs.com/package/fundamental-analysis"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-[13px] font-medium no-underline transition-colors"
-              style={{ background: '#cb3837', color: '#fff', border: '1px solid #b83131' }}
-            >
-              <NpmIcon />
-              <span className="hidden sm:inline">npm</span>
-            </a>
-
-            {/* Dark mode toggle */}
-            <button
-              onClick={toggle}
-              className="flex items-center justify-center w-8 h-8 rounded-md transition-colors"
-              style={{ background: 'var(--bg-muted)', color: 'var(--text-3)', border: '1px solid var(--border)', cursor: 'pointer' }}
-              aria-label="Toggle dark mode"
-            >
-              {dark ? <SunIcon /> : <MoonIcon />}
-            </button>
-          </div>
-        </header>
-
-        {/* Page content */}
-        <main className="flex-1 px-4 md:px-8 lg:px-12 py-8 w-full mx-auto">
-          <div className="page-enter">
-            <Outlet />
-          </div>
-        </main>
-
-        {/* Footer */}
-        <footer className="px-8 py-6 text-center text-sm" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-4)' }}>
-          <p className="m-0">
-            fundamental-analysis is open source (MIT) and maintained by{' '}
-            <a href="https://boffincoders.com/?utm_source=docs&utm_medium=footer&utm_campaign=fundamental-analysis" target="_blank" rel="noopener" className="font-semibold no-underline" style={{ color: 'var(--blue)' }}>
-              Boffin Coders
-            </a>
-            {' '}·{' '}
-            <a href="https://github.com/boffincoders/fundamental-analysis" target="_blank" rel="noopener" className="no-underline" style={{ color: 'var(--text-4)' }}>
-              GitHub
-            </a>
-            {' '}·{' '}
-            <a href="https://www.npmjs.com/package/fundamental-analysis" target="_blank" rel="noopener" className="no-underline" style={{ color: 'var(--text-4)' }}>
-              npm
-            </a>
-          </p>
-          <p className="m-0 mt-2 text-[12px]">
-            Ratings are generic rules of thumb, not investment advice. Thresholds vary by sector.
-          </p>
-        </footer>
-      </div>
+      <footer className="px-6 py-7 text-center text-sm" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-4)' }}>
+        <p className="m-0">
+          fundamental-analysis is open source (MIT) and maintained by{' '}
+          <a href="https://boffincoders.com/?utm_source=docs&utm_medium=footer&utm_campaign=fundamental-analysis" target="_blank" rel="noopener" className="font-semibold no-underline" style={{ color: 'var(--blue)' }}>
+            Boffin Coders
+          </a>
+          {' '}·{' '}
+          <a href="https://github.com/boffincoders/fundamental-analysis" target="_blank" rel="noopener" className="no-underline" style={{ color: 'var(--text-4)' }}>
+            GitHub
+          </a>
+          {' '}·{' '}
+          <a href="https://www.npmjs.com/package/fundamental-analysis" target="_blank" rel="noopener" className="no-underline" style={{ color: 'var(--text-4)' }}>
+            npm
+          </a>
+        </p>
+        <p className="m-0 mt-2 text-[12px]">
+          Ratings and verdicts are generic rules of thumb, not investment advice. Thresholds vary by sector.
+        </p>
+      </footer>
     </div>
   );
 };
+
+// Top bar link; active on its own path or, with match, any path under it.
+function TopLink({ to, label, match }: { to: string; label: string; match?: string }) {
+  const { pathname } = useLocation();
+  const active = pathname === to || pathname.startsWith(`${match ?? to}/`) || (match != null && pathname.startsWith(match));
+  return (
+    <Link
+      to={to}
+      className="px-2.5 py-1.5 rounded-lg text-[14px] no-underline"
+      style={{ color: active ? 'var(--text)' : 'var(--text-3)', background: active ? 'var(--bg-subtle)' : 'transparent' }}
+    >
+      {label}
+    </Link>
+  );
+}
 
 // Reusable top-level nav link
 function NavLink({ to, label, onClick }: { to: string; label: string; onClick?: () => void }) {

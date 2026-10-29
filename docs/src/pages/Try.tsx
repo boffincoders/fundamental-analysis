@@ -14,7 +14,7 @@ import { buildVerdict, DISCLAIMER, fullPiotroski, type Tone, type Verdict } from
 
 type Unit = 'x' | '%' | '$' | '$B' | 'days' | 'score' | 'int';
 
-const STATUS_COLOR: Record<string, string> = { Good: 'var(--green)', Bad: 'var(--red)', Neutral: 'var(--blue)', 'N/A': 'var(--text-4)' };
+const STATUS_COLOR: Record<string, string> = { Good: 'var(--green)', Bad: 'var(--red)', Neutral: 'var(--neutral)', 'N/A': 'var(--text-4)' };
 
 function formatValue(v: number | null, unit: Unit): string {
   if (v == null || !Number.isFinite(v)) return '—';
@@ -459,6 +459,11 @@ export default function Try() {
             Type a share price to see valuation ratios, change the growth assumption, and copy the exact code.
           </p>
         </>
+      )}
+      {!entry && (
+        <figure className="m-0 mb-8 max-w-[1000px]">
+          <img src={`${import.meta.env.BASE_URL}diagrams/verdict.svg`} alt="How the rule-based verdict is formed: Piotroski and Altman combine into financial health; Graham's price tests and Lynch's PEG rule combine into price versus classic limits. Not financial advice." loading="lazy" width={1000} className="block w-full h-auto rounded-xl" />
+        </figure>
       )}
       {param && !entry && (
         <p className="text-[14px] mb-4" style={{ color: 'var(--red)' }}>“{param}” isn’t in the demo. Pick one of these:</p>

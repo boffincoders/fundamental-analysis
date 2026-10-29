@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="498" viewBox="0 0 1000 498" role="img" aria-labelledby="t d">
+<title id="t">null, never a misleading number</title>
+<desc id="d">EPS is zero: plain arithmetic 250 / 0 gives Infinity (breaks sorting and averages); pe(250, 0) returns null. Earnings expected to shrink: plain arithmetic 30 / (-0.05 * 100) gives -6 (a negative PEG looks &quot;cheap&quot;); peg(30, -0.05) returns null. Loss on negative equity: plain arithmetic -2 / -10 gives 0.2 (reads as a healthy 20% ROE); roe(-2, -10) returns null. Net debt, but EBITDA negative: plain arithmetic (100 - 10) / -20 gives -4.5 (looks like a net-cash company); netDebtToEbitda(100, 10, -20) returns null. Growth typed as 15 for 15%: plain arithmetic 30 / (15 * 100) gives 0.02 (100× too small); peg(30, 0.15) returns 2.</desc>
+<style>
+
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<rect width="1000" height="498" rx="14" fill="#0b1220"/>
+<rect x="0.5" y="0.5" width="999" height="497" rx="14" fill="none" stroke="#24314d"/>
+<text x="20" y="40" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="20" font-weight="700" fill="#e6edf6">null, never a misleading number</text>
+<text x="20" y="64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#8b9bb4">Ratios that cannot be computed honestly return null, so a screener can skip them instead of ranking garbage.</text>
+<rect x="16" y="84" width="968" height="40" rx="10" fill="#16223b" stroke="#24314d"/>
+<text x="32" y="109" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#e6edf6">Situation</text>
+<text x="262" y="109" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#ff8a7a">Plain arithmetic</text>
+<text x="612" y="109" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" font-weight="600" fill="#34d3b4">fundamental-analysis</text>
+<rect x="16" y="130" width="968" height="56" rx="8" fill="#111a2e" stroke="#24314d"/>
+<text x="32" y="163" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#e6edf6">EPS is zero</text>
+<text x="262" y="154" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" fill="#e6edf6">250 / 0  →  Infinity</text>
+<text x="262" y="174" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#ff8a7a">breaks sorting and averages</text>
+<text x="612" y="154" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" fill="#e6edf6">pe(250, 0)  →  null</text>
+<text x="612" y="174" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#34d3b4">not meaningful, so null</text>
+<rect x="16" y="192" width="968" height="56" rx="8" fill="#111a2e" stroke="#24314d"/>
+<text x="32" y="225" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#e6edf6">Earnings expected to shrink</text>
+<text x="262" y="216" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" fill="#e6edf6">30 / (-0.05 * 100)  →  -6</text>
+<text x="262" y="236" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#ff8a7a">a negative PEG looks &quot;cheap&quot;</text>
+<text x="612" y="216" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" fill="#e6edf6">peg(30, -0.05)  →  null</text>
+<text x="612" y="236" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#34d3b4">not meaningful, so null</text>
+<rect x="16" y="254" width="968" height="56" rx="8" fill="#111a2e" stroke="#24314d"/>
+<text x="32" y="287" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#e6edf6">Loss on negative equity</text>
+<text x="262" y="278" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" fill="#e6edf6">-2 / -10  →  0.2</text>
+<text x="262" y="298" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#ff8a7a">reads as a healthy 20% ROE</text>
+<text x="612" y="278" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" fill="#e6edf6">roe(-2, -10)  →  null</text>
+<text x="612" y="298" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#34d3b4">not meaningful, so null</text>
+<rect x="16" y="316" width="968" height="56" rx="8" fill="#111a2e" stroke="#24314d"/>
+<text x="32" y="349" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#e6edf6">Net debt, but EBITDA negative</text>
+<text x="262" y="340" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" fill="#e6edf6">(100 - 10) / -20  →  -4.5</text>
+<text x="262" y="360" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#ff8a7a">looks like a net-cash company</text>
+<text x="612" y="340" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" fill="#e6edf6">netDebtToEbitda(100, 10, -20)  →  null</text>
+<text x="612" y="360" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#34d3b4">not meaningful, so null</text>
+<rect x="16" y="378" width="968" height="56" rx="8" fill="#111a2e" stroke="#24314d"/>
+<text x="32" y="411" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#e6edf6">Growth typed as 15 for 15%</text>
+<text x="262" y="402" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" fill="#e6edf6">30 / (15 * 100)  →  0.02</text>
+<text x="262" y="422" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#ff8a7a">100× too small</text>
+<text x="612" y="402" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="12.5" fill="#e6edf6">peg(30, 0.15)  →  2</text>
+<text x="612" y="422" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" fill="#34d3b4">rates are decimals</text>
+<text x="20" y="476" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#8b9bb4">Check for null before you sort, average or display. With insights on, each null comes with a status of N/A and a reason.</text>
+</svg>

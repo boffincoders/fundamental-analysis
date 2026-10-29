@@ -1,0 +1,70 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="470" viewBox="0 0 1000 470" role="img" aria-labelledby="t d">
+<title id="t">What happens when you call analyzeCompany()</title>
+<desc id="d">Your numbers go into analyzeCompany. Step 1 checks inputs: missing fields, division by zero, NaN and meaningless ratios become null. Step 2 computes ratios, for example P/E 28.67 and ROE 1.199. Step 3 rates each one against generic thresholds with a plain-English insight. Step 4 returns a typed result grouped into seven categories.</desc>
+<style>
+@keyframes k-app { 0% { stroke: #24314d; } 0.000% { stroke: #24314d; } 1.667%, 15.556% { stroke: #34d3b4; } 18.333% { stroke: #24314d; } 84.444% { stroke: #24314d; } 86.111%, 95.556% { stroke: #34d3b4; } 98.333% { stroke: #24314d; } 100% { stroke: #24314d; } }
+.k-app { animation: k-app 9s ease-in-out infinite; }
+@keyframes a-1 { 0% { stroke: #24314d; } 11.111% { stroke: #24314d; } 12.778%, 20.000% { stroke: #34d3b4; } 22.778% { stroke: #24314d; } 100% { stroke: #24314d; } }
+.a-1 { animation: a-1 9s ease-in-out infinite; }
+@keyframes k-guard { 0% { stroke: #24314d; } 15.556% { stroke: #24314d; } 17.222%, 33.333% { stroke: #34d3b4; } 36.111% { stroke: #24314d; } 100% { stroke: #24314d; } }
+.k-guard { animation: k-guard 9s ease-in-out infinite; }
+@keyframes a-2 { 0% { stroke: #24314d; } 28.889% { stroke: #24314d; } 30.556%, 37.778% { stroke: #34d3b4; } 40.556% { stroke: #24314d; } 100% { stroke: #24314d; } }
+.a-2 { animation: a-2 9s ease-in-out infinite; }
+@keyframes k-calc { 0% { stroke: #24314d; } 33.333% { stroke: #24314d; } 35.000%, 51.111% { stroke: #34d3b4; } 53.889% { stroke: #24314d; } 100% { stroke: #24314d; } }
+.k-calc { animation: k-calc 9s ease-in-out infinite; }
+@keyframes a-3 { 0% { stroke: #24314d; } 46.667% { stroke: #24314d; } 48.333%, 55.556% { stroke: #34d3b4; } 58.333% { stroke: #24314d; } 100% { stroke: #24314d; } }
+.a-3 { animation: a-3 9s ease-in-out infinite; }
+@keyframes k-rate { 0% { stroke: #24314d; } 51.111% { stroke: #24314d; } 52.778%, 68.889% { stroke: #34d3b4; } 71.667% { stroke: #24314d; } 100% { stroke: #24314d; } }
+.k-rate { animation: k-rate 9s ease-in-out infinite; }
+@keyframes a-4 { 0% { stroke: #24314d; } 64.444% { stroke: #24314d; } 66.111%, 73.333% { stroke: #34d3b4; } 76.111% { stroke: #24314d; } 100% { stroke: #24314d; } }
+.a-4 { animation: a-4 9s ease-in-out infinite; }
+@keyframes k-out { 0% { stroke: #24314d; } 68.889% { stroke: #24314d; } 70.556%, 86.667% { stroke: #34d3b4; } 89.444% { stroke: #24314d; } 100% { stroke: #24314d; } }
+.k-out { animation: k-out 9s ease-in-out infinite; }
+@keyframes a-5 { 0% { stroke: #24314d; } 82.222% { stroke: #24314d; } 83.889%, 91.111% { stroke: #34d3b4; } 93.889% { stroke: #24314d; } 100% { stroke: #24314d; } }
+.a-5 { animation: a-5 9s ease-in-out infinite; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; } }
+</style>
+<defs><marker id="head" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#8b9bb4"/></marker></defs>
+<rect width="1000" height="470" rx="14" fill="#0b1220"/>
+<rect x="0.5" y="0.5" width="999" height="469" rx="14" fill="none" stroke="#24314d"/>
+<text x="20" y="40" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="20" font-weight="700" fill="#e6edf6">What happens when you call analyzeCompany()</text>
+<text x="20" y="64" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" fill="#8b9bb4">Inputs are checked, ratios computed and each one rated. Anything that cannot be computed honestly comes back as null.</text>
+<path class="a-1" d="M 245 159 H 253" fill="none" stroke="#24314d" stroke-width="2" marker-end="url(#head)"/>
+<path class="a-2" d="M 487 159 H 495" fill="none" stroke="#24314d" stroke-width="2" marker-end="url(#head)"/>
+<path class="a-3" d="M 729 159 H 737" fill="none" stroke="#24314d" stroke-width="2" marker-end="url(#head)"/>
+<path class="a-4" d="M 855 237 V 284" fill="none" stroke="#24314d" stroke-width="2" marker-end="url(#head)"/>
+<path class="a-5" d="M 255 356 H 129 V 241" fill="none" stroke="#24314d" stroke-width="2" marker-end="url(#head)"/>
+<g>
+<rect class="k-app" x="16" y="84" width="226" height="150" rx="10" fill="#111a2e" stroke="#24314d" stroke-width="1.5"/>
+<text x="30" y="110" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#e6edf6">Your numbers</text>
+<line x1="28" y1="122" x2="230" y2="122" stroke="#24314d"/>
+<text x="30" y="142" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#6ea8fe">analyzeCompany({</text><text x="30" y="160" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#e6edf6">  price: 250, eps: 8.72,</text><text x="30" y="178" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#e6edf6">  netIncome, totalEquity,</text><text x="30" y="196" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#8b9bb4">  …any fields you have</text>
+</g>
+<g>
+<rect class="k-guard" x="258" y="84" width="226" height="150" rx="10" fill="#111a2e" stroke="#24314d" stroke-width="1.5"/>
+<circle cx="278" cy="105" r="10" fill="#34d3b4"/><text x="278" y="109" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#0b1220">1</text><text x="296" y="110" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#e6edf6">Check the inputs</text>
+<line x1="270" y1="122" x2="472" y2="122" stroke="#24314d"/>
+<text x="272" y="142" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#e6edf6">missing field     → null</text><text x="272" y="160" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#e6edf6">divide by zero    → null</text><text x="272" y="178" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#e6edf6">NaN / Infinity    → null</text><text x="272" y="196" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#8b9bb4">meaningless ratio → null</text>
+</g>
+<g>
+<rect class="k-calc" x="500" y="84" width="226" height="150" rx="10" fill="#111a2e" stroke="#24314d" stroke-width="1.5"/>
+<circle cx="520" cy="105" r="10" fill="#34d3b4"/><text x="520" y="109" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#0b1220">2</text><text x="538" y="110" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#e6edf6">Compute the ratios</text>
+<line x1="512" y1="122" x2="714" y2="122" stroke="#24314d"/>
+<text x="514" y="142" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#8b9bb4">pe  = price ÷ eps</text><text x="514" y="160" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#e6edf6">    = 28.67</text><text x="514" y="178" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#8b9bb4">roe = netIncome ÷ equity</text><text x="514" y="196" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#e6edf6">    = 1.199</text>
+</g>
+<g>
+<rect class="k-rate" x="742" y="84" width="226" height="150" rx="10" fill="#111a2e" stroke="#24314d" stroke-width="1.5"/>
+<circle cx="762" cy="105" r="10" fill="#34d3b4"/><text x="762" y="109" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#0b1220">3</text><text x="780" y="110" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#e6edf6">Rate each one</text>
+<line x1="754" y1="122" x2="956" y2="122" stroke="#24314d"/>
+<text x="756" y="142" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#ff8a7a">pe  28.7 → Bad</text><text x="756" y="160" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#7ee787">roe 1.20 → Good</text><text x="756" y="178" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#8b9bb4">generic thresholds,</text><text x="756" y="196" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#8b9bb4">plain-English insight</text>
+</g>
+<g>
+<rect class="k-out" x="258" y="290" width="710" height="132" rx="10" fill="#111a2e" stroke="#24314d" stroke-width="1.5"/>
+<circle cx="278" cy="311" r="10" fill="#34d3b4"/><text x="278" y="315" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12" font-weight="700" fill="#0b1220">4</text><text x="296" y="316" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="13.5" font-weight="600" fill="#e6edf6">A typed result, grouped into seven categories</text>
+<line x1="270" y1="328" x2="956" y2="328" stroke="#24314d"/>
+<text x="272" y="348" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#c49bff">CompanyAnalysisWithInsights</text><text x="272" y="366" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#e6edf6">{ valuation: { pe: { value: 28.67, status: &quot;Bad&quot;, insight: &quot;Expensive by generic standards.&quot; }, … },</text><text x="272" y="384" font-family="ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace" font-size="11" fill="#e6edf6">  profitability: { roe: { value: 1.199, status: &quot;Good&quot;, … } }, liquidity, solvency, … }</text>
+</g>
+<text x="141" y="320" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#8b9bb4">returns</text>
+<text x="141" y="338" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#8b9bb4">the result</text>
+<text x="20" y="450" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif" font-size="12.5" fill="#8b9bb4">Example: Apple's SEC figures with an illustrative $250 share price. Pass false (the default) to get plain numbers instead of { value, status, insight }.</text>
+</svg>

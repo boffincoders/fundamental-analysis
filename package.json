@@ -80,7 +80,8 @@
     "build": "tsup",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "diagrams": "node scripts/build-diagrams.mjs"
   },
   "devDependencies": {
     "tsup": "^8.0.0",
