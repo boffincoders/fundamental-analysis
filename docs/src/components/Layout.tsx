@@ -242,6 +242,8 @@ const AppLayout: React.FC = () => {
           More open source by Boffin Coders:{' '}
           <a href="https://boffincoders.github.io/akamai-netstorageapi-typescript/" target="_blank" rel="noopener" style={{ color: 'var(--text-4)' }}>ts-netstorageapi-akamai</a>
           {' '}·{' '}
+          <a href="https://boffincoders.github.io/durable_queue/" target="_blank" rel="noopener" style={{ color: 'var(--text-4)' }}>durable_queue</a>
+          {' '}·{' '}
           <a href="https://github.com/boffincoders" target="_blank" rel="noopener" style={{ color: 'var(--text-4)' }}>github.com/boffincoders</a>
         </p>
         <p className="m-0 mt-2 text-[12px]">

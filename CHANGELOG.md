@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.3.1 — 2026-10-29
+
+Documentation-only release. **No code changes:** every function returns
+exactly what it did in 1.3.0, so upgrading is safe.
+
+- README: new banner in the Boffin Coders brand and an "About Boffin
+  Coders" section (with links to the sister packages
+  ts-netstorageapi-akamai and durable_queue), so the npm page matches the
+  docs site.
+- Docs site (https://boffincoders.github.io/fundamental-analysis/):
+  redesigned home page with concept diagrams, a "Try it" demo that
+  analyses 20 US companies from their SEC filings, and Boffin Coders
+  branding.
+
 ## 1.3.0 — 2026-10-28
 
 ### Renamed
