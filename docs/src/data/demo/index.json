@@ -1,0 +1,142 @@
+[
+ {
+  "ticker": "AAPL",
+  "name": "Apple",
+  "sector": "Technology",
+  "periodEnd": "2026-06-27",
+  "filed": "2026-07-31"
+ },
+ {
+  "ticker": "MSFT",
+  "name": "Microsoft",
+  "sector": "Technology",
+  "periodEnd": "2026-09-30",
+  "filed": "2026-10-28"
+ },
+ {
+  "ticker": "NVDA",
+  "name": "NVIDIA",
+  "sector": "Semiconductors",
+  "periodEnd": "2026-07-26",
+  "filed": "2026-08-26"
+ },
+ {
+  "ticker": "GOOGL",
+  "name": "Alphabet",
+  "sector": "Communication services",
+  "periodEnd": "2026-06-30",
+  "filed": "2026-07-23"
+ },
+ {
+  "ticker": "AMZN",
+  "name": "Amazon",
+  "sector": "Consumer discretionary",
+  "periodEnd": "2026-06-30",
+  "filed": "2026-07-31"
+ },
+ {
+  "ticker": "META",
+  "name": "Meta Platforms",
+  "sector": "Communication services",
+  "periodEnd": "2026-09-30",
+  "filed": "2026-10-22"
+ },
+ {
+  "ticker": "TSLA",
+  "name": "Tesla",
+  "sector": "Automobiles",
+  "periodEnd": "2026-09-30",
+  "filed": "2026-10-22"
+ },
+ {
+  "ticker": "AVGO",
+  "name": "Broadcom",
+  "sector": "Semiconductors",
+  "periodEnd": "2026-08-02",
+  "filed": "2026-09-10"
+ },
+ {
+  "ticker": "LLY",
+  "name": "Eli Lilly",
+  "sector": "Pharmaceuticals",
+  "periodEnd": "2026-06-30",
+  "filed": "2026-08-05"
+ },
+ {
+  "ticker": "JNJ",
+  "name": "Johnson & Johnson",
+  "sector": "Pharmaceuticals",
+  "periodEnd": "2026-09-27",
+  "filed": "2026-10-21"
+ },
+ {
+  "ticker": "MRNA",
+  "name": "Moderna",
+  "sector": "Biotechnology",
+  "periodEnd": "2026-06-30",
+  "filed": "2026-07-31"
+ },
+ {
+  "ticker": "UNH",
+  "name": "UnitedHealth Group",
+  "sector": "Health care",
+  "periodEnd": "2026-06-30",
+  "filed": "2026-08-10"
+ },
+ {
+  "ticker": "MA",
+  "name": "Mastercard",
+  "sector": "Financial services",
+  "periodEnd": "2026-06-30",
+  "filed": "2026-07-30"
+ },
+ {
+  "ticker": "WMT",
+  "name": "Walmart",
+  "sector": "Consumer staples",
+  "periodEnd": "2026-07-31",
+  "filed": "2026-08-28"
+ },
+ {
+  "ticker": "COST",
+  "name": "Costco",
+  "sector": "Consumer staples",
+  "periodEnd": "2026-08-30",
+  "filed": "2026-10-07"
+ },
+ {
+  "ticker": "HD",
+  "name": "Home Depot",
+  "sector": "Consumer discretionary",
+  "periodEnd": "2026-08-02",
+  "filed": "2026-08-25"
+ },
+ {
+  "ticker": "PG",
+  "name": "Procter & Gamble",
+  "sector": "Consumer staples",
+  "periodEnd": "2026-09-30",
+  "filed": "2026-10-22"
+ },
+ {
+  "ticker": "KO",
+  "name": "Coca-Cola",
+  "sector": "Consumer staples",
+  "periodEnd": "2026-10-02",
+  "filed": "2026-10-28"
+ },
+ {
+  "ticker": "XOM",
+  "name": "ExxonMobil",
+  "sector": "Energy",
+  "periodEnd": "2026-06-30",
+  "filed": "2026-08-03"
+ },
+ {
+  "ticker": "NFLX",
+  "name": "Netflix",
+  "sector": "Communication services",
+  "periodEnd": "2026-09-30",
+  "filed": "2026-10-21"
+ }
+]

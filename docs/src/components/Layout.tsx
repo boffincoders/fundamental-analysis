@@ -81,6 +81,7 @@ const AppLayout: React.FC = () => {
       {/* Top nav links */}
       <div className="px-3 mb-2">
         <NavLink to="/" label="Overview & Playground" onClick={() => setMobileOpen(false)} />
+        <NavLink to="/try" label="Try it on real stocks" onClick={() => setMobileOpen(false)} />
         <NavLink to="/api-docs" label="API Reference & Guide" onClick={() => setMobileOpen(false)} />
       </div>
 
@@ -268,7 +269,7 @@ const AppLayout: React.FC = () => {
 // Reusable top-level nav link
 function NavLink({ to, label, onClick }: { to: string; label: string; onClick?: () => void }) {
   const location = useLocation();
-  const active = location.pathname === to;
+  const active = location.pathname === to || (to !== '/' && location.pathname.startsWith(`${to}/`));
   return (
     <Link
       to={to}

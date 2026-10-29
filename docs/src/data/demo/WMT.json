@@ -1,0 +1,316 @@
+{
+ "ticker": "WMT",
+ "name": "Walmart",
+ "legalName": "Walmart Inc.",
+ "sector": "Consumer staples",
+ "cik": 104169,
+ "currency": "USD",
+ "asOf": {
+  "periodEnd": "2026-07-31",
+  "basis": "TTM",
+  "balanceSheetDate": "2026-07-31",
+  "form": "10-Q",
+  "filed": "2026-08-28",
+  "url": "https://www.sec.gov/Archives/edgar/data/104169/000010416926000154/",
+  "lastFiled": "2026-08-28"
+ },
+ "snapshot": {
+  "eps": 2.76,
+  "sharesOutstanding": 7933746241,
+  "bookValuePerShare": 12.3823,
+  "revenuePerShare": 91.8187,
+  "annualDividendPerShare": 0.99,
+  "totalRevenue": 728466000000,
+  "costOfRevenue": 550183000000,
+  "grossProfit": null,
+  "operatingIncome": 32280000000,
+  "ebit": 32280000000,
+  "ebitda": 47373000000,
+  "interestExpense": 1859000000,
+  "netIncome": 22076000000,
+  "taxRate": 0.2325,
+  "operatingCashFlow": 42923000000,
+  "freeCashFlow": 13509000000,
+  "totalAssets": 293914000000,
+  "totalLiabilities": 189408000000,
+  "totalEquity": 98238000000,
+  "currentAssets": 88703000000,
+  "currentLiabilities": 115630000000,
+  "totalDebt": 50411000000,
+  "longTermDebt": 36462000000,
+  "cashAndEquivalents": 11529000000,
+  "inventory": 61600000000,
+  "tradeReceivables": 11075000000,
+  "retainedEarnings": 103601000000
+ },
+ "annual": [
+  {
+   "fiscalYear": 2022,
+   "fiscalYearEnd": "2022-01-31",
+   "revenue": 567762000000,
+   "costOfRevenue": 429000000000,
+   "operatingIncome": 25942000000,
+   "netIncome": 13673000000,
+   "eps": 1.62,
+   "dividendPerShare": 0.7333,
+   "freeCashFlow": 11075000000,
+   "operatingCashFlow": 24181000000,
+   "dilutedShares": 8415000000,
+   "totalAssets": 244860000000,
+   "totalLiabilities": 152969000000,
+   "longTermDebt": 34864000000,
+   "currentAssets": 81070000000,
+   "currentLiabilities": 87379000000
+  },
+  {
+   "fiscalYear": 2023,
+   "fiscalYearEnd": "2023-01-31",
+   "revenue": 605881000000,
+   "costOfRevenue": 463721000000,
+   "operatingIncome": 20428000000,
+   "netIncome": 11680000000,
+   "eps": 1.42,
+   "dividendPerShare": 0.7467,
+   "freeCashFlow": 11984000000,
+   "operatingCashFlow": 28841000000,
+   "dilutedShares": 8202000000,
+   "totalAssets": 243197000000,
+   "totalLiabilities": 159443000000,
+   "longTermDebt": 34649000000,
+   "currentAssets": 75655000000,
+   "currentLiabilities": 92198000000
+  },
+  {
+   "fiscalYear": 2024,
+   "fiscalYearEnd": "2024-01-31",
+   "revenue": 642637000000,
+   "costOfRevenue": 490142000000,
+   "operatingIncome": 27012000000,
+   "netIncome": 15511000000,
+   "eps": 1.91,
+   "dividendPerShare": 0.76,
+   "freeCashFlow": 15120000000,
+   "operatingCashFlow": 35726000000,
+   "dilutedShares": 8108000000,
+   "totalAssets": 252399000000,
+   "totalLiabilities": 162050000000,
+   "longTermDebt": 36132000000,
+   "currentAssets": 76877000000,
+   "currentLiabilities": 92415000000
+  },
+  {
+   "fiscalYear": 2025,
+   "fiscalYearEnd": "2025-01-31",
+   "revenue": 674538000000,
+   "costOfRevenue": 511753000000,
+   "operatingIncome": 29348000000,
+   "netIncome": 19436000000,
+   "eps": 2.41,
+   "dividendPerShare": 0.83,
+   "freeCashFlow": 12660000000,
+   "operatingCashFlow": 36443000000,
+   "dilutedShares": 8081000000,
+   "totalAssets": 260823000000,
+   "totalLiabilities": 163402000000,
+   "longTermDebt": 33401000000,
+   "currentAssets": 79458000000,
+   "currentLiabilities": 96584000000
+  },
+  {
+   "fiscalYear": 2026,
+   "fiscalYearEnd": "2026-01-31",
+   "revenue": 706413000000,
+   "costOfRevenue": 535395000000,
+   "operatingIncome": 29825000000,
+   "netIncome": 21893000000,
+   "eps": 2.73,
+   "dividendPerShare": 0.94,
+   "freeCashFlow": 14923000000,
+   "operatingCashFlow": 41565000000,
+   "dilutedShares": 8022000000,
+   "totalAssets": 284668000000,
+   "totalLiabilities": 178781000000,
+   "longTermDebt": 34624000000,
+   "currentAssets": 84874000000,
+   "currentLiabilities": 107469000000
+  }
+ ],
+ "sources": {
+  "costOfRevenue": {
+   "tag": "CostOfRevenue",
+   "basis": "TTM",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "operatingIncome": {
+   "tag": "OperatingIncomeLoss",
+   "basis": "TTM",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "netIncome": {
+   "tag": "NetIncomeLoss",
+   "basis": "TTM",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "interestExpense": {
+   "tag": "InterestExpenseDebt",
+   "basis": "TTM",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "operatingCashFlow": {
+   "tag": "NetCashProvidedByUsedInOperatingActivities",
+   "basis": "TTM",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "eps": {
+   "tag": "EarningsPerShareDiluted",
+   "basis": "TTM",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "totalAssets": {
+   "tag": "Assets",
+   "basis": "instant",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "totalEquity": {
+   "tag": "StockholdersEquity",
+   "basis": "instant",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "currentAssets": {
+   "tag": "AssetsCurrent",
+   "basis": "instant",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "currentLiabilities": {
+   "tag": "LiabilitiesCurrent",
+   "basis": "instant",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "cashAndEquivalents": {
+   "tag": "CashAndCashEquivalentsAtCarryingValue",
+   "basis": "instant",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "longTermDebt": {
+   "tag": "LongTermDebtNoncurrent",
+   "basis": "instant",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "inventory": {
+   "tag": "InventoryNet",
+   "basis": "instant",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "tradeReceivables": {
+   "tag": "ReceivablesNetCurrent",
+   "basis": "instant",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "retainedEarnings": {
+   "tag": "RetainedEarningsAccumulatedDeficit",
+   "basis": "instant",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "totalLiabilities": {
+   "tag": "LiabilitiesAndStockholdersEquity − equity",
+   "basis": "instant",
+   "end": "2026-07-31"
+  },
+  "ebit": {
+   "tag": "OperatingIncomeLoss",
+   "basis": "TTM",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "sharesOutstanding": {
+   "tag": "dei:EntityCommonStockSharesOutstanding",
+   "basis": "instant",
+   "end": "2026-08-26",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "totalRevenue": {
+   "tag": "RevenueFromContractWithCustomerExcludingAssessedTax",
+   "basis": "TTM",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "annualDividendPerShare": {
+   "tag": "CommonStockDividendsPerShareDeclared",
+   "basis": "TTM",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "ebitda": {
+   "tag": "EBIT + DepreciationAmortizationAndAccretionNet",
+   "basis": "TTM",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "freeCashFlow": {
+   "tag": "operating cash flow − PaymentsToAcquirePropertyPlantAndEquipment",
+   "basis": "TTM",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "taxRate": {
+   "tag": "IncomeTaxExpenseBenefit ÷ pre-tax income",
+   "basis": "TTM",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "totalDebt": {
+   "tag": "long-term debt + LongTermDebtCurrent",
+   "basis": "instant",
+   "end": "2026-07-31",
+   "form": "10-Q",
+   "filed": "2026-08-28"
+  },
+  "bookValuePerShare": {
+   "tag": "equity ÷ shares outstanding"
+  },
+  "revenuePerShare": {
+   "tag": "revenue ÷ shares outstanding"
+  }
+ },
+ "missing": [
+  "grossProfit"
+ ],
+ "fetchedAt": "2026-10-29T04:05:32.361Z"
+}

@@ -209,7 +209,8 @@ export default function Home() {
         </p>
         <div className="flex flex-wrap items-center gap-3">
           <code className="px-3 py-2 rounded-lg text-[13px] font-mono" style={{ background: '#0d1117', color: '#4ade80' }}>npm install fundamental-analysis</code>
-          <a href="#playground" className="px-4 py-2 rounded-lg text-[13px] font-medium no-underline" style={{ background: 'var(--blue)', color: '#fff' }}>Try the playground</a>
+          <Link to="/try" className="px-4 py-2 rounded-lg text-[13px] font-medium no-underline" style={{ background: 'var(--blue)', color: '#fff' }}>See it on real companies</Link>
+          <a href="#playground" className="px-4 py-2 rounded-lg text-[13px] font-medium no-underline" style={{ border: '1px solid var(--border)', color: 'var(--text-2)' }}>Playground</a>
           <Link to="/api-docs" className="px-4 py-2 rounded-lg text-[13px] font-medium no-underline" style={{ border: '1px solid var(--border)', color: 'var(--text-2)' }}>API reference</Link>
         </div>
         <p className="text-[12px] mt-4 mb-0" style={{ color: 'var(--text-4)' }}>

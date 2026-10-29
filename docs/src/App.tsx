@@ -4,6 +4,7 @@ import AppLayout from './components/Layout';
 import Home from './pages/Home';
 import MetricView from './pages/MetricView';
 import ApiDocs from './pages/ApiDocs';
+import Try from './pages/Try';
 
 // Dark mode context
 export const DarkModeContext = createContext<{ dark: boolean; toggle: () => void }>({
@@ -32,6 +33,8 @@ function App() {
             <Route index element={<Home />} />
             <Route path="api-docs" element={<ApiDocs />} />
             <Route path="metrics/:id" element={<MetricView />} />
+            <Route path="try" element={<Try />} />
+            <Route path="try/:ticker" element={<Try />} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Route>
         </Routes>
