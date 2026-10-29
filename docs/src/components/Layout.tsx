@@ -224,7 +224,7 @@ const AppLayout: React.FC = () => {
       {/* Shared Boffin Coders footer pattern (same as the other package docs) */}
       <footer className="px-6 py-8 text-center text-sm" style={{ borderTop: '1px solid var(--border)', color: 'var(--text-4)' }}>
         <a
-          href="https://boffincoders.com/?utm_source=docs&utm_medium=footer&utm_campaign=fundamental-analysis"
+          href="https://boffincoders.com/open-source/fundamental-analysis?utm_source=docs&utm_medium=footer&utm_campaign=fundamental-analysis"
           target="_blank"
           rel="noopener"
           className="inline-flex items-center gap-3 no-underline mb-3"

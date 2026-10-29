@@ -137,6 +137,7 @@ function llmsTxt(tickers: string[]): string {
 - Conventions: rates are decimals (0.15 = 15 %); amounts in any one currency per snapshot; null means "not meaningful"; ratings are generic, sector-blind rules of thumb and not investment advice
 - NaN and Infinity: ratio functions, TTM and history helpers, CAGR, intrinsic value, DCF and all analyzers return null instead (from 1.3.2); the plain-arithmetic helpers netDebt, netCash, calculateEnterpriseValue, cashConversionCycle, computeGFactor and the composite score functions expect valid numbers and pass NaN through
 - Source: https://github.com/boffincoders/fundamental-analysis
+- Project page: https://boffincoders.com/open-source/fundamental-analysis
 
 ## What it is (and is not)
 
