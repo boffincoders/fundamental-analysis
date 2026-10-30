@@ -6,42 +6,42 @@
  "cik": 1141391,
  "currency": "USD",
  "asOf": {
-  "periodEnd": "2026-06-30",
+  "periodEnd": "2026-09-30",
   "basis": "TTM",
-  "balanceSheetDate": "2026-06-30",
+  "balanceSheetDate": "2026-09-30",
   "form": "10-Q",
-  "filed": "2026-07-30",
-  "url": "https://www.sec.gov/Archives/edgar/data/1141391/000114139126000083/",
-  "lastFiled": "2026-07-30"
+  "filed": "2026-10-29",
+  "url": "https://www.sec.gov/Archives/edgar/data/1141391/000114139126000124/",
+  "lastFiled": "2026-10-29"
  },
  "snapshot": {
-  "eps": 18.18,
-  "sharesOutstanding": 883000000,
-  "bookValuePerShare": 6.3545,
-  "revenuePerShare": 39.7316,
-  "annualDividendPerShare": 3.37,
-  "totalRevenue": 35083000000,
+  "eps": 19.11,
+  "sharesOutstanding": 876000000,
+  "bookValuePerShare": 7.7089,
+  "revenuePerShare": 41.4247,
+  "annualDividendPerShare": 3.48,
+  "totalRevenue": 36288000000,
   "costOfRevenue": null,
   "grossProfit": null,
-  "operatingIncome": 20465000000,
-  "ebit": 20465000000,
-  "ebitda": 21660000000,
-  "interestExpense": 748000000,
-  "netIncome": 16257000000,
-  "taxRate": 0.1941,
-  "operatingCashFlow": 17437000000,
-  "freeCashFlow": 16702000000,
-  "totalAssets": 57691000000,
-  "totalLiabilities": 52085000000,
-  "totalEquity": 5611000000,
-  "currentAssets": 26522000000,
-  "currentLiabilities": 25004000000,
-  "totalDebt": 24643000000,
-  "longTermDebt": 22184000000,
-  "cashAndEquivalents": 11291000000,
+  "operatingIncome": 21266000000,
+  "ebit": 21266000000,
+  "ebitda": 22497000000,
+  "interestExpense": 812000000,
+  "netIncome": 16958000000,
+  "taxRate": 0.1892,
+  "operatingCashFlow": 16861000000,
+  "freeCashFlow": 16082000000,
+  "totalAssets": 58149000000,
+  "totalLiabilities": 51409000000,
+  "totalEquity": 6753000000,
+  "currentAssets": 24480000000,
+  "currentLiabilities": 24196000000,
+  "totalDebt": 23938000000,
+  "longTermDebt": 22189000000,
+  "cashAndEquivalents": 10147000000,
   "inventory": null,
-  "tradeReceivables": 5047000000,
-  "retainedEarnings": 91771000000
+  "tradeReceivables": 5258000000,
+  "retainedEarnings": 95640000000
  },
  "annual": [
   {
@@ -139,156 +139,156 @@
   "operatingIncome": {
    "tag": "OperatingIncomeLoss",
    "basis": "TTM",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "netIncome": {
    "tag": "NetIncomeLoss",
    "basis": "TTM",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "interestExpense": {
    "tag": "InterestExpenseNonoperating",
    "basis": "TTM",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "operatingCashFlow": {
    "tag": "NetCashProvidedByUsedInOperatingActivities",
    "basis": "TTM",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "eps": {
    "tag": "EarningsPerShareDiluted",
    "basis": "TTM",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "totalAssets": {
    "tag": "Assets",
    "basis": "instant",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "totalLiabilities": {
    "tag": "Liabilities",
    "basis": "instant",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "totalEquity": {
    "tag": "StockholdersEquity",
    "basis": "instant",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "currentAssets": {
    "tag": "AssetsCurrent",
    "basis": "instant",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "currentLiabilities": {
    "tag": "LiabilitiesCurrent",
    "basis": "instant",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "cashAndEquivalents": {
    "tag": "CashAndCashEquivalentsAtCarryingValue",
    "basis": "instant",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "longTermDebt": {
    "tag": "LongTermDebtNoncurrent",
    "basis": "instant",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "tradeReceivables": {
    "tag": "AccountsReceivableNetCurrent",
    "basis": "instant",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "retainedEarnings": {
    "tag": "RetainedEarningsAccumulatedDeficit",
    "basis": "instant",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "ebit": {
    "tag": "OperatingIncomeLoss",
    "basis": "TTM",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "sharesOutstanding": {
    "tag": "WeightedAverageNumberOfDilutedSharesOutstanding",
    "basis": "period",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "totalRevenue": {
    "tag": "Revenues",
    "basis": "TTM",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "annualDividendPerShare": {
    "tag": "CommonStockDividendsPerShareDeclared",
    "basis": "TTM",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "ebitda": {
    "tag": "EBIT + DepreciationAndAmortization",
    "basis": "TTM",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "freeCashFlow": {
    "tag": "operating cash flow − PaymentsToAcquirePropertyPlantAndEquipment",
    "basis": "TTM",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "taxRate": {
    "tag": "IncomeTaxExpenseBenefit ÷ pre-tax income",
    "basis": "TTM",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "totalDebt": {
    "tag": "long-term debt + LongTermDebtCurrent",
    "basis": "instant",
-   "end": "2026-06-30",
+   "end": "2026-09-30",
    "form": "10-Q",
-   "filed": "2026-07-30"
+   "filed": "2026-10-29"
   },
   "bookValuePerShare": {
    "tag": "equity ÷ shares outstanding"
@@ -302,5 +302,5 @@
   "grossProfit",
   "inventory"
  ],
- "fetchedAt": "2026-10-29T04:05:32.342Z"
+ "fetchedAt": "2026-10-30T12:47:46.754Z"
 }

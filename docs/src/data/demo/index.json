@@ -31,8 +31,8 @@
   "ticker": "AMZN",
   "name": "Amazon",
   "sector": "Consumer discretionary",
-  "periodEnd": "2026-06-30",
-  "filed": "2026-07-31"
+  "periodEnd": "2026-09-30",
+  "filed": "2026-10-30"
  },
  {
   "ticker": "META",
@@ -59,8 +59,8 @@
   "ticker": "LLY",
   "name": "Eli Lilly",
   "sector": "Pharmaceuticals",
-  "periodEnd": "2026-06-30",
-  "filed": "2026-08-05"
+  "periodEnd": "2026-09-30",
+  "filed": "2026-10-29"
  },
  {
   "ticker": "JNJ",
@@ -87,8 +87,8 @@
   "ticker": "MA",
   "name": "Mastercard",
   "sector": "Financial services",
-  "periodEnd": "2026-06-30",
-  "filed": "2026-07-30"
+  "periodEnd": "2026-09-30",
+  "filed": "2026-10-29"
  },
  {
   "ticker": "WMT",
