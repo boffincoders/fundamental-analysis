@@ -1,7 +1,7 @@
 {
  "ticker": "MSFT",
  "name": "Microsoft",
- "legalName": "MICROSOFT CORPORATION",
+ "legalName": "MICROSOFT CORP",
  "sector": "Technology",
  "cik": 789019,
  "currency": "USD",
@@ -319,5 +319,5 @@
   }
  },
  "missing": [],
- "fetchedAt": "2026-10-29T04:05:32.122Z"
+ "fetchedAt": "2026-11-02T15:41:20.854Z"
 }
