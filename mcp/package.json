@@ -1,0 +1,43 @@
+{
+  "name": "fundamental-analysis-mcp",
+  "version": "0.1.0",
+  "description": "MCP server for fundamental analysis: P/E, DCF, Graham Number, Altman Z-Score and ROE as read-only tools. Each result returns the value, the formula, the inputs and caveats. No data fetching, no API keys, zero dependencies.",
+  "author": {
+    "name": "Boffin Coders",
+    "url": "https://boffincoders.com"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/boffincoders/fundamental-analysis.git",
+    "directory": "mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/boffincoders/fundamental-analysis/issues"
+  },
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "model-context-protocol",
+    "finance-mcp-server",
+    "fundamental-analysis",
+    "financial-ratios",
+    "dcf",
+    "graham-number",
+    "altman-z-score",
+    "valuation"
+  ],
+  "bin": {
+    "fundamental-analysis-mcp": "dist/server.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "build": "tsup",
+    "test": "vitest run"
+  }
+}
