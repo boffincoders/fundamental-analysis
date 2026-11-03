@@ -1,8 +1,8 @@
 # fundamental-analysis-mcp
 
 An MCP server that gives an AI assistant the calculators from
-[fundamental-analysis](https://www.npmjs.com/package/fundamental-analysis): P/E, DCF, Graham Number, Altman Z-Score and
-return on equity.
+[fundamental-analysis](https://www.npmjs.com/package/fundamental-analysis): P/E, DCF, Graham Number, Altman Z-Score,
+Piotroski F-Score, return on equity, profit margins, and liquidity and debt ratios.
 
 Every result returns four things: the value, the formula that produced it, the inputs it used and the caveats you need
 before acting on it. The assistant brings the figures. The server fetches nothing, needs no API key and has no
@@ -17,6 +17,10 @@ dependencies.
 | `graham_number` | sqrt(22.5 x EPS x book value per share), and the price against it |
 | `altman_z_score` | Z (public manufacturers) or Z'' (everyone else), with the zone |
 | `return_on_equity` | Net income / equity, null when equity is zero or negative |
+| `piotroski_f_score` | The 0 to 9 score with each of the nine signals, and which signals a missing prior year leaves unscored |
+| `profit_margin` | Gross, operating, net or free cash flow margin as a share of revenue |
+| `liquidity_ratio` | Current ratio, or quick ratio without inventory |
+| `leverage_ratio` | Debt to equity, or interest coverage (EBIT / interest expense) |
 
 Every tool is read-only: it computes and answers, and changes nothing.
 

@@ -1,7 +1,7 @@
 {
   "name": "fundamental-analysis-mcp",
   "version": "0.1.0",
-  "description": "MCP server for fundamental analysis: P/E, DCF, Graham Number, Altman Z-Score and ROE as read-only tools. Each result returns the value, the formula, the inputs and caveats. No data fetching, no API keys, zero dependencies.",
+  "description": "MCP server for fundamental analysis: P/E, DCF, Graham Number, Altman Z-Score, Piotroski F-Score, ROE, margins, and liquidity and debt ratios as read-only tools. Each result returns the value, the formula, the inputs and caveats. No data fetching, no API keys, zero dependencies.",
   "author": {
     "name": "Boffin Coders",
     "url": "https://boffincoders.com"
@@ -25,6 +25,7 @@
     "dcf",
     "graham-number",
     "altman-z-score",
+    "piotroski-f-score",
     "valuation"
   ],
   "bin": {

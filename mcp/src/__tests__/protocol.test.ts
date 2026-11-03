@@ -98,4 +98,60 @@ describe("tools", () => {
     expect(call("return_on_equity", { netIncome: 50, equity: 250 }).result.structuredContent.value).toBeCloseTo(0.2, 6);
     expect(call("return_on_equity", { netIncome: -50, equity: -250 }).result.structuredContent.value).toBeNull();
   });
+  it("scores a full Piotroski F-Score with its band", () => {
+    const r = call("piotroski_f_score", {
+      netIncome: 100,
+      totalAssets: 1000,
+      operatingCashFlow: 150,
+      priorNetIncome: 80,
+      priorTotalAssets: 1000,
+      longTermDebt: 200,
+      priorLongTermDebt: 250,
+      currentRatioValue: 1.5,
+      priorCurrentRatioValue: 1.4,
+      sharesOutstanding: 100,
+      priorSharesOutstanding: 100,
+      grossMarginValue: 0.4,
+      priorGrossMarginValue: 0.38,
+      assetTurnoverValue: 0.9,
+      priorAssetTurnoverValue: 1.0,
+    }).result.structuredContent;
+    expect(r.value).toBe(8);
+    expect(r.maxScore).toBe(9);
+    expect(r.rating).toBe("strong");
+    expect(r.signals.f9_improvingAssetTurnover).toBe(false);
+  });
+
+  it("names the Piotroski signals a missing year leaves unscored", () => {
+    const r = call("piotroski_f_score", { netIncome: 100, totalAssets: 1000, operatingCashFlow: 150 }).result.structuredContent;
+    expect(r.value).toBe(3);
+    expect(r.maxScore).toBe(3);
+    expect(r.rating).toBeNull();
+    expect(r.caveats[0]).toContain("Scored 3 of 9");
+    expect(r.caveats[0]).toContain("F9");
+    expect(call("piotroski_f_score", { netIncome: 1, totalAssets: 0, operatingCashFlow: 1 }).result.isError).toBe(true);
+  });
+
+  it("computes each margin and asks for the field its kind needs", () => {
+    expect(call("profit_margin", { kind: "gross", revenue: 1000, costOfRevenue: 600 }).result.structuredContent.value).toBeCloseTo(0.4, 6);
+    expect(call("profit_margin", { kind: "operating", revenue: 1000, operatingIncome: 150 }).result.structuredContent.value).toBeCloseTo(0.15, 6);
+    expect(call("profit_margin", { kind: "free_cash_flow", revenue: 1000, freeCashFlow: 90 }).result.structuredContent.value).toBeCloseTo(0.09, 6);
+    expect(call("profit_margin", { kind: "net", revenue: 0, netIncome: 5 }).result.structuredContent.value).toBeNull();
+    expect(call("profit_margin", { kind: "net", revenue: 1000 }).result.isError).toBe(true);
+    expect(call("profit_margin", { kind: "ebitda", revenue: 1000 }).result.isError).toBe(true);
+  });
+
+  it("computes the current and quick ratios", () => {
+    expect(call("liquidity_ratio", { kind: "current", currentAssets: 300, currentLiabilities: 200 }).result.structuredContent.value).toBeCloseTo(1.5, 6);
+    expect(call("liquidity_ratio", { kind: "quick", currentAssets: 300, inventory: 100, currentLiabilities: 200 }).result.structuredContent.value).toBeCloseTo(1, 6);
+    expect(call("liquidity_ratio", { kind: "quick", currentAssets: 300, currentLiabilities: 200 }).result.isError).toBe(true);
+  });
+
+  it("computes debt to equity and interest coverage", () => {
+    expect(call("leverage_ratio", { kind: "debt_to_equity", totalDebt: 500, totalEquity: 250 }).result.structuredContent.value).toBeCloseTo(2, 6);
+    const neg = call("leverage_ratio", { kind: "debt_to_equity", totalDebt: 500, totalEquity: -250 }).result.structuredContent;
+    expect(neg.caveats.some((c: string) => c.startsWith("Equity is negative"))).toBe(true);
+    expect(call("leverage_ratio", { kind: "interest_coverage", ebit: 300, interestExpense: -50 }).result.structuredContent.value).toBeCloseTo(6, 6);
+    expect(call("leverage_ratio", { kind: "interest_coverage", ebit: 300, interestExpense: 0 }).result.structuredContent.value).toBeNull();
+  });
 });

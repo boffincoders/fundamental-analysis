@@ -6,6 +6,15 @@ import {
   altmanZScore,
   altmanZScoreDoublePrime,
   roe,
+  piotroski,
+  grossMargin,
+  operatingMargin,
+  netProfitMargin,
+  fcfMargin,
+  currentRatio,
+  quickRatio,
+  debtToEquity,
+  interestCoverage,
 } from "../../src/index";
 
 /**
@@ -49,6 +58,21 @@ const nullNote = (value: number | null, why: string): string[] => (value === nul
 
 const zone = (z: number | null, safe: number, distress: number): string | null =>
   z === null ? null : z > safe ? "safe" : z < distress ? "distress" : "grey";
+
+const kindOf = (args: Record<string, unknown>, kinds: readonly string[]): string => {
+  const k = args.kind;
+  if (typeof k !== "string" || !kinds.includes(k)) throw new InputError(`"kind" must be one of ${kinds.map((x) => `"${x}"`).join(", ")}`);
+  return k;
+};
+
+const PIOTROSKI_PAIRS: [string, string, string][] = [
+  ["F3 (ROA improving)", "priorNetIncome", "priorTotalAssets"],
+  ["F5 (long-term debt ratio falling)", "longTermDebt", "priorLongTermDebt"],
+  ["F6 (current ratio improving)", "currentRatioValue", "priorCurrentRatioValue"],
+  ["F7 (no new shares)", "sharesOutstanding", "priorSharesOutstanding"],
+  ["F8 (gross margin improving)", "grossMarginValue", "priorGrossMarginValue"],
+  ["F9 (asset turnover improving)", "assetTurnoverValue", "priorAssetTurnoverValue"],
+];
 
 export const tools: ToolDef[] = [
   {
@@ -252,6 +276,219 @@ export const tools: ToolDef[] = [
         caveats: [
           ...nullNote(value, "equity is zero or negative, where a loss would show as a positive ROE."),
           "High debt raises ROE without better operations: read it beside debt to equity.",
+        ],
+      };
+    },
+  },
+  {
+    name: "piotroski_f_score",
+    title: "Piotroski F-Score",
+    description:
+      "Nine pass or fail accounting signals (profitability, leverage and liquidity, efficiency) added into a 0 to 9 score. Signals that compare two years are scored only when both years are given.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        netIncome: num("Net income, current year"),
+        totalAssets: num("Total assets, current year"),
+        operatingCashFlow: num("Cash flow from operations, current year"),
+        priorNetIncome: num("Optional: net income, prior year (F3)"),
+        priorTotalAssets: num("Optional: total assets, prior year (F3, F5)"),
+        longTermDebt: num("Optional: long-term debt, current year (F5)"),
+        priorLongTermDebt: num("Optional: long-term debt, prior year (F5)"),
+        currentRatioValue: num("Optional: current ratio, current year (F6)"),
+        priorCurrentRatioValue: num("Optional: current ratio, prior year (F6)"),
+        sharesOutstanding: num("Optional: shares outstanding, current year (F7)"),
+        priorSharesOutstanding: num("Optional: shares outstanding, prior year (F7)"),
+        grossMarginValue: num("Optional: gross margin as a decimal, current year (F8)"),
+        priorGrossMarginValue: num("Optional: gross margin as a decimal, prior year (F8)"),
+        assetTurnoverValue: num("Optional: revenue / total assets, current year (F9)"),
+        priorAssetTurnoverValue: num("Optional: revenue / total assets, prior year (F9)"),
+      },
+      required: ["netIncome", "totalAssets", "operatingCashFlow"],
+      additionalProperties: false,
+    },
+    run: (args) => {
+      const netIncome = need(args, "netIncome");
+      const totalAssets = need(args, "totalAssets");
+      const operatingCashFlow = need(args, "operatingCashFlow");
+      if (totalAssets <= 0) throw new InputError('"totalAssets" must be above 0');
+      const opt = (k: string) => optional(args, k);
+      const inputs = {
+        netIncome,
+        totalAssets,
+        operatingCashFlow,
+        priorNetIncome: opt("priorNetIncome"),
+        priorTotalAssets: opt("priorTotalAssets"),
+        longTermDebt: opt("longTermDebt"),
+        priorLongTermDebt: opt("priorLongTermDebt"),
+        currentRatioValue: opt("currentRatioValue"),
+        priorCurrentRatioValue: opt("priorCurrentRatioValue"),
+        sharesOutstanding: opt("sharesOutstanding"),
+        priorSharesOutstanding: opt("priorSharesOutstanding"),
+        grossMarginValue: opt("grossMarginValue"),
+        priorGrossMarginValue: opt("priorGrossMarginValue"),
+        assetTurnoverValue: opt("assetTurnoverValue"),
+        priorAssetTurnoverValue: opt("priorAssetTurnoverValue"),
+      };
+      const r = piotroski(inputs);
+      const missing = PIOTROSKI_PAIRS.filter(([, a, b]) => args[a] === undefined || args[b] === undefined).map(([label]) => label);
+      const rating = r.maxScore < 9 ? null : r.score >= 7 ? "strong" : r.score >= 3 ? "average" : "weak";
+      return {
+        value: r.score,
+        maxScore: r.maxScore,
+        rating,
+        signals: r.signals,
+        formula:
+          "F-Score = count of signals met: F1 ROA > 0, F2 CFO > 0, F3 ROA up, F4 CFO / assets > ROA, F5 long-term debt / assets down, F6 current ratio up, F7 shares not up, F8 gross margin up, F9 asset turnover up",
+        inputs,
+        caveats: [
+          ...(missing.length > 0
+            ? [`Scored ${r.maxScore} of 9 signals. Not scored, a year is missing: ${missing.join(", ")}. The 0 to 9 bands apply only to a full score.`]
+            : ["Bands: 7 to 9 strong, 3 to 6 average, 0 to 2 weak."]),
+          "Piotroski built the score to sort value stocks (high book to market). Each signal is pass or fail, so a small change can move the score by a point.",
+        ],
+      };
+    },
+  },
+  {
+    name: "profit_margin",
+    title: "Profit margin (gross, operating, net, FCF)",
+    description: "One margin as a share of revenue: gross, operating, net or free cash flow.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        kind: { type: "string", enum: ["gross", "operating", "net", "free_cash_flow"], description: "Which margin" },
+        revenue: num("Revenue for the period"),
+        costOfRevenue: num("Cost of revenue (gross)"),
+        operatingIncome: num("Operating income (operating)"),
+        netIncome: num("Net income (net)"),
+        freeCashFlow: num("Free cash flow (free_cash_flow)"),
+      },
+      required: ["kind", "revenue"],
+      additionalProperties: false,
+    },
+    run: (args) => {
+      const kind = kindOf(args, ["gross", "operating", "net", "free_cash_flow"]);
+      const revenue = need(args, "revenue");
+      const field = { gross: "costOfRevenue", operating: "operatingIncome", net: "netIncome", free_cash_flow: "freeCashFlow" }[kind]!;
+      const amount = need(args, field);
+      const value =
+        kind === "gross"
+          ? grossMargin(revenue, amount)
+          : kind === "operating"
+            ? operatingMargin(amount, revenue)
+            : kind === "net"
+              ? netProfitMargin(amount, revenue)
+              : fcfMargin(amount, revenue);
+      const formula = {
+        gross: "Gross margin = (revenue - cost of revenue) / revenue",
+        operating: "Operating margin = operating income / revenue",
+        net: "Net margin = net income / revenue",
+        free_cash_flow: "FCF margin = free cash flow / revenue",
+      }[kind]!;
+      return {
+        value,
+        formula,
+        inputs: { kind, revenue, [field]: amount },
+        caveats: [
+          ...nullNote(value, "revenue is zero."),
+          "The result is a decimal: 0.25 means 25%.",
+          kind === "gross"
+            ? "What goes into cost of revenue differs between companies, so compare gross margins within one industry."
+            : "Compare margins within one industry and over the same period length.",
+          ...(kind === "net" ? ["One-off gains and losses move net income. Read it beside the operating margin."] : []),
+        ],
+      };
+    },
+  },
+  {
+    name: "liquidity_ratio",
+    title: "Liquidity ratio (current, quick)",
+    description: "Whether short-term assets cover short-term liabilities: the current ratio, or the quick ratio that leaves out inventory.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        kind: { type: "string", enum: ["current", "quick"], description: "current or quick (acid test)" },
+        currentAssets: num("Current assets"),
+        currentLiabilities: num("Current liabilities"),
+        inventory: num("Inventory (quick)"),
+      },
+      required: ["kind", "currentAssets", "currentLiabilities"],
+      additionalProperties: false,
+    },
+    run: (args) => {
+      const kind = kindOf(args, ["current", "quick"]);
+      const ca = need(args, "currentAssets");
+      const cl = need(args, "currentLiabilities");
+      if (kind === "current") {
+        const value = currentRatio(ca, cl);
+        return {
+          value,
+          formula: "Current ratio = current assets / current liabilities",
+          inputs: { kind, currentAssets: ca, currentLiabilities: cl },
+          caveats: [
+            ...nullNote(value, "current liabilities are zero."),
+            "Below 1, current liabilities are larger than current assets. About 1.2 to 2 is the usual comfortable range, but it differs by industry: retailers that sell stock fast often run lower.",
+          ],
+        };
+      }
+      const inventory = need(args, "inventory");
+      const value = quickRatio(ca, inventory, cl);
+      return {
+        value,
+        formula: "Quick ratio = (current assets - inventory) / current liabilities",
+        inputs: { kind, currentAssets: ca, inventory, currentLiabilities: cl },
+        caveats: [
+          ...nullNote(value, "current liabilities are zero."),
+          "Above 1, liquid assets cover current liabilities without selling stock. This version takes out inventory only. A stricter one counts just cash, short-term investments and receivables.",
+        ],
+      };
+    },
+  },
+  {
+    name: "leverage_ratio",
+    title: "Leverage ratio (debt to equity, interest coverage)",
+    description: "How much debt a company carries against its equity, or how many times its operating profit covers its interest.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        kind: { type: "string", enum: ["debt_to_equity", "interest_coverage"], description: "Which ratio" },
+        totalDebt: num("Total debt (debt_to_equity)"),
+        totalEquity: num("Shareholders' equity (debt_to_equity)"),
+        ebit: num("EBIT, operating income (interest_coverage)"),
+        interestExpense: num("Interest expense, positive or negative as your data reports it (interest_coverage)"),
+      },
+      required: ["kind"],
+      additionalProperties: false,
+    },
+    run: (args) => {
+      const kind = kindOf(args, ["debt_to_equity", "interest_coverage"]);
+      if (kind === "debt_to_equity") {
+        const debt = need(args, "totalDebt");
+        const equity = need(args, "totalEquity");
+        const value = debtToEquity(debt, equity);
+        return {
+          value,
+          formula: "Debt to equity = total debt / shareholders' equity",
+          inputs: { kind, totalDebt: debt, totalEquity: equity },
+          caveats: [
+            ...nullNote(value, "equity is zero."),
+            ...(equity < 0 ? ["Equity is negative, so the ratio is negative and cannot be ranked against positive ones."] : []),
+            "Above about 2 is high for most industries, though capital-heavy businesses such as utilities run higher, and the ratio says little about banks. Use one debt definition (with or without leases) across the companies you compare.",
+          ],
+        };
+      }
+      const ebit = need(args, "ebit");
+      const interest = need(args, "interestExpense");
+      const value = interestCoverage(ebit, interest);
+      return {
+        value,
+        formula: "Interest coverage = EBIT / |interest expense|",
+        inputs: { kind, ebit, interestExpense: interest },
+        caveats: [
+          ...nullNote(value, "interest expense is zero, so there is no interest to cover."),
+          "Interest expense is taken as a size, whatever its sign. A negative result means EBIT is negative.",
+          "Below 1.5 the company may struggle to pay its interest, above 3 it is well covered. One year's EBIT can fall fast for a cyclical company.",
         ],
       };
     },
