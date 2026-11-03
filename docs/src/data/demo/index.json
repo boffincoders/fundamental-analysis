@@ -3,8 +3,8 @@
   "ticker": "AAPL",
   "name": "Apple",
   "sector": "Technology",
-  "periodEnd": "2026-06-27",
-  "filed": "2026-07-31"
+  "periodEnd": "2026-09-26",
+  "filed": "2026-11-03"
  },
  {
   "ticker": "MSFT",
@@ -129,8 +129,8 @@
   "ticker": "XOM",
   "name": "ExxonMobil",
   "sector": "Energy",
-  "periodEnd": "2026-06-30",
-  "filed": "2026-08-03"
+  "periodEnd": "2026-09-30",
+  "filed": "2026-11-02"
  },
  {
   "ticker": "NFLX",
