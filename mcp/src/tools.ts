@@ -15,7 +15,9 @@ import {
   quickRatio,
   debtToEquity,
   interestCoverage,
+  analyzeCompany,
 } from "../../src/index";
+import type { CompanySnapshotInput, EvaluatedMetric } from "../../src/index";
 
 /**
  * Every tool answers with the number, the formula that produced it, the inputs it used
@@ -72,6 +74,45 @@ const PIOTROSKI_PAIRS: [string, string, string][] = [
   ["F7 (no new shares)", "sharesOutstanding", "priorSharesOutstanding"],
   ["F8 (gross margin improving)", "grossMarginValue", "priorGrossMarginValue"],
   ["F9 (asset turnover improving)", "assetTurnoverValue", "priorAssetTurnoverValue"],
+];
+
+/** The figures analyze_company takes, in the library's own names (CompanySnapshotInput), each with its schema text. */
+const SNAPSHOT_FIELDS: [keyof CompanySnapshotInput, string][] = [
+  ["price", "Share price"],
+  ["marketCap", "Market capitalisation (price x shares outstanding)"],
+  ["eps", "Earnings per share, trailing twelve months or last fiscal year"],
+  ["bookValuePerShare", "Book value per share"],
+  ["revenuePerShare", "Revenue per share"],
+  ["annualDividendPerShare", "Dividends per share over one year"],
+  ["analystTargetPrice", "Analyst target price"],
+  ["expectedEarningsGrowthRate", "Expected yearly EPS growth as a decimal, e.g. 0.15 (PEG)"],
+  ["sharesOutstanding", "Shares outstanding"],
+  ["totalRevenue", "Revenue for the period"],
+  ["costOfRevenue", "Cost of revenue, as a positive number"],
+  ["grossProfit", "Gross profit, used when cost of revenue is not given"],
+  ["operatingIncome", "Operating income"],
+  ["ebit", "Earnings before interest and taxes"],
+  ["ebitda", "EBITDA"],
+  ["interestExpense", "Interest expense, as a positive number"],
+  ["netIncome", "Net income"],
+  ["taxRate", "Effective tax rate as a decimal, e.g. 0.25 (ROIC)"],
+  ["operatingCashFlow", "Cash flow from operations"],
+  ["freeCashFlow", "Operating cash flow minus capital expenditure"],
+  ["totalAssets", "Total assets"],
+  ["totalLiabilities", "Total liabilities"],
+  ["totalEquity", "Shareholders' equity"],
+  ["currentAssets", "Current assets"],
+  ["currentLiabilities", "Current liabilities"],
+  ["totalDebt", "Short-term plus long-term borrowings"],
+  ["longTermDebt", "Long-term debt"],
+  ["cashAndEquivalents", "Cash and equivalents"],
+  ["inventory", "Inventory"],
+  ["tradeReceivables", "Trade receivables"],
+  ["workingCapital", "Current assets minus current liabilities; worked out from them when left out"],
+  ["retainedEarnings", "Retained earnings"],
+  ["returns", "Return for the period as a decimal (Sharpe)"],
+  ["riskFree", "Risk-free rate for the same period as a decimal (Sharpe)"],
+  ["stdDev", "Standard deviation of returns for the same period (Sharpe)"],
 ];
 
 export const tools: ToolDef[] = [
@@ -489,6 +530,66 @@ export const tools: ToolDef[] = [
           ...nullNote(value, "interest expense is zero, so there is no interest to cover."),
           "Interest expense is taken as a size, whatever its sign. A negative result means EBIT is negative.",
           "Below 1.5 the company may struggle to pay its interest, above 3 it is well covered. One year's EBIT can fall fast for a cyclical company.",
+        ],
+      };
+    },
+  },
+  {
+    name: "analyze_company",
+    title: "Company analysis (every ratio at once)",
+    description:
+      "Every ratio the figures allow, in one call: valuation, profitability, liquidity, solvency, efficiency, risk (Altman Z, Z'', Piotroski) and quality. Every figure is optional; a metric whose figures are missing comes back null and is named. With withInsights, each metric also gets a status and a one-line reading.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        ...Object.fromEntries(SNAPSHOT_FIELDS.map(([k, d]) => [k, num(d)])),
+        withInsights: { type: "boolean", description: "Optional: add a status (Good, Neutral, Bad, N/A) and a one-line reading to each metric" },
+      },
+      additionalProperties: false,
+    },
+    run: (args) => {
+      const known = new Set<string>([...SNAPSHOT_FIELDS.map(([k]) => k as string), "withInsights"]);
+      const unknown = Object.keys(args).filter((k) => !known.has(k));
+      if (unknown.length > 0) {
+        throw new InputError(`Unknown field: ${unknown.map((k) => `"${k}"`).join(", ")}. Use the names in the input schema, such as "totalRevenue" for revenue.`);
+      }
+      const withInsights = args.withInsights;
+      if (withInsights !== undefined && typeof withInsights !== "boolean") throw new InputError('"withInsights" must be true or false');
+      const data: CompanySnapshotInput = {};
+      for (const [k] of SNAPSHOT_FIELDS) {
+        const v = optional(args, k);
+        if (v !== undefined) data[k] = v;
+      }
+      if (Object.keys(data).length === 0) throw new InputError("Pass at least one figure");
+
+      const analysis = analyzeCompany(data, withInsights === true);
+      const computed: string[] = [];
+      const notComputed: string[] = [];
+      for (const [group, metrics] of Object.entries(analysis)) {
+        for (const [name, m] of Object.entries(metrics as Record<string, unknown>)) {
+          const v = withInsights === true ? (m as EvaluatedMetric).value : m;
+          (v === null || v === undefined ? notComputed : computed).push(`${group}.${name}`);
+        }
+      }
+      const piotroskiScored = !notComputed.includes("risk.piotroski");
+      return {
+        value: computed.length,
+        metricsTotal: computed.length + notComputed.length,
+        analysis,
+        notComputed,
+        formula:
+          "value = the number of metrics the figures allowed. Each metric uses its standard formula, the same as the single-metric tools of this server.",
+        inputs: { ...data, withInsights: withInsights === true },
+        caveats: [
+          "Give every amount in one currency and unit. Flow items (revenue, income, cash flow) cover one period, usually the trailing twelve months or the last fiscal year. Rates are decimals: 0.15 means 15%.",
+          ...(notComputed.length > 0 ? [`${notComputed.length} metrics came back null because a figure they need was not passed: ${notComputed.join(", ")}.`] : []),
+          ...(piotroskiScored
+            ? ["The Piotroski score here sees one year, so the signals that compare two years are not scored. For all nine, use piotroski_f_score with the prior year."]
+            : []),
+          ...(withInsights === true
+            ? ["Each status is a generic rule of thumb that ignores the sector: a P/E of 30 is ordinary for software and high for a utility. Compare with sector peers before drawing conclusions."]
+            : []),
+          "The current ratio, EV/EBITDA and Altman Z are not meaningful for banks and insurers.",
         ],
       };
     },

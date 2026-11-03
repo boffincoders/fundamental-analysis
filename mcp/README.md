@@ -2,7 +2,8 @@
 
 An MCP server that gives an AI assistant the calculators from
 [fundamental-analysis](https://www.npmjs.com/package/fundamental-analysis): P/E, DCF, Graham Number, Altman Z-Score,
-Piotroski F-Score, return on equity, profit margins, and liquidity and debt ratios.
+Piotroski F-Score, return on equity, profit margins, and liquidity and debt ratios, plus one tool that runs every ratio
+your figures allow in a single call.
 
 Every result returns four things: the value, the formula that produced it, the inputs it used and the caveats you need
 before acting on it. The assistant brings the figures. The server fetches nothing, needs no API key and has no
@@ -21,6 +22,7 @@ dependencies.
 | `profit_margin` | Gross, operating, net or free cash flow margin as a share of revenue |
 | `liquidity_ratio` | Current ratio, or quick ratio without inventory |
 | `leverage_ratio` | Debt to equity, or interest coverage (EBIT / interest expense) |
+| `analyze_company` | Every ratio the figures allow, grouped as valuation, profitability, liquidity, solvency, efficiency, risk and quality, with the metrics that came back null named. Add `withInsights` for a status and a one-line reading per metric |
 
 Every tool is read-only: it computes and answers, and changes nothing.
 
@@ -65,6 +67,12 @@ Ask: "Graham Number for EPS 4 and book value 25 a share, price 40?" The `graham_
 npm run build   # one file, dist/server.js, with the library bundled in
 npx vitest run mcp   # from the repository root
 ```
+
+## MCP registry
+
+`server.json` describes the server for the official MCP registry as `io.github.boffincoders/fundamental-analysis-mcp`,
+and `mcpName` in `package.json` carries the same name so the registry can check the npm package. Publish to npm first,
+then run `mcp-publisher publish` from this folder.
 
 ## Licence
 

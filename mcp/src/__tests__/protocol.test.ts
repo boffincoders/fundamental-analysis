@@ -154,4 +154,43 @@ describe("tools", () => {
     expect(call("leverage_ratio", { kind: "interest_coverage", ebit: 300, interestExpense: -50 }).result.structuredContent.value).toBeCloseTo(6, 6);
     expect(call("leverage_ratio", { kind: "interest_coverage", ebit: 300, interestExpense: 0 }).result.structuredContent.value).toBeNull();
   });
+
+  it("analyzes a company in one call and names what the figures could not reach", () => {
+    const r = call("analyze_company", {
+      price: 50,
+      eps: 2.5,
+      totalRevenue: 1000,
+      costOfRevenue: 600,
+      netIncome: 100,
+      totalAssets: 2000,
+      totalEquity: 800,
+      operatingCashFlow: 150,
+      currentAssets: 300,
+      currentLiabilities: 200,
+    }).result.structuredContent;
+    expect(r.analysis.valuation.pe).toBeCloseTo(20, 6);
+    expect(r.analysis.profitability.grossMargin).toBeCloseTo(0.4, 6);
+    expect(r.analysis.liquidity.currentRatio).toBeCloseTo(1.5, 6);
+    expect(r.analysis.risk.piotroski.maxScore).toBeLessThan(9);
+    expect(r.value).toBeGreaterThan(0);
+    expect(r.value + r.notComputed.length).toBe(r.metricsTotal);
+    expect(r.notComputed).toContain("risk.sharpe");
+    expect(r.caveats.some((c: string) => c.includes("piotroski_f_score"))).toBe(true);
+  });
+
+  it("adds a status and a reading to each metric with withInsights", () => {
+    const r = call("analyze_company", { price: 50, eps: 2.5, withInsights: true }).result.structuredContent;
+    expect(r.analysis.valuation.pe).toMatchObject({ value: 20, status: expect.any(String), insight: expect.any(String) });
+    expect(r.notComputed).toContain("valuation.pb");
+    expect(r.caveats.some((c: string) => c.includes("sector"))).toBe(true);
+  });
+
+  it("refuses an empty, misspelt or non-numeric company snapshot", () => {
+    expect(call("analyze_company", {}).result.isError).toBe(true);
+    const typo = call("analyze_company", { revenue: 1000 }).result;
+    expect(typo.isError).toBe(true);
+    expect(typo.content[0].text).toContain("totalRevenue");
+    expect(call("analyze_company", { price: "50" }).result.isError).toBe(true);
+    expect(call("analyze_company", { price: 50, withInsights: "yes" }).result.isError).toBe(true);
+  });
 });
